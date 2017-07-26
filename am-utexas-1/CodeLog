@@ -1,0 +1,47 @@
+Importing Bruce Porter's AM version in prolog. Doesn't run in gprolog -
+perhaps we need to mess with modules.
+  http://www.coli.uni-saarland.de/~kris/learn-prolog-now/html/node104.html#subsec.l12.modules
+=-=1 - Sat Nov 29 09:30:06 PST 2008
+
+Now am.pl compiles. But what does abolish do?
+=-=2 - Sat Nov 29 10:40:30 PST 2008
+
+Getting the rest of the files to compile. One error remaining:
+  h92.pl:166:58: syntax error: current or previous operator needs brackets
+IMPORTANT: replaced commas with periods to respect indentation in 2 heuristics.
+
+Minor fixes:
+  disable definition: ucall/1.
+  disable duplicate definitions: collectclauses/3 in common and utilities, print_put_trace in common and am.
+  disable primitives: reverse, nth, list, append, member, delete, makelist.
+  rename duplicate private definition: loop_composit/8 in h407 -> loop_composit2.
+
+  update syntax for directives: abolish, public, dynamic.
+  amutilities -> multiple files.
+  explicitly consult files in am_init.
+  assert -> assertz.
+  remove no_style_check directives.
+  multiline -> single-line strings.
+=-=3 - Wed Dec  3 09:36:39 PST 2008
+
+Ok, it compiles now, though I need to call load_am_files separately before am.
+am dies within various abolish calls that I can comment out to get it to run.
+Don't want to save those until I figure out what I'm doing.
+=-=6 - Thu Dec  4 18:43:24 PST 2008
+
+make those procedures dynamic right at the start. Now is it hung or just
+processing for a long time?
+=-=7 - Thu Dec 11 12:23:44 PST 2008
+No, I need to call:
+  [am].
+  load_am_files.
+  [am].
+  am.
+for it to work/hang.
+=-=8 - Thu Dec 11 12:28:39 PST 2008
+Ok, now I can start it up with just:
+  [am].
+  am.
+=-=9 - Thu Dec 11 12:30:41 PST 2008
+assert->assertz in heuristics.
+=-=10 - Sun Dec 14 11:19:34 PST 2008
