@@ -1,0 +1,517 @@
+Using Analogical Representations for
+Mathematical Concept Formation
+Alison Pease, Simon Colton, Ramin Ramezani, Alan Smaill, and Markus Guhe
+
+Abstract. We argue that visual, analogical representations of mathematical
+concepts can be used by automated theory formation systems to develop further concepts and conjectures in mathematics. We consider the role of visual
+reasoning in human development of mathematics, and consider some aspects
+of the relationship between mathematics and the visual, including artists using mathematics as inspiration for their art (which may then feed back into
+mathematical development), the idea of using visual beauty to evaluate mathematics, mathematics which is visually pleasing, and ways of using the visual
+to develop mathematical concepts. We motivate an analogical representation
+of number types with examples of “visual” concepts and conjectures, and
+present an automated case study in which we enable an automated theory
+formation program to read this type of visual, analogical representation.
+
+1 Introduction
+1.1 The Problem of Finding Useful Representations
+Antirepresentationalism aside, the problem of ﬁnding representations which
+are useful for a given task is well-known in the computational worlds of A.I.
+and cognitive modelling, as well as most domains in which humans work.
+The problem can be seen in a positive light: for instance, in “discovery”,
+Alison Pease · Alan Smaill · Markus Guhe
+School of Informatics, University of Edinburgh, Informatics Forum,
+10 Crichton Street, Edinburgh, EH8 9AB, United Kingdom
+e-mail: A.Pease@ed.ac.uk
+Simon Colton · Ramin Ramezani
+Department of Computing, Imperial College London, 180 Queens Gate,
+London, SW7 2RH, United Kingdom
+e-mail: sgc@doc.ic.ac.uk
+L. Magnani et al. (Eds.): Model-Based Reasoning in Science & Technology, SCI 314, pp. 301–314.
+c Springer-Verlag Berlin Heidelberg 2010
+springerlink.com
+
+
+302
+
+A. Pease et al.
+
+or “constructivist” teaching, a teacher is concerned with the mental representations which a student builds, tries to recognise the representations and
+provide experiences which will be useful for further development or revision
+of the representations [6]. As an example, Machtinger [22] (described in [6,
+pp. 94–95]) carried out a series of lessons in which groups of kindergarten
+children used the familiar situation of walking in pairs to represent basic
+number concepts: an even number was a group in which every child had a
+partner, and odd, a group in which one child had no partner. Machtinger
+encouraged the children to evolve these representations by physically moving
+around and combining diﬀerent groups and partners, resulting in the children ﬁnding relatively interesting conjectures about even and odd numbers,
+such as:
+even + even = even
+even + odd = odd
+odd + odd = even.
+The problem of representation can also be seen in a negative light: for instance
+automated systems dealing in concepts, particularly within analogies, are
+sometimes subject to the criticism that they start with pre-ordained, human
+constructed, special purpose, frozen, apparently ﬁne-tuned and otherwise arbitrary representions of concepts. Thus, a task may be largely achieved via
+the natural intelligence of the designer rather than any artiﬁcial intelligence
+within her automated system. These criticisms are discussed in [2] and [20].
+
+1.2 Fregean and Analogical Representations
+Sloman [29, 30] relates philosophical ideas on representation to A.I. and
+distinguishes two types of representation: Fregean representations, such as
+(most) sentences, referring phrases, and most logical and mathematical formulae; and representations which are analogous – structurally similar – to
+the entities which they represent, such as maps, diagrams, photographs, and
+family trees. Sloman elaborates the distinction:
+Fregean and analogical representations are complex, i.e. they have parts and
+relations between parts, and therefore a syntax. They may both be used
+to represent, refer to, or denote, things which are complex, i.e. have parts
+and relations between parts. The diﬀerence is that in the case of analogical
+representations both must be complex (i.e. representation and thing) and there
+must be some correspondence between their structure, whereas in the case of
+Fregean representations there need be no correspondence. [30, p. 2]
+
+In this paper we discuss ways of representing mathematical concepts which
+can be used in automated theory formation (ATF) to develop further concepts
+and conjectures in mathematics. Our thesis is that an analogical representation can be used to construct interesting concepts in ATF. We believe that
+analogical, pre-Fregean representations will be important in modeling Lakoﬀ
+
+Using Analogical Representations for Mathematical Concept Formation
+
+303
+
+and N´
+un
+˜ ez’s theory on embodiment in mathematics [19], in which a situated,
+embodied being interacts with a physical environment to build up mathematical ideas1 . In particular, we believe that there is a strong link between
+analogical representation and visual reasoning.
+The paper is organized as follows: we ﬁrst consider the role of vision in
+human development of mathematics, and consider some aspects of the relationship between mathematics and the visual, in section 2. These include
+artists using mathematics as inspiration for their art (which may then feed
+back into mathematical development), the idea of using visual beauty to
+evaluate mathematics, mathematics which is visually pleasing, and ways of
+using the visual to develop mathematical concepts. In section 3 we motivate
+an analogical representation of number types with examples of “visual” concepts and conjectures, and in section 4 we present an automated case study
+in which we enable an automated theory formation program to read this
+type of visual representation. Sections 5 and 6 contain our further work and
+conclusions. Note that while we focus on the role that the visual can play
+in mathematics, there are many examples of blind mathematicians. Jackson
+[16] describes Nicolas Saunderson who went blind while still a baby, but went
+on be Lucasian Professor of Mathematics at Cambridge University; Bernard
+Morin who went blind at six but was a very successful topologist, and Lev
+Semenovich Pontryagin who went blind at fourteen but was inﬂuential particularly in topology and homotopy. (Leonhard Euler was a particularly eminent
+mathematician who was blind for the last seventeen years of his life, during
+which he produced half of his total work. However, he would still have had a
+normal visual system.)
+
+2 The Role of Visual Thinking in Mathematics
+2.1 Concept Formation as a Mathematical Activity
+Disciplines which investigate mathematical activity, such as mathematics education and philosophy of mathematics, usually focus on proof and problem
+solving aspects. Conjecture formulation, or problem posing, is sometimes addressed, but concept formation is somewhat neglected. For instance, in the
+philosophy of mathematical practice, which focuses on what mathematicians
+do (as opposed to proof and the status of mathematical knowledge), Giaquinto gives an initial list of some neglected philosophical aspects of mathematical activity as discovery, explanation, justiﬁcation and application, where
+the goals are respectively knowledge, understanding, relative certainty and
+practical beneﬁts [12, p. 75]. Even in research on visual reasoning in mathematics education, visualizers are actually deﬁned as people who “prefer to
+use visual methods when attempting mathematical problems which may be
+1
+
+One of the goals of a project we are involved in, the Wheelbarrow Project, is to
+produce a computational model of Lakoﬀ and N´
+un
+˜ez’s theory.
+
+304
+
+A. Pease et al.
+
+solved by both visual and non-visual methods” [24, p. 298] (our emphasis; see
+also [25, 26, 34] for similar focus) and mathematical giftedness and ability
+are measured by the ability to solve problems [17].
+
+2.2 Problems with Visual (Analogical)
+Representations in Mathematics
+Debate about the role of visual reasoning in mathematics has tended to follow the focus on proof, and centers around the controversy about whether
+visual reasoning – and diagrams in particular – can be used to prove, or to
+merely illustrate, a theorem. In contrast, in this paper we focus on the often overlooked mathematical skills of forming and evaluating concepts and
+conjectures. We hold that visual reasoning does occur in this context. For
+instance, the sieve of Eratosthenes, the Mandelbrot set and other fractals,
+and symmetry are all inherently visual concepts, and the number line and
+Argand diagram (the complex plane diagram) are visual constructs which
+greatly aided the acceptance of negative (initially called ﬁctitious) and imaginary numbers, respectively.
+The principle objection to using visual reasoning in mathematics, and diagrams in particular, is that it is claimed that they cannot be as rigorous as
+algebraic representations: they are heuristics rather than proof-theoretic devices (for example, [31]). Whatever the importance of this objection, it does
+not apply to us since we are concerned with the formation of concepts, open
+conjectures and axioms, and evaluation and acceptance criteria in mathematics. The formation of these aspects of a mathematical theory is not a question
+of rigor as these are not the sort of things that can be provable (in the case
+of conjectures it is the proof which is rigorous, rather than the formation of
+a conjecture statement). However, other objections may be relevant. Winterstein [35, chap. 3] summarizes problems in the use of diagrammatic reasoning: impossible drawings or optical illusions, roughness of drawing, drawing
+mistakes, ambiguous drawing, handling quantiﬁers, disjunctions and generalization (he goes on to show that similar problems are found in sentential
+reasoning). Another problem suggested by Kulpa [18] is that we cannot visually represent a theorem without representing its proof, which is clearly
+a problem when forming open conjectures. Additionally, in concept formation, it is diﬃcult to represent diagrammatically the lack, or non-existence
+of something. For instance, primes are deﬁned as numbers for which there
+do not exist any divisors except for 1 and the number itself. This is hard to
+represent visually. However, we hold that these problems sometimes occur
+because a diagrammatic language has been insuﬃciently developed, rather
+than any inherent problem with diagrams, and are not suﬃcient to prevent
+useful concept formation.
+
+Using Analogical Representations for Mathematical Concept Formation
+
+305
+
+2.3 Automated Theory Formation and Visual
+Reasoning
+We support our argument that visual reasoning plays a role in mathematical
+theory formation with a case study of automated visual reasoning in concept
+formation, in the domain of number theory. Although the automated reasoning community has focused on theorem proving, it is also well aware of the
+need to identify processes which lead to new concepts and conjectures being
+formed, as opposed to solely proving ready made conjectures. Although such
+programs [8, 11, 21, 27] include reasoning in the domains of graph theory and
+plane geometry – prime candidates for visual reasoning – representation in
+theory formation programs has tended to be algebraic.
+
+2.4 Relationships between Mathematics and Art
+Artists who represent mathematical concepts visually develop a further relationship between mathematics and the visual. For instance, Escher [10]
+represented mathematical concepts such as regular division of a plane, superposition of a hyperbolic plane on a ﬁxed two-dimensional plane, polyhedra such as spheres, columns, cubes, and the small stellated dodecahedron,
+and concepts from topology, in a mathematically interesting way. Other examples include Albrecht D¨
+urer, a Renaissance printmaker and artist, who
+contributed to polyhedral literature [7]; sculptor John Robinson, who displayed highly complex mathematical knot theory in polished bronze [1]; and
+the artist John Ernest (a member of the British constructivist art movement), who produced art which illustrates mathematical ideas [9], such as
+his artistic representation of the equation for the sum of the ﬁrst n natural
+numbers 1 + 2 + 3 + ... + n = n(n + 1)/2 , a M¨
+obius strip sculpture and various
+works based on group theory (Ernest’s ideas fed back into mathematics as
+contributions to graph theory).
+
+2.5 Using the Visual to Evaluate Mathematical
+Concepts
+A visual representation of mathematical concepts and conjectures can also
+suggest new ways of evaluation. As opposed to the natural sciences, which
+can be evaluated based on how they describe a physical reality, there is no obvious way of evaluating mathematics beyond the criteria of rigor, consistency,
+etc. Aesthetic judgements provide a further criterion. [28] examines the roles
+of the aesthetic in mathematical inquiry, and describes views by Hadamard
+[13], von Neumann [32] and Penrose [23], who all argue that the motivations
+for doing mathematics are ultimately aesthetic ones. There are many quotes
+from mathematicians concerning the importance of beauty in mathematics,
+such as Hardy’s oft-quoted “The mathematician’s patterns, like the painter’s
+
+306
+
+A. Pease et al.
+
+or the poet’s must be beautiful; the ideas, like the colors or the words must
+ﬁt together in a harmonious way. Beauty is the ﬁrst test: there is no permanent place in this world for ugly mathematics.” [14, p. 85]. Clearly, beauty
+may not be visual (one idea of mathematical beauty is a “deep theorem”,
+which establishes connections between previously unrelated domains, such as
+Euler’s identity eiπ + 1 = 0). However, aesthetic judgements of beauty can
+often be visual: Penrose [23], for example, suggests many visual examples of
+aesthetics being used to guide theory formation in mathematics.
+
+3 Visual Concepts and Theorems in Number Theory
+3.1 Figured Number Concepts
+Figured numbers, known to the Pythagoreans, are regular formulations of
+pebbles or dots, in linear, polygonal, plane and solid patterns. The polygonal
+numbers, for instance, constructed by drawing similar patterns with a larger
+number of sides, consist of dot conﬁgurations which can be arranged evenly in
+the shape of a polygon [15, 33]. In Figure 1 we show the ﬁrst three triangular
+numbers, square numbers and pentagonal numbers. These provide a nice
+example of Sloman’s analogical representations.
+
+Fig. 1 Instances of the ﬁrst three polygonal numbers: triangular numbers 1–3,
+square numbers 1–3 and pentagonal numbers 1–3.
+
+Using Analogical Representations for Mathematical Concept Formation
+
+307
+
+The ﬁrst six triangular numbers are 1, 3, 6, 10, 15, 21; square numbers
+1, 4, 9, 16, 25, 36; and pentagonal numbers 1, 5, 12, 22, 35, 51. Further polygonal numbers include hexagonal, heptagonal, octagonal numbers, and so on.
+These concepts can be combined, as some numbers can be arranged into
+multiple polygons. For example, the number 36 can be arranged both as
+a square and a triangle. Combined concepts thus include square triangular
+numbers, pentagonal square numbers, pentagonal square triangular numbers,
+and so on.
+
+3.2 Conjectures and Theorems about Figured
+Concepts
+If interesting statements can be made about a concept then this suggests
+that it is valuable. One way of evaluating a mathematical concept, thus, is by
+considering conjectures and theorems about it. We motivate the concepts of
+triangular and square numbers with a few examples of theorems about them.
+Firstly, the formula for the sum of consecutive numbers, 1 + 2 + 3 + ... + n =
+n(n + 1)/2, can be expressed visually with triangular numbers, as shown in
+Figure 2.
+
+Fig. 2 Diagram showing that 1+2+3+4 = 4∗5/2. This generalizes to the theorem
+that the sum of the ﬁrst n consecutive numbers is n(n + 1)/2.
+
+Secondly, Figure 3 is a representation of the theorem that the sum of the
+odd numbers gives us the series of squared numbers:
+1 = 12
+1 + 3 = 22
+1 + 3 + 5 = 32
+1 + 3 + 5 + 7 = 42
+...
+Finally, Figure 4 expresses the theorem that any pair of adjacent triangular
+numbers add to a square number:
+
+308
+
+A. Pease et al.
+
+1+3 = 4
+3+6 = 9
+6 + 10 = 16
+45 + 55 = 100
+...
+Further theorems on polygonal numbers include the square of the nth
+triangular number equals the sum of the ﬁrst n cubes, and all perfect numbers
+are triangular numbers.
+
+Fig. 3 Diagram showing that 1 + 3 + 5 + 7 + 9 = 52 ; This generalizes to the theorem
+that the sums of the odd numbers gives us the series of squared numbers.
+
+Fig. 4 Diagram showing that S2 = T1 + T2 ; S3 = T2 + T3 ; S3 = T2 + T3 ; This
+generalizes to the theorem that each square number (except 1) is the sum of two
+successive triangular numbers.
+
+4 An Automated Case Study
+4.1 The HR Machine Learning System
+The HR machine learning system2 [3] takes in mathematical objects of
+interest, such as examples of groups, and core concepts such as the concept
+of being an element or the operator of a group. Concepts are supplied with
+a deﬁnition and examples. Its concept formation functionality embodies the
+constructivist philosophy that “new ideas come from old ideas”, and works
+2
+
+HR is named after mathematicians Godfrey Harold Hardy (1877–1947) and Srinivasa Aiyangar Ramanujan (1887–1920).
+
+Using Analogical Representations for Mathematical Concept Formation
+
+309
+
+by applying one of seventeen production rules to a known concept to generate
+another concept. These production rules include:
+• The exists rule: adds existential quantiﬁcation to the new concept’s deﬁnition
+• The negate rule: negates predicates in the new deﬁnition
+• The match rule: uniﬁes variables in the new deﬁnition
+• The compose rule: takes two old concepts and combines predicates from
+their deﬁnitions in the new concept’s deﬁnition
+For each concept, HR calculates the set of examples which have the property
+described by the concept deﬁnition. Using these examples, the deﬁnition and
+information about how the concept was constructed and how it compares
+to other concepts, HR estimates how interesting the concept is, [4], and this
+drives an agenda of concepts to develop. As it constructs concepts, it looks for
+empirical relationships between them, and formulates conjectures whenever
+such a relationship is found. In particular, HR forms equivalence conjectures
+whenever it ﬁnds two concepts with exactly the same examples, implication
+conjectures whenever it ﬁnds a concept with a proper subset of the examples
+of another, and non-existence conjectures whenever a new concept has an
+empty set of examples.
+
+4.2 Enabling HR to Read Analogical Representations
+When HR has previously worked in number theory [3], a Fregean representation has been used. For example the concept of integers, with examples 1 − 5
+would be represented as the predicates: integer(1), integer(2), integer(3), integer(4), integer(5), where the term “integer” is not deﬁned elsewhere. In
+order to test our hypothesis that it is possible to perform automated concept
+formation in number theory using analogical representations as input, we
+built an interface between HR and the Painting Fool [5], calling the resulting
+system HR-V (where “V” stands for “visual”). The Painting Fool performs
+colour segmentation, thus enabling it to interpret paintings, and simulates
+the painting process, aiming to be autonomously creative. HR-V takes in diagrams as its object of interest, and outputs concepts which categorise these
+diagrams in interesting ways.
+As an example, we used the ancient Greek analogical representation of
+ﬁgured numbers as dot patterns. We gave HR-V rectangular conﬁgurations
+of dots on a grid for the numbers 1–20, as shown in Figure 5 for 7, 8 and
+9. Rearranging n dots as diﬀerent rectangular patterns and categorizing the
+results can suggest concepts such as:
+• equality (two separate collections of dots that can be arranged into exactly
+the same rectangular conﬁgurations),
+• evens (numbers that can be arranged into two equal rows),
+• odds (numbers that cannot be arranged into two equal rows),
+
+310
+
+A. Pease et al.
+
+Rectangular representations of the number 7
+
+Rectangular representations of the number 8
+
+Rectangular representations of the number 9
+
+Fig. 5 Rectangular conﬁgurations for the numbers 7, 8 and 9.
+
+• divisors (the number of rows and columns of a rectangle),
+• primes (a collection of dots that can only be arranged as a rectangle with
+either 1 column or 1 row),
+• composite numbers (a collection of dots that can be arranged as a rectangle
+with more than 1 column and more than 1 row), and
+• squares (a collection of dots that can be arranged as a rectangle with an
+equal number of rows and columns).
+HR-V generated a table describing the rectangle concept, consisting of triples:
+[total number of dots in the pattern, number of rows in the rectangle, number
+of columns in the rectangle]. This is identical to the divisor concept (usually
+input by the user) and from here HR-V used its production rules to generate
+mathematical concepts. For instance, it used match[X, Y, Y ], which looked
+through the triples and kept only those whose number of columns was equal
+to the number of rows, and then exists[X] on this subset, which then omitted the number of rows and number of columns and left only the ﬁrst part
+of the triple: number of dots. This resulted in the concept of square numbers
+(deﬁned as a number y such that there exists a number x where x ∗ x = y) In
+another example, HR-V counted how many diﬀerent rectangular conﬁgurations there were for each number – size[X] – and then searched through this
+list to ﬁnd those numbers which had exactly two rectangular conﬁgurations
+– match[X, 2] – to ﬁnd the concept of prime number. In this way, HR-V categorized the type or shape of conﬁguration which can be made from diﬀerent
+numbers into various mathematical concepts.
+
+Using Analogical Representations for Mathematical Concept Formation
+
+311
+
+4.3 Results
+After a run of 10,000 steps, HR-V discovered evens, odds, squares, primes,
+composites and refactorable numbers (integers which are divisible by the
+number of their divisors), as shown in Figure 6, with a few dull number types
+deﬁned.
+
+Even numbers can be represented as rectangles with two columns;
+odd numbers cannot
+
+Square numbers can be represented as rectangles
+with the same number of rows .as columns
+
+Prime numbers have exactly two rectangular configurations;
+composite numbers have more than two
+
+The number of different rectangular configurations of refactorable numbers
+corresponds to the number of rows in one of the rectangles
+
+Fig. 6 The concepts which HR-V generated from rectangular conﬁgurations of
+numbers 1–20: evens, odds, squares, primes, composites and refactorables.
+
+Thus, HR-V is able to invent standard number types using number rectangle deﬁnitions of them. This is a starting point, suggesting that automatic
+concept formation is possible using analogical representations. We would like
+to be able to show that analogical representations can lead to concepts which
+would either not be discovered at all, or would be diﬃcult to discover, if
+represented in a Fregean manner.
+
+312
+
+A. Pease et al.
+
+5 Further Work
+Although the representations can be seen as analogous to the idea they represent, they are still subject to many of the criticisms described in Section 1,
+such as being pre-ordained, human constructed, special purpose and frozen.
+In order to address this, we are currently enabling HR to produce its own dot
+patterns, via two new production rules. These production rules are diﬀerent
+to the others in that they produce a new model or entity from an old one (or
+old ones), as opposed to the other seventeen production rules which produce
+a new concept from an old concept (or old concepts). In both production
+rules, an entity is a conﬁguration of dots which is represented by a 100*100
+grid with values of on/oﬀ where “on” depicts a dot.
+The ﬁrst new production rule will take in one entity and add dots to
+produce a new one. There are two parameters:
+(i) the type of adding (where to put the dot);
+(ii) the numerical function (how many dots to add).
+The second new production rule will take in two entities and merge them
+to produce a new one. This is like the “compose” production rule but takes
+entities rather than concepts. Alternatively, it can take in one entity and
+perform symmetry operations on it.
+While we have focused on concept formation in this paper, we believe that
+analogical representations, and visual reasoning in particular, can be fruitful
+in other aspects of mathematical activity; including conjecture and axiom
+formation, and evaluation and acceptance criteria. We hope to develop the
+automated case study in these aspects, as well as to extend concept formation
+to further mathematical domains.
+
+6 Conclusion
+We have argued that automatic concept formation is possible using analogous representations, and can lead to important and interesting mathematical
+concepts. We have demonstrated this via our automated case study. Finding
+a representation which enables either people or automated theory formation
+systems to fruitfully explore and develop a domain is an important challenge:
+one which we believe will be increasingly important, given the current focus
+in A.I. on embodied cognition.
+
+References
+1. Brown, R.: John Robinson’s symbolic sculptures: Knots and mathematics. In:
+Emmer, M. (ed.) The visual mind II, pp. 125–139. MIT Press, Cambridge (2005)
+2. Chalmers, D., French, R., Hofstadter, D.: High-level perception, representation, and analogy: A critique of artiﬁcial intelligence methodology. Journal of
+Experimental and Theoretical Artiﬁcial Intelligence 4, 185–211 (1992)
+
+Using Analogical Representations for Mathematical Concept Formation
+
+313
+
+3. Colton, S.: Automated Theory Formation in Pure Mathematics. Springer, Heidelberg (2002)
+4. Colton, S., Bundy, A., Walsh, T.: On the notion of interestingness in automated mathematical discovery. International Journal of Human Computer
+Studies 53(3), 351–375 (2000)
+5. Colton, S., Valstar, M., Pantic, M.: Emotionally aware automated portrait
+painting. In: Proceedings of the 3rd International Conference on Digital Interactive Media in Entertainment and Arts, DIMEA (2008)
+6. Davis, R.B., Maher, C.A.: How students think: The role of representations.
+In: English, L.D. (ed.) Mathematical Reasoning: Analogies, Metaphors, and
+Images, pp. 93–115. Lawrence Erlbaum, Mahwah (1997)
+7. D¨
+urer, A.: Underweysung der Messung (Four Books on Measurement) (1525)
+8. Epstein, S.L.: Learning and discovery: One system’s search for mathematical
+knowledge. Computational Intelligence 4(1), 42–53 (1988)
+9. Ernest, P.: John Ernest, a mathematical artist. Philosophy of Mathematics
+Education Journal. Special Issue on Mathematics and Art 24 (December 2009)
+10. Escher, M.C., Ernst, B.: The Magic Mirror of M.C. Escher. Taschen GmbH
+(2007)
+11. Fajtlowicz, S.: On conjectures of Graﬃti. Discrete Mathematics 72, 113–118
+(1988)
+12. Giaquinto, M.: Mathematical activity. In: Mancosu, P., Jørgensen, K.F., Pedersen, S.A. (eds.) Visualization, Explanation and Reasoning Styles in Mathematics, pp. 75–87. Springer, Heidelberg (2005)
+13. Hadamard., J.: The Psychology of Invention in the Mathematical Field. Dover
+(1949)
+14. Hardy, G.H.: A Mathematician’s Apology. Cambridge University Press, Cambridge (1994)
+15. Heath, T.L.: A History of Greek Mathematics: From Thales to Euclid, vol. 1.
+Dover Publications Inc. (1981)
+16. Jackson, A.: The world of blind mathematicians. Notices of the AMS 49(10),
+1246–1251 (2002)
+17. Krutestskii, V.A.: The psychology of mathematical abilities in schoolchildren.
+University of Chicago Press, Chicago (1976)
+18. Kulpa, Z.: Main problems of diagrammatic reasoning. part i: The generalization problem. In: Aberdein, A., Dove, I. (eds.) Foundations of Science, Special
+Issue on Mathematics and Argumentation, vol. 14(1-2), pp. 75–96. Springer,
+Heidelberg (2009)
+19. Lakoﬀ, G., N´
+un
+˜ez, R.: Where Mathematics Comes From: How the Embodied
+Mind Brings Mathematics into Being. Basic Books Inc., U.S.A (2001)
+20. Landy, D., Goldstone, R.L.: How we learn about things we don’t already understand. Journal of Experimental and Theoretical Artiﬁcial Intelligence 17,
+343–369 (2005)
+21. Lenat, D.: AM: An Artiﬁcial Intelligence approach to discovery in mathematics.
+PhD thesis, Stanford University (1976)
+22. Machtinger, D.D.: Experimental course report: Kindergarten. Technical Report 2, The Madison Project, Webster Groves, MO (July 1965)
+23. Penrose, R.: The role of aesthetics in pure and applied mathematical research.
+In: Penrose, R. (ed.) Roger Penrose: Collected Works, vol. 2. Oxford University
+Press, Oxford (2009)
+
+314
+
+A. Pease et al.
+
+24. Presmeg, N.C.: Visualisation and mathematical giftedness. Journal of Educational Studies in Mathematics 17(3), 297–311 (1986)
+25. Presmeg, N.C.: Prototypes, metaphors, metonymies and imaginative rationality
+in high school mathematics. Educational Studies in Mathematics 23(6), 595–
+610 (1992)
+26. Presmeg, N.C.: Generalization using imagery in mathematics. In: English, L.D.
+(ed.) Mathematical Reasoning: Analogies, Metaphors, and Images, pp. 299–312.
+Lawrence Erlbaum, Mahwah (1997)
+27. Sims, M.H., Bresina, J.L.: Discovering mathematical operator deﬁnitions. In:
+Proceedings of the Sixth International Workshop on Machine Learning, Morgan
+Kaufmann, San Francisco (1989)
+28. Sinclair, N.: The roles of the aesthetic in mathematical inquiry. Mathematical
+Thinking and Learning 6(3), 261–284 (2004)
+29. Sloman, A.: Interactions between philosophy and artiﬁcial intelligence: The role
+of intuition and non-logical reasoning in intelligence. Artiﬁcial Intelligence 2,
+209–225 (1971)
+30. Sloman, A.: Afterthoughts on analogical representation. In: Theoretical Issues
+in Natural Language Processing (TINLAP-1), pp. 431–439 (1975)
+31. Tennant, N.: The withering away of formal semantics? Mind and Language 1,
+302–318 (1986)
+32. von Neumann, J.: The mathematician. In: Newman, J. (ed.) The world of
+mathematics, pp. 2053–2065. Simon and Schuster, New York (1956)
+33. Wells, D.: The Penguin Dictionary of Curious and Interesting Numbers. Penguin Books Ltd., London (1997)
+34. Wheatley, G.H.: Reasoning with images in mathematical activity. In: English,
+L.D. (ed.) Mathematical Reasoning: Analogies, Metaphors, and Images, pp.
+281–297. Lawrence Erlbaum, Mahwah (1997)
+35. Winterstein, D.: Using Diagrammatic Reasoning for Theorem Proving in a
+Continuous Domain. PhD thesis, University of Edinburgh (2004)
+
+

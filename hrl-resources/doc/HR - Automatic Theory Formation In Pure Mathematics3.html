@@ -1,0 +1,247 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+<script type="text/javascript" src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics3_files/analytics.js"></script>
+<script type="text/javascript">archive_analytics.values.server_name="wwwb-app19.us.archive.org";archive_analytics.values.server_ms=184;</script>
+<link type="text/css" rel="stylesheet" href="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics3_files/banner-styles.css">
+
+
+</head><body alink="blue" text="blue" vlink="blue" background="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics3_files/chalk.jpg"><a name="top"></a>
+<title> HR - Automatic Theory Formation In Pure Mathematics </title>
+
+
+
+<a name="build_concepts"></a>
+<h2>3. HOW HR BUILDS NEW CONCEPTS</h2>
+<p><font color="red">Subsections:&nbsp;&nbsp;
+<a href="#representation">Representation</a>&nbsp;&nbsp;
+<a href="#build_examples">Examples</a>&nbsp;&nbsp;
+<a href="#production_rules">Production Rules</a>
+</font>
+</p><p align="justify">
+HR deals with three aspects of a mathematical concept:
+</p><ul><li>Models: ie. examples of a concept, for instance, the
+models of prime numbers are 2,3,5,7,11, etc.</li>
+<li>Definitions. A concept may have more than one
+definition. For example, primes are often (incorrectly) defined as
+those integers divisible by only 1 and themselves - which means that 1
+is a prime number. A better definition is: those integers with exactly
+2 divisors.</li>
+<li>Properties of concepts. These are measurable qualities of a
+concept which give more information than the definition and models
+alone. For example a property of prime numbers is that there are 25
+primes less than 100.</li>
+</ul>
+<a name="representation"></a>
+<h2>Representation</h2>
+<p align="justify">
+In HR, two things are used to represent the concept, the models and
+the construction history (a series of instructions detailing how the
+concept was built using previous concepts). HR is not tied to a single
+logical formalism for the definitions of the concepts it
+produces. Definitions are generated as and when they are needed, using
+the construction history, and are given in whichever format is
+required for the task at hand. For example, when the definition is
+required in a proof by the Otter theorem prover (see later), it is
+generated in a first order logic style acceptable to Otter. Similarly,
+when the user wants to read the definition, it is output in LaTeX and
+marked up to make it more readable. This approach makes it easier for
+HR to interact with theorem provers, model generators, computer
+algebra packages and so on.
+
+</p><p align="justify"> The models in HR are stored as complete
+data-tables. By complete, we mean that there is no missing data. An
+initial set of concepts (which can be given by the user, or generated
+by HR and MACE, if the user supplies the axioms of the finite algebra
+of interest), are given to HR in the form of data-tables. HR needs to
+know how to de-compose each entity into elements and it needs some
+relations between the elements. For example, amongst others, integers
+can be broken into finite sets of:
+
+</p><ol>
+<li>Divisors</li>
+<li>Digits</li>
+<li>Positive integers less than them</li>
+</ol>
+<p align="justify">
+and these would be stored as the following tables:
+</p><p>
+</p><center>
+<img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics3_files/integer_representations.html">
+</center>
+<p align="justify">
+Then the multiplication relation can be given for pairs of divisors of
+an integer, and the addition relation can be given for pairs of
+integers less than the integer. The tables for these concepts are:
+</p><p>
+</p><center>
+<img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics3_files/integer_relations.html">
+</center>
+<p align="justify">
+Note that presenting addition and multiplication in this way ensures
+that the tables are complete.
+</p><p align="justify">
+When working in a finite algebra, both the decompositions and
+relations are determined by the axioms. In the following table, I give 
+some algebras and their decompositions and relations.
+</p><p>
+<table align="center" width="75%" border="3">
+<tbody><tr>
+<td><font color="red">Algebra</font></td>
+<td><font color="red">Decompositions</font></td>
+<td><font color="red">Relations</font></td>
+</tr>
+<tr>
+<td>Group</td>
+<td>Elements, Identities</td>
+<td>Multiplication (*), Inverses</td>
+</tr>
+<tr><td>Ring</td>
+<td>Elements, Additive Identities</td>
+<td>Addition, Multiplication, Additive Inverse</td>
+</tr>
+<tr>
+<td>IP-loop</td>
+<td>Elements, Identities</td>
+<td>Multiplication, IP</td>
+</tr>
+</tbody></table>
+</p><p align="justify">
+When working in graph theory, the decomposition is into nodes, and the 
+relation is given by the edges. We are currently implementing ways by
+which HR can use more complicated decompositions, for example graphs
+into paths of nodes.
+
+<a name="build_examples"></a>
+</p><h2>Example Constructions</h2>
+
+<p align="justify">
+HR builds new concepts using one of a set of production rules which
+take data-tables of old concepts and output new data-tables. For
+example, below we are given Table 0, with the division of integers up
+to 4, namely rows [<i>a,b,c</i>] where <i>a=b*c</i>. The "match"
+production rule then takes table 0 and produces table 1 by finding all
+rows in table 0 where the 2nd and 3rd columns are the same.
+
+</p><p>
+<img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics3_files/squares.html">
+</p><p align="justify">
+Each production rule is supplied with parameters to describe exactly
+what to do. In this case, the parameters [1,2,2] should be read: "find
+rows where column 1 is the same as column 1, column 2 is the same as
+column 2 and column 3 is the same as column 2". As column 2 and 3 are
+the same, the new data-table has only one column here. After the match
+production rule has produced table 1, the new table is input to the
+"exists" production rule. The exists production rule simply removes
+columns from the input table, and the parameters tell it which
+column(s) to keep. In this case, the parameters [1] tell it to keep
+just the first column. The outcome of these two production rules is to
+take the given table of divisions of the integers and to re-invent the
+square numbers.
+</p><p align="justify">
+In the second example, below, we see the size and split production
+rules in action. The size production rule counts the number of times
+an entry is seen in a column. For example, if we look down column one
+of Table 0 below, we see that the number 1 appears once, 2 and 3
+appear twice and the number 4 appears three times. The parameters [1]
+for the size production rule tell it to count the number of
+occurrences of entries in column 1. The split production rule, with
+parameters 2=2, goes through table 1 and finds rows where column two
+equals the numerical value 2. The outcome of these two production
+rules is to take the given table of divisions of the integers and to
+re-invent the prime numbers.
+
+<img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics3_files/primes.html">
+</p><p align="justify">
+Note that the construction history of the tables is recorded as a set
+of triples (old_concept, production_rule, parameters), which have to be
+performed to reconstruct the data-table. For example, the construction
+history for table 4 above is:
+</p><p>
+</p><center>
+(0,size,[1])<br>
+(3,split,[2=2])<br>
+</center>
+
+<p align="justify">
+HR is also given a definition for table 0, which we write in the form:
+</p><p align="center">
+<font color="red">0. [a,b,c] : a=b*c.</font>
+</p><p align="justify">
+From this definition, and because it knows that the match production
+rule was used to build table 1, it can generate a definition for the
+pairs of integers in table 1 as this:
+</p><p align="center">
+<font color="red">1. [a,b] : a=b*b.</font>
+</p><p align="justify">
+From this definition, and because it knows that the exists production
+rule was used to build table 2, it can generate a definition for the
+integers in table 2 as this:
+</p><p align="center">
+<font color="red">2. [a] : exists b in <b>N</b> s.t. b*b=a.</font>
+</p><p align="justify">
+Similarly, HR can generate a definition for the pairs in table 3:
+</p><p align="center">
+<font color="red">3. [a,n] : n=|{(b,c) in <b>N</b><sup>2</sup> : b*c = a}|</font>
+</p><p align="justify">
+and from definition 3, a (slightly non-standard) definition for prime
+numbers can be generated:
+</p><p align="center">
+<font color="red">4. [a] : 2=|{(b,c) in <b>N</b><sup>2</sup> : b*c =
+a}</font></p><p align="justify">
+
+<a name="production_rules"></a>
+</p><h2> The Production Rules </h2>
+<p align="justify">
+There are at present 10 production rules, but these get added to from
+time to time. Each production rule manipulates data-tables in a fairly
+simple, and non-domain-specific way. An informal description of each
+one is given here (in increasing difficulty).
+
+</p><ol>
+<li><font color="green">Exists</font> This removes columns.</li>
+<li><font color="green">Match</font> This finds rows where certain
+columns are identical.</li>
+<li><font color="green">Size</font> This counts the number of occurrences
+of each entry in a column.</li>
+<li><font color="green">Split</font> This finds rows where certain
+columns have certain (usually numerical) values.</li>
+<li><font color="green">Negate</font> This produces the compliment of a
+data-table, ie. those rows which could possibly be in the table, but
+which aren't there.</li>
+<li><font color="green">Conjunct</font> This takes two old data-tables
+and finds rows in the first which match with rows in the second.</li>
+<li><font color="green">Forall</font> This finds sets of rows where all
+possible entries are present (eg. all the divisors of an
+integer).</li>
+<li><font color="green">Common</font> This finds entities (eg. integers)
+in a data-table which have rows in common (eg. integers which share a
+prime divisor).</li>
+<li><font color="green">Compose</font> This takes two old data-tables
+which can used to define functions, and computes the data-table
+representing their composition.</li>
+<li><font color="green">Fold</font> This constructs the orbit of
+entities under a function (ie. it repeatedly takes the output of a
+function and puts it back in as input).</li>
+</ol>
+
+<hr>
+©&nbsp;Simon Colton 1999.
+
+
+
+
+
+
+
+
+</body></html>
+<!--
+     FILE ARCHIVED ON 20:17:31 Jul 22, 2001 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 10:44:17 May 16, 2016.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->

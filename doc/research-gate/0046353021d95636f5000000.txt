@@ -1,0 +1,815 @@
+Tracking Quantity Fluctuations using STT
+Robert C. Kahlert, Ben Rode, David Baxter,
+Michael Witbrock, Ken Forbus, Larry Birnbaum,
+Purvesh Shah, Dave Schneider,
+Kathy Panton, Alan Belasco, David Crabbe
+Cycorp Inc.
+3721 Executive Center Drive
+Austin, TX 78781
+{rck, ben, baxter, witbrock, shah, daves}@cyc.com
+{forbus,birnbaum}@cs.northwestern.edu
+
+Abstract
+We describe an approach to extracting and tracking events
+in which measurable quantities such as economic indicators
+undergo a change. The causes and consequences of oil price
+fluctuations are an example of such events, and are tracked
+in the STT (Situation Tracking Testbed) prototype. We
+propose a representation of these event types in the logical
+representation language CycL and apply this representation
+to the problem of identifying and extracting information
+from news sources in RSS feed repositories.
+
+Introduction
+[Forbus et al, 2005] described STT, the Situation Tracking
+Testbed, a research prototype for developing and
+evaluating power tools for intelligence analysis. STT
+combines analogical reasoning, intelligent information
+retrieval, and knowledge integration, to assist intelligence
+analysts, often pro-actively, in researching and modeling
+changes in situations over time.
+STT structures situations using scripts [Schank & Abelson
+1977], explicit structured representations of stereotypical
+situations, such as kidnappings or sieges, as they unfold
+over time. In STT, scripts focus the information retrieval
+tasks. As situations change, scripts help STT to model the
+changing relationships between the events and their
+participants.
+Yet, scripts are limiting when dealing with causal dependency, where they are most appropriate for stereotypical or
+highly specific causality. Consider economists’ explanations of the causes and the effects of a fluctuation in
+gasoline prices: A disaster affects critical refinement
+capabilities for crude oil, decreasing the supply of gasoline,
+which in turn raises prices for gasoline and—indirectly—
+other goods. This reduces consumer spending, eventually
+driving down the stock prices of retailers. Such
+explanations cannot use scripts to induce a partial order on
+events and roles; rather, they organize events using causal
+connections, postulated in economic laws, among event
+and situation types.
+
+Conceptually, these event types often represent changes in
+quantities that denote capacities, rates of supply or
+demand, inventory levels and similar measures. We propose to call these event types quantity change events. The
+ability to identify and track such events—and the chains of
+causal relationships that they represent—is an important
+tool for intelligence analysis. Such event chains can be of
+strategic importance, especially where energy prices are
+concerned.
+In adding this class of situation modeling, STT is applying
+insights from qualitative process research [Forbus 1984] to
+the problem of situation tracking.
+The structure of the remainder of this document is as
+follows. We first give an informal characterization of the
+language used in source documents to describe the information to be extracted. Our primary example domain will
+be quantity changes related to oil price fluctuations. Since
+STT’s research activities are guided by its qualitative
+models, we next propose a representational approach to
+modeling the quantity change events discussed in our
+sources using the logical representation language CycL
+[Matuszek et al 2006]. We then describe how STT will use
+this representation in extracting and tracking chains of
+quantity change events in document corpora such as RSS
+feed repositories. We conclude with a prospective look at
+how we have begun to evaluate the performance of the
+tracking system—and thereby the appropriateness of the
+representation— and will continue to in the near future.
+
+Characterizations of the Source Documents
+Since STT attempts to identify quantity change events in
+RSS news feeds and extract both individual events and
+causal chains of these from the sources, it seems
+appropriate to provide an informal characterization of the
+source documents, specifically in terms of the natural
+language employed. This characterization is based on the
+construction of a small pilot corpus of news articles. Such
+a pilot corpus has several advantages: Its analysis grounds
+
+the design of an appropriate representational vocabulary
+(described in the next section Representing Quantity
+Change Events below) and identifies needed background
+knowledge. The corpus helps in suggesting and/or training
+STT’s textual extraction patterns. Finally, it allows evaluating and monitoring the performance of STT in the
+identification of quantity change events as well as the
+extraction of chains of such events (see also the section
+Assessing the Performance of STT below).
+
+Changes in Oil Prices: The Example Domain
+We chose changes in the price of crude oil as an example
+domain. Unsurprisingly, there is no shortage of articles on
+this subject, from which we selected some of the factors to
+which economists attribute oil price changes. Oil prices
+are driven by energy demand of economies, weather
+(hurricanes, cold or mild winters), political issues (stability
+in OPEC members like Nigeria; foreign policy toward
+OPEC members like Iran, Saudi Arabia, and Venezuela),
+inventory levels, infrastructure capacities, and the financial
+health of oil companies allowing them to sustain long-term
+R&D and exploration. Some of these issues are related,
+e.g., instability in an OPEC member might cause oil
+companies operating there to decrease exploration.
+Very often, the types of causal events cited in these cases
+are themselves changes in quantities, such as inventory
+levels, consumption rates, production rates, and similar.
+Consequently, proper modeling of quantity change events
+and the representation of the laws stating dependencies
+between quantity changes plays an important role.
+
+Pilot Corpus Construction
+We selected 50 articles and short reports via the WWW
+from news agencies such as the BBC, CNN and oil Industry journals that discuss oil prices, oil exploration, and
+influences on oil demand and availability, within the time
+span of 2003-2006. We then hand-annotated the corpus to
+identify and classify the quantity change events reported.
+The analysis revealed that 39 documents mentioned
+quantity change events in some form or another: oil supply
+levels, strategic natural gas reserves, production
+capabilities, rise in company stocks, etc.
+
+Ten documents described oil related issues but mentioned
+no quantity change events; these articles were intended as
+distracters with apparently high relevance in an evaluation
+set. One document was a duplicate of another.
+Of the over 200 quantity change events, 86 concerned
+changes in the trading of oil, and of these 20 were changes
+in oil futures and 66 changes in oil prices.
+
+Extracting Quantity Change Events
+While the language used in oil price change reporting is
+highly stylized, an impressive variety of verb-forms is used
+to liven up the market reporting: 20 verbs for increase
+events, 14 for decrease events. A host of additional phrases
+qualifies the price and relates it to prior trading situations
+(for a fragment of a BNF grammar for matching just
+decreases in oil prices, see Figure 1 below).
+Quantity change events of this kind are associated with a
+trading organization, such as ICE Futures London
+(formerly International Petroleum Exchange) or the New
+York Mercantile Exchange (NYMEX). Because of the
+strong tie these organizations have with specific cities,
+writers often use the city names as referential short-hands.
+Consequently, a rise of the oil price in London is not to be
+read as a rise of the price paid by people in the Greater
+London area, but as a rise of the price of oil futures
+(typically, Brent crude) as traded on the ICE Futures
+exchange in London. Especially in the futures market,
+specific futures (so-called benchmarks) are associated with
+specific locales—for example, the West Texas Intermediate benchmark is traded at the US spot market in Cushing,
+Oklahoma, while (North Sea) Brent crude is traded at ICE
+Futures London. Thus, the name of the traded product
+provides a default trading location, allowing journalists to
+omit location information.
+Unsurprisingly, date information in the articles is overwhelmingly relative to the date of the publication of the
+article. About a third of the articles have no date
+information at all, and half of the articles require knowing
+the current date to puzzle out references such as
+“Monday”, “August 15”, or “the previous day”.
+
+<decrease> ::= <decrease-verb> <decrease-change-qualifier> <amount> ;
+<decrease-verb> ::= be down | drop | edge | fall [back] | follow a fall | lose
+| plunge | retreat | shed | slip | slump | tumble;
+<decrease-change-qualifier> ::= by [more than] <change-amount>
+to [settle at | close at | just under]
+| below | as low as | from <amount> to <amount> | more than;
+<change_amount> ::= amount | percentage;
+<percentage> ::= <float> % ;
+<amount> ::= [ <currency> ] <float> [ <barrel-qualifier> ] [ <currency> ] ;
+<currency> ::= US [$] | U.S. [$] | usd | cents ;
+<barrel-qualifier> ::= per barrel | / bbl ;
+
+Figure 1: Simplified over-accepting BNF grammar for extracting the amount part of oil price decrease events.
+
+Special care has to be exercised when extracting
+information about futures, which come with additional date
+information: three fourths give the month and ten percent
+the day on which the futures are due.
+
+Extracting Event Chains
+So far our analysis of quantity change events has focused
+primarily on oil price change events. We are in the process
+of extending that hand-annotation and analysis of the pilot
+corpus to the events that precede the quantity change event
+in the causal chain. Consider for example the rise of the
+Brent crude oil futures in London on February 19, 2006, as
+indirectly caused by the reduction of shipping of crude
+from the Nigeria delta—a quantity change event that was
+in turn caused by the shutdown of Royal Dutch Shell’s
+Forcados oil terminal.
+This chain of events consists of several quantity change
+events—the rise in the oil price as traded at the ICE
+Futures in London, caused by the drop in global supply due
+to the reduction of shipments from one of the oil hubs of
+the Niger Delta. However, the last quantity change event,
+the reduction of shipment, is tied to a non-quantity change
+event, namely the closing of the Forcados oil terminal by
+Shell. With this shut-down event, the event chain is
+effectively grounded.
+Interestingly, preliminary analysis indicates that the interests of the readers go beyond the grounding non-quantity
+change event. All articles on the shutdown of the Forcados
+oil terminal report on the rebels living in the Nigerian
+Delta, who, through their attacks, forced Shell’s hand in
+the shutdown.
+For STT, this observation reveals an interesting dilemma:
+that extra level of detail, obviously appreciated by the
+readers, introduces an enormous degree of complexity in
+terms of the necessary capabilities for event representation,
+information extraction and natural language parsing.
+Quantity change events as such are relatively straightforward to model and interpret; and the possible grounding
+events for limited domains appear to form a manageable
+class. But the background events that triggered the grounding event are semantically very unconstrained, and the
+capability to model and parse them all presents quite a
+challenge.
+
+Representing Quantity Change Events
+We now describe our representational approach to modeling quantity change events, the way these events could, in
+principle, chain together, and how these chains eventually
+bottom out in non-quantity change events.
+
+The Representational Vocabulary
+ResearchCYC is replete with predicates for specifying
+scalar quantities, e.g. priceChargedFor, a ternary
+predicate which relates a geographic location and a
+commodity type to a scalar value that is the price charged
+for instances of that commodity type in that region.
+
+Predicates such as this have been ResearchCyc’s timehonored approach to tracking quantities, following e.g.
+[Cohen et al., 1998]. Note two very important features.
+First, these predicates are time-dependent, since prices may
+vary between time t and time t′. Second, at point p and
+time t, priceChargedFor is functional in its scalar
+argument, mapping a location and a commodity type to at
+most one price. (Notice that the time range from t to t′ is
+not given as an explicit argument to the predicate, but
+represented in the temporal qualification of the context
+[Lenat 1999].
+These properties are sufficient to make predicates such as
+priceChargedFor appropriate building blocks for evaluatable parametric functions or fluents [McCarthy 1998].
+CycL provides for a currying-function, Kappa, to derive
+lower-arity predicates from higher-arity predicates by
+fixing one or more of the argument positions. Here, Kappa
+is used to fix the commodity type argument of the predicate priceChargedFor –– to Petroleum-CrudeOil:
+(Kappa (?REGION ?PRICE)
+(priceChargedFor ?REGION
+Petroleum-CrudeOil ?PRICE))
+
+The function-denoting function, FunctionToArg allows
+us to convert this to a parametric function, which takes a
+geographic region for its argument, and, at a given time,
+returns the price of crude oil in that region:
+(FunctionToArg 2
+(Kappa (?REGION ?PRICE)
+(priceChargedFor ?REGION
+Petroleum-CrudeOil ?PRICE)))
+
+A bit of syntactic sugar—declaring this to be the macro
+expansion of a new function PriceOfInRegionFn—
+allows us to express this parametric function so:
+(PriceOfInRegionFn Petroleum-CrudeOil)
+
+Such parametric functions are one key building block of
+the quantity change event vocabulary. Another one consists
+in collection-denoting functions, which, given a parametric
+function and a candidate argument for the function, return
+the class of events in which the value denoted by the
+function applied to the argument increases or decreases.
+For example, ChangeInValueReturnedByFn takes as arguments a time-dependent function f, an argument to f and
+a scalar comparator, e.g. greaterThan. It returns the class
+of events in which the values returned by the function
+(when applied to the admitted argument) at start and end of
+the event, respectively, are related by the comparator.
+Thus, the class of all events in which the price of crude oil
+in Bahrain, say, was strictly greater at the end than at the
+start can be precisely and compositionally represented by
+(ChangeInValueReturnedByFn
+(PriceOfInRegionFn Petroleum-CrudeOil)
+Baharain greaterThan)
+
+Rules of Inference for Quantity Change Events
+
+Grounding Quantity Change Events
+
+The next part of the CycL infrastructure for reasoning
+about quantity change is a set of inference rules modeling
+economic laws which explain, for example, price changes
+in terms of changes in demand, supply, or inventory.
+Relationships of direct and inverse proportionality can be
+defined between parametric functions thus, e.g. the inverse
+proportionality relationship between supply and demand
+can be captured as follows:
+
+The vocabulary described so far allows reasoning about
+economic rules that function at a high level of abstraction.
+However, these laws are intended to correlate (and thereby
+explain) real-world events. Therefore, the vocabulary must
+also allow modeling the transition from the realm of
+economic theory into the specific event types that ground
+the event chain. The vocabulary must support relating
+localized or specialized quantity change event types to
+non-quantity change event types, Consider the following
+rule, which relates events in which the decreases in
+production rates of specific facilities are explained by
+events that cause these facilities to close. More formally,
+this rule states at the type level that possible triggers for
+decrease events in the production rate of a type of resource
+for a given region are events where the resource-relevant
+mineral fields of that region are shut down. When given a
+commodity type as an argument, the function-denoting
+function ProductionRateOfByFn returns a temporally
+parameterized unary function which, when applied to a
+region, denotes the regional rate of production of a type of
+commodity (for example, of petroleum crude oil).
+SubcollectionOfWithRelationToFn is a type-denoting function which takes a type, a relation, and an
+individual as arguments and returns the subset of the type
+characterized by its instances having the given relation to
+the given individual.
+
+(implies
+(genls ?PRODTYPE ConsumableProduct)
+(inverselyProportional
+(FunctionToArg 2 (Kappa (?AGT ?RATE)
+(supplyRate ?AGT ?PRODTYPE ?RATE)))
+(FunctionToArg 2 (Kappa (?AGT ?RATE)
+(demandRate ?AGT ?PRODTYPE ?RATE))))
+
+The knowledge about the inverse proportional relationship
+can then be used to interpret the relation between, the
+changes in the values returned by two functions that are
+inversely proportional as a relationship of cause between
+instances of the corresponding event types –
+(implies
+(and
+(inverselyProportional ?FN1 ?FN2)
+(isa ?CHANGE-EVENT
+(ChangeInValueReturnedByFn
+?FN1 ?ARG ?COMPARE))
+(inverseBinaryPredicateOf
+?COMPARE ?INVERSE-COMPARE))
+(thereExists ?OTR-CHANGE-EVENT
+(and
+(causes-SitSit
+?CHANGE-EVENT ?OTR-CHANGE-EVENT)
+(isa ?OTR-CHANGE-EVENT
+(ChangeInValueReturnedByFn
+?FN2 ?ARG ?INVERSE-COMPARE))))
+
+At current, the functional dependencies supporting quantity
+change reasoning in Cyc are to a certain extent ‘hand
+derived’ from economic explanations. However, in the
+long run, we plan to use qualitative process theory [Forbus,
+1984] to express a common–sense theory of economics
+that can be used to automatically fill in intermediate causal
+events in explanations, since the causal chains mentioned
+in text are often partial. For example, a rule that states how
+price and supply vary inversely proportional with respect
+to each other could then be derived from a qualitative proportionality assertion like the following:
+(implies
+(genls ?PRODTYPE ConsumableProduct)
+(qprop((QPQuantityFn price)
+?AGT ?PRODTYPE)
+((QPQuantityFn supplyRate)
+?AGT ?PRODTYPE)
+?PRODTYPE))
+
+(implies
+(and
+(isa ?FIELD MineralField)
+(objectFoundInLocation ?FIELD ?REGION)
+(naturalResourcesInRegion
+?FIELD ?RESOURCE-TYPE))
+(candidateTriggerSituationTypes
+(ChangeInValueReturnedByFn
+(ProductionRateOfByFn
+?RESOURCE-TYPE)
+?REGION lessThan))
+(SubcollectionOfWithRelationToFn
+ClosingAFacility objectActedOn
+?FIELD))
+
+By chaining functional dependencies until arrival at an
+event type for which candidate triggers are inferred, it is
+possible to identify causal triggers for a wide variety of
+quantity change events. This reasoning process
+complements the reasoning done by qualitative process
+theory [Forbus, 1984], since it concerns the preconditions
+and external events that perturb the network of causal
+relationships, as opposed to reasoning within the influences
+of the causal network itself.
+
+From Grounding to Narrative Closure
+While rules like the above example satisfy the modeling
+requirement of grounding the event chain in events that are
+themselves not quantity change events, the readers of the
+RSS feeds are interested in more information than that. In
+the example of a reported facility shut-down, traders might
+
+use such information to speculate, for example, about the
+duration of the production rate reduction. As an example,
+consider the following rule, which suggests that candidate
+trigger event types for the shutdown of facilities might be
+types of attacks upon those facilities.
+(implies
+(and
+(genls ?CLOSING ClosingAFacility)
+(isa ?FACTILTY Facility-Construct)
+(implies
+(isa ?INCIDENT ?CLOSING)
+(objectActedOn ?INCIDENT ?FACILITY)))
+(candidateTriggerSituationTypes ?CLOSING
+(SubcollectionOfWithRelationToFn
+AttackOnObject attackAgainst
+?FACILITY)))
+
+This suggests two things. For one, it highlights the importance of the existing script vocabulary available to STT,
+because the beginning of such a quantity change event
+sequence might require a script to be modeled. Furthermore, in terms of analyzing news sources, the event supporting the proximate causal event explaining the earliest
+quantity change event often suffices as the initial trigger in
+the explanation chain for human analysts.
+
+Maintaining Geo-Temporal Soundness
+This presentation of the vocabulary for representing and
+reasoning about quantity change events so far has glossed
+over the question of how STT ensures that the temporal
+and spatial indices of reasoning remain sound. One would
+not want to suggest a rise of gasoline prices in Germany as
+a cause for a drop in consumer spending in Brazil (without
+some additional arguments). Spatial indices in economic
+reasoning are tricky, because often the spatial proximity
+masks what is in reality a qualitative influence, which
+however need not be local at all. Thus, a drop in crude oil
+production in neighboring Canada may be as problematic
+for the United States as a decrease in production in South
+American Venezuela, because both are exporters of crude
+oil to the US.
+Equally, one would not want to suggest a rise in crude oil
+futures in March as a possible cause for a rise in gasoline
+prices in February (ever). Here, the events involved project
+temporal constraints onto the reasoning and the document
+search space that provide helpful pruning support.
+In the long term, we hope to leverage ResearchCYC’s
+context space mechanism [Lenat 1999] widely, but that
+mechanism is, at present, most developed for temporal
+indices. We plan to address the issue of spatial context in
+more detail in the very near future.
+
+Natural Language Representations
+All of the representation for change events presented so far
+is tied to the natural language knowledge that STT has
+about English. The assertions that relate the representation
+
+to English lexical information are not used during
+reasoning about the situations, but are leveraged by the
+intelligent information extraction sub-systems of STT, for
+example, to generate appropriate information retrieval
+strings or to parse sections of the retrieved documents in
+order to extract quantity change event information.
+Because of the compositional nature of natural language,
+there is some advantage to constructing the fluents in an
+equally compositional way, as this often simplifies the
+mapping between natural language and logical
+representation.
+Such lexical information also includes many of the English
+syntactic patterns that are used when reporting causal
+chains in the news [Kuehne and Forbus, 2004].
+
+Tracking Quantity Change Events
+We now turn to the problem of extending STT, a system
+geared to leverage events structured by scripts, to handle
+quantity change events properly. This extension is an
+ongoing effort at the time of writing.
+
+How STT performs Research
+STT currently takes as an input a property of an event or
+situation that the analyst is interested in, e.g. the name of a
+person who was kidnapped. STT then uses background
+knowledge, i.e. information about the event type, the
+expected sub-events and other information provided by the
+script infrastructure to parameterize appropriate information extraction techniques. STT currently employs two
+techniques, the Brussel [Wagner et al 2006] system, a pattern matching text extractor, and ResearchCYC’s event
+learning prototype, which uses an example-based machine
+translation approach.1 Each extraction approach builds up
+its own model of the situation, which STT currently
+reconciles using a voting scheme. The analyst is presented
+with the best resulting situation model.
+
+Extending STT to handle Quantity Change Events
+STT’s basic approach applies equally to quantity change
+events. Instead of generating document retrieval queries
+from the sub-event information of the script, STT will
+leverage the information about sequences of situation types
+that have the quantity change event type as a consequence.
+STT will search for temporally prior sources that confirm
+that any of the suggested situation types happened. If such
+an event is an instance of a “script”-modeled event type,
+STT will switch into “script mode” for its research as
+before. If the causative event is an instance of a quantity
+change event type, then the algorithm will be applied
+recursively to determine a cause for that event.
+When reasoning about the potential causes of an individual
+quantity change event, such as a specific decrease in the
+price of crude oil to a value below US$58 per barrel on
+1
+
+This system is still undergoing active development; there is
+currently no publication citation for it.
+
+February 15, 2006, STT could then proceed as follows:
+First, STT determines quantity change event types that the
+individual event belongs to. Next, STT postulates the
+existence of an encompassing situation type, which
+represents the class of all situations whose outcomes
+include a quantity change event in which the crude oil
+price dropped. Finally, STT applies its rules of inference to
+determine possible sub-situation types, such as quantity
+change event types which might explain the price drop. In
+our example, STT might conclude that—among others—
+the quantity change event type that represents the class of
+all rises in total inventory of crude oil is an applicable subsituation type. This information is now available to STT
+for modeling and research purposes; for example, applied
+to intelligent information extraction this could result in the
+pro-active retrieval of the following text snippet:
+Energy prices continued to fall February 15 [2006],
+with crude futures dropping below $58/bbl for the
+first time since November [2005] following another
+rise in US inventories. [OGJ 2006-02-16]
+One of the distinguishing features of the STT system is its
+capability for tracking, i.e. monitoring information sources
+for news on events the analyst expressed interest in. Here,
+the quantity change event infrastructure is as helpful as the
+scripts are, because the inference rules suggest types of
+news feeds to expect.
+
+used to order the abductive expansion step, in the hope that
+more plausible scenarios will bottom out first and make
+other chains of reasoning unnecessary..
+Finally, we hope to exploit the fact that many documents
+mention not one but two events and their link. Such cases
+could in the future assist the system in learning new
+connections, represented as the core for a new inference
+rule, between two event types STT is already familiar with.
+
+Assessing the Performance of STT
+We are currently developing metrics to assess the
+performance of STT in extracting individual and chains of
+quantity change events. Providing metrics is complicated
+by the fact that both IR components within STT, Brussel
+and the ResearchCYC event learner, are undergoing heavy
+redesign. Brussel is being retooled to employ the GATE
+[Cunningham et al 2002] engine for its IE needs; the event
+learner team is augmenting the document index with geotemporal information, as well as experimenting with more
+aggressive document preprocessing, using a statistical POS
+tagger and disambiguation.
+We hope to have separate metrics for each of the individual
+phases—quantity change event identification, document
+identification, event chain extraction—as well as for the
+end-to-end performance. The pilot corpus will serve as a
+baseline that we will extend continuously as STT gains
+proficiency.
+
+Improving STT to handle Quantity Change Events
+Some of the assumptions of the current STT
+implementation will have to be revisited. For example,
+quantity change events put a much higher premium on
+correctly identifying the time and space indices of the news
+article being analyzed. STT is already very adept at
+decoding temporal references that need to be interpreted
+with respect to the date of the article, but some additional
+work might be required.
+The branching factor of the form of "textual abduction" as
+described here is a valid concern. However, we have
+already identified several strategies for aggressively
+bounding the factor. First, a lack of matching documents
+should in general help to prune incorrect connections.
+Some care is necessary with this heuristic, since we also
+expect there to be many situations of skipped mediating
+quantity change events. News articles can leap from
+attributing an increase in consumer spending to a drop in
+oil prices, leaving out all mediating steps that relate the
+average consumer’s discretionary spending to the prices of
+products derived from crude oil. Here, a robust commonsense model of economics can help to puzzle out the
+implied mediating steps and construct a coherent model of
+the event chain.
+It is in general the case that additional background knowledge can go a long way. For example, for a reduction in
+the global supply of oil, the OPEC member states make
+much better suspects for analysis than other states. If not
+for outright pruning, such considerations could at least be
+
+Identifying Quantity Change Events
+As described above in Characterization of Source
+Documents, we have gathered 50 documents involving oilrelated matters for a pilot corpus. We split the corpus into
+18 training and 29 validation documents and removed one
+duplicate. We annotated the corpus, identifying over 200
+quantity change events, of which 87 were oil price or oil
+futures change events. This revealed that the training
+corpus contained half of all oil price change events (35 of
+66), and the vast majority of the oil futures change events
+(17 of 20). Next, we plan to train STT on the training set
+and evaluated its performance for precision and recall on
+both the training and the withheld validation document set.
+
+Identifying Research Documents
+As STT tries to elucidate the event chain leading up to a
+quantity change event, it will require a document corpus of
+articles upon which it can draw. In order to locate
+appropriate documents within that corpus, STT will need
+to both pre-process the corpus and generate appropriate
+search requests to the IR engine hosting the corpus.
+We plan to evaluate the document identification along the
+dimensions of precision and recall by “hiding” our small
+pilot corpus in the 12,000 document corpus of RRS feeds
+that is part of the STT installation.
+
+Event Chain Extraction
+A further candidate metric we plan to gather is the length
+of the event chain reconstructed, with one metric for overall chain length and a second metric for how many
+mediating quantity change events skipped in a seed article
+STT was able to fill in. This will require additional
+annotations on the pilot corpus to identify event chain
+lengths as well as the possibilities of cross-document chain
+reconstruction.
+
+Tracking Background Knowledge Extension
+As the pilot corpus grows and STT is enabled to handle the
+training identifications and extractions, the likelihood of
+encountering a completely novel situation should go down.
+Specifically, the amount of background knowledge that
+must be added to understand a new article should decrease
+over time. For this reason, we tracked the background
+knowledge that had to be added to ResearchCYC in order
+to represent the training set portion of the pilot corpus. The
+knowledge breaks down into general background knowledge about quantity change events; knowledge needed to
+represent the use-cases from the pilot corpus; and natural
+language knowledge for both of these categories.
+Overall, we introduced 71 new terms and stated 509 facts
+about them—for detailed metrics on the new terms
+introduced, see Table 1 below. The number of functions
+introduced reflects the representational choice of
+evaluatable parametric functions. In addition, we added
+547 facts that involve only terms already defined in
+ResearchCYC, of which 101 fleshed out existing quantity
+change knowledge; 69 facts concerned information relevant for the use-cases; and 317 provided additional natural
+language information.
+We plan to continue to do monitor these metrics as we
+grow the pilot corpus, expecting the number of new terms
+introduced to decline steadily.
+
+Many exciting research issues remain. Some involve
+simply evaluating existing solutions to relevant aspects of
+the problem. Work on the analysis of argumentation, both
+economic [Riesbeck 1983] and political [Forbus and
+Kuehne 2005], needs to be considered. Of especial concern
+here is to capture the respective influences—for example,
+between supply, price and demand—in such a way that no
+loops are introduced.
+Then there are opportunities for exploiting the possible
+explanations that explicit models of qualitative process
+networks provide [Collins 1994] in order to suggest
+connections that no text is yet talking about. The latter
+approach should be most effective when coupled with
+analogical reasoning as a pruning function for pinpointing
+the most likely explanations. Both the acquisition of new
+triggering events and of the semantically open-ended
+background events might benefit from the use of cotraining techniques of bootstrapping [Blum & Mitchell
+1998]. All of these efforts need to be canvassed for
+potential contributions, which if selected need to be
+positioned appropriately within STT’s framework.
+Finally, one class of events that we have put aside for the
+moment which figures prominently in the oil price literature is innovation. Conceptually, an innovation is an engineering event that negates a background assumption, a potentially difficult representational operation (if it cannot be
+handled via restricting the temporal projection). This is
+especially tricky when innovative techniques, possibly
+involving new terminology for processes and equipment,
+are introduced, as the underlying knowledge base will
+either not have the lexical infrastructure to recognize the
+terminology or will be unclear as to where in its class
+hierarchies to position these new entities. Further research,
+most likely involving building stub terms using analogical
+reasoning, will be required.
+
+Conclusion and Outlook
+We described an approach to tracking quantity change
+events, such as the event chains triggered by oil price
+fluctuations, in the STT (Situation Tracking Testbed)
+prototype. We characterized the available source material,
+based on the analysis of a pilot corpus, introduced
+vocabulary appropriate to modeling that pilot corpus and
+described how STT will employ this representational infrastructure for research purposes.
+
+Quantity Changes
+Natural Language
+Pilot Usecases
+Totals
+
+Collections
+Terms
+Facts
+7
+67
+—
+19
+10
+45
+17
+131
+
+Functions
+Terms
+Facts
+10
+42
+—
+5
+5
+64
+15
+111
+
+Predicates
+Terms
+Facts
+5
+80
+—
+2
+2
+21
+7
+103
+
+Other Individuals
+Terms
+Facts
+7
+38
+7
+20
+18
+137
+32
+195
+
+Table 1: Metrics for the background knowledge needed to represent the use-cases in the pilot training corpus that
+introduced new terms. Because facts can involve multiple new terms, summing up the fact totals will count some facts
+twice. In the metrics presented here, 31 facts are mentioned twice, leaving 509 new facts.
+
+References
+Blum, A., Mitchell, T. 1998. Combining labeled and
+unlabeled data with co-training. In: COLT: Proceedings of
+the Workshop on Computational Learning Theory. Morgan
+Kaufmann Publishers.
+Cohen, P. Schrag, R. Jones, E. Pease, A. Lin, A. Starr, B.
+Gunning, D. Burke, M. 1998. The DARPA HighPerformance Knowledge Bases Project, AI 1998, 19/4,
+pp.25-50.
+Collins, J. W., 1994. Process-based diagnosis: An approach to understanding novel failures (Tech. Rep. No.
+48). Evanston, Illinois: Northwestern University, The
+Institute for the Learning Sciences.
+Cunningham, H., Maynard, D., Bontcheva, K., Tablan, V.,
+GATE: A Framework and Graphical Development
+Environment for Robust NLP Tools and Applications. in:
+Proceedings of the 40th Anniversary Meeting of the
+Association for Computational Linguistics (ACL'02).
+Philadelphia, July 2002.
+Engelmore, R., and Morgan, A. eds. 1986. Blackboard Systems. Reading, Mass.: Addison-Wesley.
+Forbus, K. 1984. Qualitative process theory. Artificial
+Intelligence, 24:85-168.
+Forbus, K., Kuehne, S., 2005. Towards a qualitative model
+of everyday political reasoning. Proceedings of QR-05,
+Graz, Austria.
+Forbus, K., Birnbaum, L., Baker, J., Wagner, E., Witbrock,
+M., 2005. Analogy, Intelligent IR, and Knowledge
+Integration for Intelligence Analysis: Situation Tracking
+and the Whodunit problem, in: Proceedings of the 2005
+International Conference on Intelligence Analysis,
+McLean, Virginia, May 2005.
+Kuehne, S. and Forbus, K. 2004. Capturing QP-relevant
+information from natural language text. Proceedings of
+QR04.
+Lenat, D. B. 1999, Dimensions of Context Space (available
+at http://www.cyc.com/doc/context-space.pdf).
+Matuszek, C. Cabral, J., Witbrock, M., DeOliveira, J,
+2006. An Introduction to the Syntax and Content of CYC,
+in: Proceedings of the 2006 AAAI Spring Symposium on
+Formalizing and Compiling Background Knowledge and
+Its Applications to Knowledge Representation and
+Question Answering, Stanford, CA, March 2006.
+McCarthy, J, Hayes, P., Some philosophical Problems, in:
+Lifschitz, V,m (ed), Formalizing Common Sense, Exeter
+(Intellect) 1998, p.21-63.
+Rickel, J. and Porter, B. 1994. Automated modeling for
+answering prediction questions: selecting the time scale
+and system boundary, pp. 1191-1198. Proc. AAAI-94.
+Riesbeck, C. K. 1983. Knowledge reorganization and
+reasoning style. Technical Report YALEU/DCS/RR 270,
+Yale University, June 1983.
+Schank, R., Abelson, R. 1977. Scripts, plans, goals, and
+understanding: An inquiry into human knowledge
+structures. Hillsdale, NJ: Lawrence Erlbaum.
+
+Wagner, E., Liu, J., Birnbaum, L., Forbus, K., and Baker,
+J., 2006. Using Explicit Semantic Models to Track
+Situations across News Articles, to appear in: Proceedings
+of the 2006 AAAI Workshop on Event Extraction, Boston,
+MA.
+(no authors), Oil and Gas Journal, February 16, 2006,
+accessed via
+http://ogj.pennnet.com/articles/article_display.cfm?Section
+=ONART&C=GenIn&ARTICLE_ID=248280&p=7
+
+

@@ -1,0 +1,243 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+<script type="text/javascript" src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics4_files/analytics.js"></script>
+<script type="text/javascript">archive_analytics.values.server_name="wwwb-app10.us.archive.org";archive_analytics.values.server_ms=223;</script>
+<link type="text/css" rel="stylesheet" href="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics4_files/banner-styles.css">
+
+
+</head><body alink="blue" text="blue" vlink="blue" background="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics4_files/chalk.jpg"><a name="top"></a>
+<title> HR - Automatic Theory Formation In Pure Mathematics </title>
+
+
+
+<a name="assess_concepts"></a>
+<h2>4. HOW HR ASSESSES NEW CONCEPTS</h2>
+<font color="red">Subsections</font>&nbsp;&nbsp;
+<a href="#classification">Classification</a>&nbsp;&nbsp;
+<a href="#comprehensibility">Comprehensibility</a>&nbsp;&nbsp;
+<a href="#statements">Provable Statements</a>
+<p align="justify">
+Even with just ten production rules, the number of possible concepts
+that HR can find is huge, and a best first search must be used if HR
+is to make any serious headway into the search space. The heuristic
+used is very simple:
+</p><ul>
+<li>Identify the best concept, in terms of what the user is looking
+for.</li>
+<li>Identify the production rule which is responsible for outputting,
+on average, the most interesting concepts.</li>
+<li>If possible, input the most interesting concept into the most
+interesting production rule and produce a new concept.</li>
+</ul>
+<p align="justify">
+Of course, it is necessary to determine what makes a concept
+interesting, and how to measure this at the time the concept is
+introduced (or perhaps, later on). HR has three general ways to assess
+concepts, based on how they classify objects, how comprehensible they
+are and the quality of the provable statements which involve
+them. Each of the following measures is normalised to give a value
+between 0 and 1, where 0 is the worst possible, and 1 is the best
+possible score.
+
+<a name="classification">
+</a></p><h2><a name="classification">Classification Measures</a></h2><a name="classification">
+
+<center><img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics4_files/3tables.html"></center>
+
+<p align="justify">
+The three tables above can be used to describe the integers 1 to
+4. For example, table 0 describes 1 as: an integer which divides as
+{(1,1)}. Similarly, table 0 describes 2 as: an integer which divides
+as {(1,2),(2,1)}, it describes 3 as: an integer which divides as
+{(1,3),(3,1)} and integer 4 as: an integer which divides as
+{(1,4),(2,2),(4,1)}. Table 3 gives more succinct descriptions: 1 is an
+integer with 1 divisor, 2 and 3 are integers with 2 divisors and 4 is
+an integer with 3 divisors. Finally, table 4 gives the most succinct
+description: 1 and 4 are not primes, 2 and 3 are primes. The first
+measure which a user might be interested in is the <font color="red">PARSIMONY</font> of a concept, which is inversely
+proportional to the size of the data-table of the concept. There are
+3*8=24 entries in table 0, so this scores 1/24 for parsimony. There
+are 8 entries in table 1, so this scores 1/8 for parsimony, and
+obviously, table 4 scores 1/2 for parsimony. These scores give a rough
+indication of how succinct the descriptions given by the concepts will
+be.
+
+</p><p align="justify">
+Note that table 3 above describes integers 2 and 3 in the same way
+(they both have 2 divisors). The user may prefer concepts which
+describe all the integers differently, such as table 0. However, in
+other domains, such as group theory, we usually want descriptions of
+isomorphic objects to be the same. Therefore, the user can give HR a
+<b>Gold Standard</b> categorisation that they are interested in, and
+HR can measure how close the categorisation given by a particular
+concept is to the gold standard, and use this to measure the concept
+itself. Table 0 above categorises all the integers differently, so we
+write [1][2][3][4] for the categorisation it gives. Table 3 gives this
+categorisation: [1][2,3][4], and table 4 gives this categorisation:
+[1,4][2,3]. Suppose that the user is interested in the following gold
+standard categorisation: [1][2,3,4].
+
+</p><p align="justify">
+We can first measure the <font color="red">INVARIANCE</font> of a
+concept, by measuring the proportion of pairs of integers which should
+be categorised together which are categorised correctly by the
+concept. Looking at the gold standard categorisation, we see that
+pairs (2,3),(2,4) and (3,4) should be categorised as the same.
+</p><ul>
+<li>Table 0 categorises (2,3), (2,4) and (3,4) as different, so scores
+0/3=0 for invariance.</li>
+<li>Table 3 categorises (2,3) as the same, but (2,4) and (3,4)
+differently, so scores 1/3 for invariance.</li>
+<li>Table 4 categorises (2,3) as the same, but (2,4) and (3,4)
+differently, so this also scores 1/3 for invariance.</li>
+</ul>
+
+<p align="justify">
+We can next measure the <font color="red">DISCRIMINATION</font> of a
+concept with a similar calculation using the pairs of integers which
+should are classed as different. Looking at the gold standard
+categorisation, we see that pairs (1,2),(1,3) and (1,4) should be
+categorised as different.
+
+</p><ul>
+<li>Table 0 categorises (1,2), (1,3) and (1,4) as different, so scores
+3/3=1 for discrimination.</li>
+<li>Table 3 categorises (1,2), (1,3) and (1,4) as different, so scores
+3/3=1 for discrimination.</li>
+<li>Table 4 categorises (1,4) as the same, but (1,2) and (1,3)
+differently, so this scores 2/3 for discrimination.</li>
+</ul>
+
+<p align="justify">
+If the user is not interested in a particular categorisation of the
+integers, they may ask HR to find as many possible categorisations,
+which means a wider coverage of the search space. To do this, HR
+should choose to build on the concepts with the least common
+categorisation, and HR uses the <font color="red">NOVELTY</font> measure
+to assess how often a categorisation has been seen. The following
+table shows how many times the categorisations given by the concepts
+have been seen:
+</p><p>
+</p><center>
+<table width="100" border="3">
+<tbody><tr>
+<td>Concept</td>
+<td>Categorisation</td>
+<td>Occurrences</td>
+</tr>
+<tr align="center"><td>0</td><td>[1][2][3][4]</td><td>1</td></tr>
+<tr align="center"><td>1</td><td>[1][2,3][4]</td><td>2</td></tr>
+<tr align="center"><td>2</td><td>[1,4][2,3]</td><td>2</td></tr>
+<tr align="center"><td>3</td><td>[1][2,3][4]</td><td>2</td></tr>
+<tr align="center"><td>4</td><td>[1,4][2,3]</td><td>2</td></tr>
+
+</tbody></table>
+</center>
+</a><p align="justify"><a name="classification">
+Therefore, we see that the most novel concept is number 1, because the
+categorisation given by it occurs nowhere else in the theory. Usually,
+there is a greater spread of number of occurrences, but in this case,
+concept 1 scores 1 for novelty, and the other concepts score 0.
+
+</a><a name="comprehensibility">
+</a></p><h2><a name="comprehensibility">Comprehensibility Measures</a></h2><a name="comprehensibility">
+
+<p align="justify">
+In the same way that it is desirable to produce parsimonious
+descriptions, we also want to produce simple, easy to understand
+concept definitions. Every time a production rule is used, in general,
+the definition becomes a little more complicated, and a little less
+comprehensible. In general, the more old concepts the user has to
+understand to be able to understand the definition of the present
+concept, the less comprehensible the definition will be. Therefore, HR
+measures the <font color="red">COMPREHENSIBILITY</font> of a concept as
+inversely proportional to the number of old concepts in its
+construction path. The construction history of concept 4 above was
+this:
+</p><p>
+</p><center>
+(0,size,[1])<br>
+(3,split,[2=2])<br>
+</center>
+<p align="justify">
+This means that to understand concept 4, it is necessary to understand
+3 concepts, namely concepts 0 and 3 and concept 4 itself. Therefore
+concept 4 scores 1/3 for comprehensibility.
+
+</p><p align="justify">
+If we look at two definitions that HR produces with 5 or less concepts
+in the construction path, we see that they are fairly understandable:
+</p><p>
+(a) &nbsp;[I,N] s.t. N = |{(a) : a | I}|</p><p>
+(b) &nbsp;[I,a] s.t. a | I &amp; a = |{(b) : b | I}|
+</p><p>
+However, if we look at two definitions with 10 concepts in the
+construction path, we see that they are fairly difficult to grasp:
+</p><p>
+(c) &nbsp;[I,a] s.t. -(a | I &amp; a = |{(b) : b | I}| &amp; (exists c d (-(I=c*d &amp; I | d &amp;
+c = |{(e) : e | I}|))))</p><p>
+(d) &nbsp;[I,N] s.t. N = |{(M) : M = |{(a b) : -(I=a*b &amp; I | b &amp; a = |{(c) :
+c | I}|)}| &amp; (exists d e (-(M=d*e &amp; M|e &amp; d = |{(f) : f | M}|)))}|
+</p><p>
+HR can provide graphs to show the construction history of a concept,
+from which the user can see how complicated the concept is. For
+example, here is the graph of the construction history of concept (c)
+above:
+</p><p>
+</p><center>
+<img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics4_files/path1.html">
+</center>
+</a><p align="justify"><a name="comprehensibility">
+Note that there are 10 boxes, 9 old concepts and the new concept. In
+practice, we make the search that HR performs depth limited based on
+this comprehensibility measure. We usually restrict the number of
+concepts in a new concept's construction path to be at most 7 or 8.
+
+</a><a name="statements">
+</a></p><h2><a name="statements">Provable Statements</a></h2><a name="statements">
+
+<p align="justify">
+Prime numbers are interesting because there are many interesting
+statements you can make about them. For example,
+</p><ul>
+<li>There are an infinite number of primes.</li>
+<li>Every integer &gt; 1 has a unique factorisation into primes.</li>
+<li>The number of primes less than <i>x</i> tends to
+<i>x/ln(x)</i>.</li>
+</ul>
+There are also some unanswered questions about primes:
+<ul>
+<li>Are there an infinite number of prime pairs?</li>
+<li>Given prime <i>p</i> what is the next prime? (without calculating
+and checking).</li>
+</ul>
+</a><p align="justify"><a name="statements">
+As discussed in </a><a href="#make_conjectures">Section 5</a> and <a href="#settle_conjectures">Section 7</a>, HR can make and sometimes
+prove or disprove conjectures about the concepts it has
+invented. Also, as detailed in <a href="#assess_conjectures">Section
+6</a>, HR can estimate the quality of the conjectures. Given a set of
+conjectures involving a concept, each with an associated measure of
+quality, a measure of the <font color="red">QUALITY OF
+CONJECTURES</font> of a concept can be calculated by simply taking an
+average of the scores for the conjectures.
+</p><hr>
+©&nbsp;Simon Colton 1999.
+
+
+
+
+
+
+
+
+</body></html>
+<!--
+     FILE ARCHIVED ON 20:37:58 Jul 22, 2001 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 10:44:16 May 16, 2016.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->

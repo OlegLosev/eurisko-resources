@@ -1,0 +1,1627 @@
+CLASSIFICATION RESULTS IN QUASIGROUP AND LOOP
+THEORY VIA A COMBINATION OF AUTOMATED
+REASONING TOOLS
+VOLKER SORGE, SIMON COLTON, ROY MCCASLAND, AND ANDREAS MEIER
+
+Abstract. We present some novel partial classification results in quasigroup
+and loop theory. For quasigroups up to size XXX and loops up to size YYY,
+we describe a unique property which determines the isomorphism (and in the
+case of loops, the isotopism) class for any example. These invariant properties
+were generated using a variety of automated techniques – including machine
+learning and computer algebra – which we present here. Moreover, each result
+has been automatically verified, again using a variety of techniques – including
+automated theorem proving, computer algebra and satisfiability solving – and
+we describe our bootstrapping approach to the generation and verification of
+these classification results.
+
+1. Introduction
+Given an equivalence class such as isomorphism or isotopism, in the process of
+deriving a classification of an algebraic domain such as loops and quasigroups, a
+natural first step is to count the number of equivalence classes for a given size. A
+natural next step is to describe the equivalence classes of a given size in terms of a
+property shared by all members of a class and by no members of another class. A
+(possibly infinite) full set of such invariant properties and a mapping from each size
+onto a subset of these properties constitutes a classification theorem, e.g., in Kronecker’s classification of Abelian groups [10] the invariant properties are described in
+terms of the cross-product decomposition of the group. Automated techniques have
+been used to good effect for the counting step, and numerous existence problems
+have been solved in this way, e.g., [19]. We present here an approach to automating
+the second step, namely to generate classification theorems for particular sizes of
+quasigroups and loops, which describe the isomorphism/isotopism class structure
+for each size.
+There are two important aspects to this approach. Firstly, the generation of
+invariant properties is key to the production of the classification theorems. We
+have used four different methods to produce these invariants: each method is given
+a pair of non-equivalent algebraic structures and is asked to determine a property
+that only one of them has. This is a description of a machine learning problem [14].
+Hence, our first approach – as described in section 3 – used a machine learning
+system, and derived first-order properties involving only the multiplication symbol
+and equality. This method was sufficient to produce isomorphism results for loops
+and quasigroups up to size ZZZ. Looking towards the final stage in classifying
+algebras, i.e., determining classifying properties shared by classes of different sizes
+(which usually describe families of algebraic structures, such as dihedral groups,
+etc.), we enhanced the approach to be able to count elements of a particular type,
+1
+
+2
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+and we found that this approach produced simpler classification theorems with
+more homogenuity across different orders.
+Turning to isotopism as the equivalence relation for loops, we found that the
+machine learning approach did not produce isotopic invariants. Instead, we used
+results from [7] to derive a method for generating equational invariants for loops,
+as described in section 4. This too had limitations, so we further invented methods for using sub-blocks of loops to produce invariants, as described in section 5.
+Using a combination of equational and sub-block invariants, we were able to produce isotopism classification results for loops up to size UUU. For each of the four
+invariant-generating methods described below, we give an overview of the method
+and present some example invarants that the method produced.
+The second major aspect to our approach is the automated verification of the
+results produced. This is important, because the theorems produced are too large
+to be checked by hand (given the number of the equivalence classes being considered). There are numerous lemmas which have to be proved in order to check an
+overall classification theorem, including: (a) checking that a property is invariant
+(b) checking that a particular algebraic structure satisfies the definition of a property (c) checking that a theorem covers all the equivalence classes for a particular
+size, etc. While some of these theorems pose little difficulty for automated theorem
+provers, we have found that other theorems are beyond the capabilities of state of
+the art provers. For this reason, we have experimented with numerous theorem
+proving systems and in some cases we have resorted to specifying the theorem as a
+satisfiability problem and using a SAT-solver. We have also used computer algebra
+techniques to simplify the problems being solved. In section 2, we describe how
+we combine these various reasoning systems and the invariant generation methods
+to derive and verify classification results for a given size of a given algebraic domain over a given equivalence relation. We conclude by presenting some of the
+classification theorems in full, and describing some future directions for our work.
+
+2. System Overview
+In [5], we have presented a bootstrapping procedure that constructs fully verified
+classification theorems for algebraic structures of fixed, finite order with respect to
+a given equivalence relation. In this section we briefly outline the technique. The
+algorithm starts with only the basic axioms of a particular algebraic structure, successively computes properties to separate non-equivalent structures, and returns a
+set of unique distinguishing properties for all equivalent classes together with representant structures. Schematically the bootstrapping procedure works as follows:
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+3
+
+Bootstrapping(n,P , ∼)
+1: Generate structure Q of cardinality n satisfying P.
+2: Let S = {(Q, P)}, I = {}.
+3: Repeat
+4:
+Pick (Q, P) ∈ S
+5:
+If (Q, P) represents an equivalence class for order n under ∼. then
+6:
+I = {(Q, P)} ∪ I
+7:
+Else
+8:
+Generate Q′ satisfying P, such that Q 6∼ Q′
+9:
+Find property P discriminating Q and Q′ under ∼
+10:
+S = S ∪ {(Q, P ∪ {P }), (Q′ , P ∪ {¬P })}
+11:Until S =
+6 ∅
+12:Return I.
+The bootstrapping procedure takes a set of properties, P, a cardinality, n, and
+an equivalence relation, ∼, as input. It returns a set, I, consisting of algebraic
+structures together with sets of properties that uniquely define equivalence classes
+with respect to ∼. Thus, the set I represents the desired classification theorem.
+I is constructed iteratively, by first generating an algebraic structure Q of order n
+satisfying the intial properties P (step 1). If we can show that Q together with P
+already forms an equivalent class then we are done (steps 5& 6). In case the proof
+fails we generate a structure Q′ satisfying the same properties as Q but that is not
+equivalent to Q. For the two structures we then compute a discriminant, i.e. a
+property invariant under ∼ such that it holds Q but not for Q′ . We then repeat the
+process for Q with properties P ∪ {P } and Q′ with P ∪ {¬P }. The bootstrapping
+procedure successively generates structures and refines discriminating properties
+until the full set of equivalence classes is computed.
+Technically the bootstrapping procedure generates a binary decision tree, where
+each leaf nodes correspond to the equivalence classes and each inner node represents
+branching with respect to a discriminating property. As an example we discuss the
+isomorphism classification theorem for quasigroups of order 3. The decision tree
+as well as the five isomorphism class representants are given in Fig. 1. The leaves
+2,4,7,8, and 9 of the tree are the isomorphism classes with respective representants
+Q2 , Q4 , Q7 , Q8 , Q9 , respectively. The properties labelling the edges of the tree correspond to the discriminating properties. Thus the properties uniquely determining
+the isomorphism class represented by a leaf corresponds to the conjunction of the
+properties given on a path from the vertex to the root. The overall classification
+theorem then corresponds to a disjunction of conjunction of discriminating properties.
+The bootstrapping procedure is a framework that combines a host of reasoning
+techniques which play their part in achieving the overall goal. While the general
+framework is implemented in a Lisp environment, it relies on third party systems
+to generate algebraic structures and discriminants, and to verify the construction
+of the decision tree at each step. We give a brief overview on the methodologies
+used in the different steps of the algorithm. For a more detailed description of the
+techniques and problem formalisations, we refer the reader to [5, 13, 20].
+Generating Algebraic Structures. We use model generation to construct algebraic structures. Model generation systems take as input a set of axioms, within
+
+4
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+¬P1
+
+1
+P1
+
+2
+
+3
+
+P2
+
+¬P2
+
+4
+
+P3
+6
+
+P4
+
+a
+b
+a
+c
+
+b
+a
+c
+b
+
+c
+c
+b
+a
+
+Q4
+a
+b
+c
+
+≡ ∃b
+≡ ∀b
+≡ ∃b
+≡ ∃b
+
+b◦b=b
+b◦b=b
+∀c b ◦ c 6= c
+∀c c ◦ b 6= c
+
+b
+b
+a
+c
+
+c
+c
+b
+a
+
+Q9
+a
+b
+c
+
+¬P3
+9
+
+¬P4
+
+7
+Q2
+a
+b
+c
+
+5
+
+P1
+P2
+P3
+P4
+
+8
+a
+a
+c
+b
+
+b
+c
+b
+a
+
+c
+b
+a
+c
+
+Q7
+a
+b
+c
+
+a
+a
+b
+c
+
+b
+b
+c
+a
+
+c
+c
+a
+b
+
+Q8
+a
+b
+c
+
+a
+a
+c
+b
+
+a
+a
+b
+c
+
+b
+c
+a
+b
+
+c
+b
+c
+a
+
+Figure 1. Decision tree for the classification problem of order 3 quasigroups.
+
+which various variables are universally or existentially quantified in first order logic.
+The aim of model generation systems is to find a complete set of instantiations of
+the variables so that the axioms are satisfied. In step 1 the algorithm calls a model
+generator with the input axioms to obtain structure that satisfies them. In step 8
+a model generator is not only supplied with the properties the desired structure
+should satisfy but also with an explicit formalisation of the structure it should not
+be equivalent to. We currently use the system Sem [22], Finder [18], and Mace [11].
+Generating Discriminants. The approach to constructing discriminating properties, necessary in step 9 of the bootstrapping procedure, varies from equivalence
+relation to equivalence relation. When dealing with the isomorphism relation, we
+treated the generation of a discriminant for a pair of algebras as a machine learning
+problem, and successfully applied automated theory formation [3] and inductive
+logic programming [6] with the HR system to such problems. HR starts with usersupplied background concepts and recursively applies one of 17 production rules to
+form new concepts from old ones in order to uniquely categorise the given concepts.
+When computing isomorphism invariants the supplied concepts are the multiplication tables of the two structures we want to discriminate. HR then derives new
+concepts and checks them against the tables in, using a forward look-ahead mechanism, which is able to make shortcuts in the search space to reach more promising
+candidates for to categorise the structures.
+While the machine learning approach works well to generate isomorphism invariants it generally fails produce invariants for isotopy classification. In light of this
+failure, we developed bespoke methods for generating isotopy invariants, which we
+as described in Sec. 4 and 5. These methods in turn make use of several third party
+system, and we will describe this in the respective sections.
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+5
+
+Verifying Properties. Throughout the bootstrapping procedure, all the results
+coming from third party systems are independently verified by first order automated
+theorem provers. Thus, for a given discriminant P and two algebras Q and Q′ , we
+show that (1) P is a proper discriminant for the equivalence relation E [which
+means that if Q and Q′ differ with respect to the property, then they cannot be
+members of the same equivalence class], (2) P holds for Q, and (3) P does not hold
+for Q′ . Proving these properties explicitly guarantees the overall correctness of the
+constructed decision tree. The proofs themselves are generally not very challenging,
+and we have experimented with several provers. We generally employ Spass [21],
+Vampire [16], and E [17] for these tasks.
+Verifying Equivalence Classes. The most difficult verification problems occurring during the classification process involve showing that a given node of the classification tree forms an equivalence class with respect to the equivalence relation
+under consideration. In other words, we need to verify that the tree cannot be
+expanded any further and that we do indeed have a leaf node. More formally, we
+need to prove that, for a particular set of properties P , all algebraic structures of
+cardinality n, which satisfy P , are equivalent, and every member of the equivalence
+class satisfies P . These types of proofs are necessary to fully verify the completeness
+of a decision tree. Although the theorems are essentially second order, because we
+work in a finite domain, they can be expressed as propositional logic problems by
+enumerating all possible equivalence mappings for structures of cardinality n and
+thus can be made accessible to automated theorem proving systems. We have been
+particularly successful using satisfiability solvers.
+Satisfiability solvers are akin to model generators, but have more restricted representation requirements for the axioms to satisfy. In particular, each axiom must be
+a disjunction of boolean variables, and so the axiom set is expressed in conjunctive
+normal form. Given this restriction, more powerful solving techniques are available
+to SAT-solvers. In addition, we have employed some so-called SMT solvers, which
+extend satisfiability solving by enabling the usage of additional decision procedures
+for particular theories. We have used the solvers zChaff solver [15], DPLLT [8], and
+CVC-3 [2].
+While using SAT solvers increases the power of our algorithm, if translated
+naively, many of the proof problems would still be beyond the capabilities of state
+of the art systems. To enable us to solve these problems, we implemented some
+computer algebra algorithms in GAP [9] to reduce their complexity. For example,
+when showing that a particular set of properties constitutes an isomorphism class for
+structures of order n, the formulation of theorem in propositional logic essentially
+amounts to enumerating and checking all possible bijective mappings between two
+structures of size n. Thus the number of mappings to consider grows quickly and to
+reduce it we use GAP to compute a generating system for the representant of the
+isomorphism class in question, thereby enabling us to reduce the number of bijective
+mappings to consider on those on the generators alone. For the related isotopy
+problem, i.e., proving that all loops with a particular property are isotopic to each
+other, we have developed a similar technique. However, since generating systems
+are not invariant under isotopy we instead generate all f g-isotopes of the given
+equivalence class representant and then show that every loop in the isotopy class
+has to be isomorphic to one of the f g-isotopes, which enables us to again reduce the
+
+6
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+number of mappings to consider to only those on the respective generating systems.
+For more details on these techniques see [20].
+3. Multiplication Isomorphism Invariants
+As we shall see in section 2, our automated approach to generating classification theorems relies heavily on a method to generate a discriminating property
+when given two example structures. That is, for instance, given two examples of
+non-equivalent loops, we need a method to determine a property which not only
+discriminates between the two loops but is sufficiently general enough that we can
+prove that two structures which differ according this discriminant cannot be equivalent. Stated in this fashion, this is an instance of a machine learning problem,
+and hence our first approach to generating invariants used our machine learning
+system, HR, which is described in detail in [3].
+In the application described here, HR starts with the two example algebraic
+structures and some background concepts describing them: the multiplication table
+(loops, quasigroups and groups), the concept of the identity element (loops and
+groups) and the concept of inverse elements (groups). HR then invents new concepts
+from old ones using a number of production rules. For instance, HR might use the
+match production rule to invent the concept of idempotent elements in loops (x s.t.
+x = x ◦ x). It then might use the exists production rule to invent the concept of
+loops where there is such an idempotent element, followed by the negate production
+rule to invent the concept of loops with no idempotent elements. In this way, HR
+is able to produce a theory containing such concepts, and if the production rules
+are restricted, then the concept definitions will be expressed in first order logic (in
+the syntax of the Otter theorem prover [12]. Given the definitions of identity and
+inverse elements, each invariant is therefore simply an expression of a sequence of
+multiplication terms which only one structure has.
+While HR has the ability to tailor its search to find discriminating concepts (as
+described in [4]), for the experiments described here, we simply ran HR with an
+exhaustive search until it found a single discriminating property, at which stage it
+outputs this result and terminates. The reason for this style of search is that it
+means that HR will consider simpler concepts for discriminants before more complex
+ones, which is important as the concepts will be used later in numerous proofs. One
+such proof is to show that the property HR finds is indeed an invariant, which can
+be expressed in first order logic and hence first order resolution theorem provers can
+be used to prove these results by refutation. As an exmaple, consider the proof that
+the property of all elements in a quasigroup being idempotent is invariant under
+isomorphism. Paraphrasing from the refutation proof of this found by a prover, let
+(G, ◦), (H⋆) be quasigroups with isomorphism ϕ : G → H. If ∀g ∈ G(g ◦g = g) then
+we also have for every h ∈ H: h ⋆ h = h. This is shown by first assuming that there
+is a h ∈ H such that h ⋆ h 6= h. Since G and H are isomorphic, there exists a unique
+g ∈ G with ϕ(g) = h. Then we have h ⋆ h = ϕ(g) ⋆ ϕ(g) = ϕ(g ◦ g) = ϕ(g) = h,
+which contradicts the assumption that h⋆h 6= h, hence proving the invariant nature
+of the property.
+4. Equational Isotopy Invariants
+Our first method to obtain isotopy invariants for loops is by adapting Falconer’s
+concepts of derived and universal identities presented in [7] to our needs. So far
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+7
+
+it was sufficient to regard quasigroups and loops respectively as sets with a single
+operations. But in order to follow Falconer’s construction we will now define the
+two additional operations \ and /.
+Let (Q, ◦) be a quasigroup, then we define two operations \ and / on Q such
+that
+(1) x · (x\y) = y and x\(x · y) = y
+(2) (y/x) · x = y and (y · x)/x = y
+Given a word w in Q then define its isotopically related word w by recursively
+applying the following transformations:
+(1) if w = x, then w = x;
+(2) if w = u · v, then w = (u/y) · (z\v)
+where y, z ∈ Q do not occur in w. For a given identity w1 = w2 , where w1 , w2
+are words in Q we call the w1 = w2 a derived identity. A derived identity that is
+invariant under isotopy a called universal identity.
+From a logical point of view an identity w1 = w2 as an equality where all variables
+occurring in the two words w1 and w2 are universally quantified. Moreover, the
+derived identity w1 = w2 are constructed by introducing two new, universally
+quantified variables y and z. As an example of a universal identity, we consider the
+two following loops:
+L4
+0
+1
+2
+3
+4
+5
+
+0
+0
+1
+2
+3
+4
+5
+
+1
+1
+2
+0
+5
+3
+4
+
+2
+2
+0
+1
+4
+5
+3
+
+3
+3
+5
+4
+1
+0
+2
+
+4
+4
+3
+5
+0
+2
+1
+
+5
+5
+4
+3
+2
+1
+0
+
+L8
+0
+1
+2
+3
+4
+5
+
+0
+0
+1
+2
+3
+4
+5
+
+1
+1
+2
+0
+5
+3
+4
+
+2
+2
+0
+1
+4
+5
+3
+
+3
+3
+4
+5
+1
+0
+2
+
+4
+4
+5
+3
+0
+2
+1
+
+5
+5
+3
+4
+2
+1
+0
+
+The following universal identity holds for L4 but does not hold for L8 :
+∀x ∀y1 ∀y2 (x/y1 ) · (((x/y1 ) · (y2 \x)) · (y2 \x)) =
+((x/y1 ) · (y2 \x)) · ((x/y1 ) · (y2 \x)).
+This universal identity was derived from the following loop identity:
+∀x x · ((x · x) · x) = (x · x) · (x · x)
+Falconer’s concept of universal identity depends on deriving universial identities
+from loop identities that hold for the free loop. However, in our adaptation we work
+in a strictly finite setting in order to derive universal identities that can be used
+as isotopy invariants to discriminate between loops. We have therefore devised the
+following algorithmic approach to construct universal identities:
+(1) In a first step our algorithm systematically generates simple identities, i.e.
+universally quantified equations of the form w1 = w2 .
+(2) It checks whether a non-trivial loop of size 4 to 8 exists satisfying the
+identity. This is achieved with a finite model generator.
+(3) If such a loop exists the algorithm rewrites w1 = w2 to its corresponding
+derived identity w1 = w2 .
+(4) The derived identity is then passed to a first order theorem prover to show
+that it is invariant under isotopy. If the theorem prover succeeds w1 = w2
+is indeed a universal identity.
+
+8
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+The presented algorithm is very effective and to date we have generated 8, 530
+universal identities. Moreover, despite starting in a very small finite setting, the
+resulting universal identities are shown to be isotopy invariants independent of
+the order of the loops or whether they are finite. Nevertheless, using universal
+identities only to find discriminating properties is not necessarily sufficient as there
+is no theoretical result guaranteeing that for two given non-isotopic quasigroups
+there exists always a discriminating universal identity. Moreover, finding a suitable
+identity amounts to a considerable search task. Thus we have developed a more
+goal-directed approach to construct isotopy invariants using exhaustive counting
+arguments.
+5. Sub-Block Isotopy Invariants
+As a more reliable method to obtain isotopy invariants we developed the necessary theoretical tools to generate invariants based on exhaustive counting arguments
+examining properties of sub-blocks of loops.
+Let (G, ·) be a quasigroup, and let A and B be non-empty subsets of G. We
+adopt the usual notation for the set A · B, namely, A · B = {a · b : a ∈ A ∧ b ∈ B}.
+Lemma 1. Let (G, ·) be a quasigroup and let (H, ∗) be a quasigroup that is isotopic
+to (G, ·) under the bijections (α, β, γ). Then, for any non-empty subsets A and B
+of G, we have |A · B| = |α(A) ∗ β(B)|.
+Proof. Observe that since γ is a bijection, then |γ(A · B)| = |A · B|. It suffices then
+to show that γ(A · B) = α(A) ∗ β(B). But this follows immediately from the fact
+that for all a ∈ A and b ∈ B, we have γ(a · b) = α(a) ∗ β(b).
+
+When G is finite, one can interpret the elements of A (resp., B) as designating a
+subset of rows (resp., columns) in the multiplication table of G. The set A · B then
+consists of the elements where these rows and columns meet. The above result thus
+suggests the following notation:
+Notation 2. Let (G, ·) be a quasigroup of order n, and let i, j, k each be integers
+such that 1 ≤ i, j, k ≤ n. Let G(i, j, k) denote the set:
+G(i, j, k) = {(A, B) : A, B ⊆ G, |A| = i, |B| = j, |A · B| = k}
+Theorem 3. Let (G, ·) and (H, ∗) be isotopic quasigroups of order n, and let i, j, k
+each be integers such that 1 ≤ i, j, k ≤ n. Then |G(i, j, k)| = |H(i, j, k)|.
+Proof. Note that the one-to-one correspondence between the collection of ordered
+pairs (A, B) such that A, B ⊆ G, |A| = i, |B| = j, and the corresponding collection
+of ordered pairs of subsets of H, is preserved under isotopy. The result now follows
+easily from Lemma 2.
+
+Example 4. As an
+loops:
+L38 0 1 2
+0 0 1 2
+1 1 2 5
+2 2 5 0
+3 3 4 1
+4 4 0 3
+5 5 3 4
+
+example for sub-block invariants, consider the following two
+3
+3
+0
+4
+5
+1
+2
+
+4
+4
+3
+1
+2
+5
+0
+
+5
+5
+4
+3
+0
+2
+1
+
+L20
+0
+1
+2
+3
+4
+5
+
+0
+0
+1
+2
+3
+4
+5
+
+1
+1
+2
+0
+4
+5
+3
+
+2
+2
+0
+1
+5
+3
+4
+
+3
+3
+5
+4
+1
+0
+2
+
+4
+4
+3
+5
+2
+1
+0
+
+5
+5
+4
+3
+0
+2
+1
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+9
+
+Loop L38 contains 4 different 2 × 2 sub-blocks that contain exactly 2 distinct elements, i.e., we have |L38 (2, 2, 2)| = 4. In detail, the single sub-blocks are the
+following:
+0 2
+2 4
+1 3
+3 5
+0 0 2
+1 5 3
+2 5 4
+4 1 2
+2 2 0
+4 3 5
+3 4 5
+5 2 1
+For loop L20 on the other hand, we have |L20 (2, 2, 2)| = 0 since it does not contain
+a single 2 × 2 sub-block with two distinct elements.
+The above results form the basis for two more isotopy-invariants, which we now
+present: frequency tuples and patterns.
+5.1. Frequency Tuples. Continuing with the notation above, fix an element (A, B) ∈
+G(i, j, k), and for each gh ∈ A · B, with 1 ≤ h ≤ k, let
+f (gh ) = |{(a, b) ∈ A × B : a · b = gh }|
+In other words, f (gh ) is the number of times that gh appears in the block formed by
+A and B, henceforth referred to as the A·B block. We let F (A, B) = (f (g1 ), . . . , f (gk )),
+and call this the (un-ordered) frequency-tuple of (A, B). If two such frequency-tuples
+F and F ′ are the same (up to order), then we write F ≈ F ′ . (We thank the anonymous referee for his/her suggestion that frequency tuples could have been treated
+as multisets.)
+Lemma 5. Let (G, ·) and (H, ∗) be isotopic quasigroups (under the bijections
+(α, β, γ)) of order n, and let i, j, k each be integers such that 1 ≤ i, j, k ≤ n. If
+(A, B) ∈ G(i, j, k), then F (A, B) ≈ F (α(A), β(B)).
+Proof. In light of Theorem 3, it suffices to prove that, for every g ∈ A · B, f (g) =
+f (γ(g)). But this equality follows immediately from the fact that if a · b = g, then
+α(a) ∗ β(b) = γ(g).
+
+Given this latest result, we adopt the following notation:
+Notation 6. Let (G, ·) be a quasigroup of order n, let i, j, k be integers such that
+1 ≤ i, j, k ≤ n, and let F be a frequency-tuple for some (C, D) ∈ G(i, j, k). Then,
+let G(i, j, k, F ) denote the set:
+G(i, j, k, F ) = {(A, B) ∈ G(i, j, k) : F (A, B) ≈ F }
+Theorem 7. Let (G, ·) be a quasigroup of order n, let i, j, k be integers such that 1 ≤
+i, j, k ≤ n, and let F be a frequency-tuple for some (C, D) ∈ G(i, j, k). Furthermore,
+let (H, ∗) be a quasigroup isotopic to (G, ·). Then |G(i, j, k, F )| = |H(i, j, k, F )|.
+Proof. This is an immediate consequence of Lemma 5 and Theorem 3.
+Example 8. To illustrate the idea of frequencies, consider again
+gether with the two 3 × 3 sub-blocks S1 and S2 given on the right:
+L38 0 1 2 3 4 5
+0 0 1 2 3 4 5
+S1 3 4 5
+S2 0
+1 1 2 5 0 3 4
+0 3 4 5
+1 1
+2 2 5 0 4 1 3
+1 0 3 4
+2 2
+3 3 4 1 5 2 0
+2 4 1 3
+3 3
+4 4 0 3 1 5 2
+5 5 3 4 2 0 1
+
+
+
+the loop L38 to-
+
+4
+3
+1
+2
+
+5
+4
+3
+0
+
+10
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+Both sub-blocks contain the same number of distinct elements, namely 5. However,
+S1 contains three elements (0, 1, 5) once and two elements (3, 4) three times, whereas
+S2 contains two elements (0, 4) once, two elements (1, 2) twice, and one element (3)
+three times. Thus S1 has the frequency tuple (1, 1, 1, 3, 3) and S2 has the frequency
+tuple (1, 1, 2, 2, 3). Overall for L38 we have invariants |L38 (2, 2, 2, (1, 1, 1, 3, 3))| = 4
+and |L38 (2, 2, 2, (1, 1, 2, 2, 3))| = 52.
+5.2. Patterns. Given non-empty subsets A and B of a quasigroup (G, ·), we look
+for patterns amongst the numbers of distinct elements within the respective subblocks. By this, we mean the following: Let |A| = i, |B| = j, and choose i′ , j ′
+such that 1 ≤ i′ ≤ i and 1 ≤ j ′ ≤ j. Now for each k, 1 ≤ k ≤ n, we let
+AB(i′ , j ′ , k) = {(A′ , B ′ ) : A′ ⊆ A, B ′ ⊆ B, |A′ | = i′ , |B ′ | = j ′ , |A′ · B ′ | = k}.
+Furthermore, let pk = |AB(i′ , j ′ , k)|. In other words, pk is the number of i′ × j ′
+sub-blocks of the A · B block, that have precisely k distinct entries. We now let
+Pi′ ,j ′ (A, B) = (p1 , . . . , pn ), and we call Pi′ ,j ′ (A, B) the i′ × j ′ pattern-tuple of
+(A, B).
+Lemma 9. Let (G, ·), (H, ∗), (α, β, γ), i, j, k, n be as in Lemma 5, and let i′ , j ′ be
+integers such that 1 ≤ i′ ≤ i and 1 ≤ j ′ ≤ j. If A, B ⊆ G such that |A| = i and
+|B| = j, then Pi′ ,j ′ (A, B) = Pi′ ,j ′ (α(A), β(B)).
+Proof. Note that for each k, 1 ≤ k ≤ n, and for each (A′ , B ′ ) ∈ AB(i′ , j ′ , k), we
+have |A′ · B ′ | = |α(A′ ) ∗ β(B ′ )|, by Lemma 1. Now since α and β are bijections,
+then (A′ , B ′ ) ∈ AB(i′ , j ′ , k) if and only if (α(A′ ), β(B ′ )) ∈ α(A)β(B)(i′ , j ′ , k). The
+result follows.
+
+Following similar lines as previously, we introduce the following notation:
+Notation 10. Let (G, ·) be a quasigroup of order n, and let Pi′ ,j ′ be an i′ × j ′
+pattern-tuple of (C, D) for some C, D ⊆ G such that |C| = i and |D| = j (1 ≤
+i, j ≤ n), where integers i′ , j ′ are such that 1 ≤ i′ ≤ i and 1 ≤ j ′ ≤ j. We let
+G(i, j, Pi′ ,j ′ ) denote the set:
+G(i, j, Pi′ ,j ′ ) = {(A, B) : A, B ⊆ G, |A| = i, |B| = j, Pi′ ,j ′ (A, B) = Pi′ ,j ′ }
+
+Theorem 11. Let (G, ·) be a quasigroup of order n, and let Pi′ ,j ′ be an i′ × j ′
+pattern-tuple of (C, D) for some C, D ⊆ G such that |C| = i and |D| = j (1 ≤
+i, j ≤ n), where integers i′ , j ′ are such that 1 ≤ i′ ≤ i and 1 ≤ j ′ ≤ j. Furthermore,
+let (H, ∗) be a quasigroup isotopic to (G, ·). Then |G(i, j, Pi′ ,j ′ )| = |H(i, j, Pi′ ,j ′ )|.
+Proof. This follows immediately from Lemma 9.
+
+
+
+Example 12. We illustrate patterns with the example of loop L25 below in which
+we are interested in 2 × 2 pattern tuples within 4 × 4 sub-blocks. The particular
+sub-block S below contains exactly one 2 × 2 sub-block with exactly two distinct
+elements.
+L25 0 1 2 3 4 5
+S 1 2 3 4
+0 0 1 2 3 4 5
+S′ 2 4
+1 1 2 0 4 5 3
+2 0 1 5 3
+2 2 0 1 5 3 4
+3 5 4 1 0
+2 1 3
+3 3 5 4 1 0 2
+4 3 5 0 2
+5 3 1
+4 4 3 5 0 2 1
+5 4 3 2 1
+5 5 4 3 2 1 0
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+11
+
+The overall pattern tuple for S ′ is P2,2 = (0, 1, 12, 23, 0, 0). The invariant for L25
+counting the number of 4×4 sub-blocks with a pattern-tuple P2,2 = (0, 1, 12, 23, 0, 0)
+is |L25 (4, 4, P2,2)| = 18.
+In order to generate additional invariants for a given pair of quasigroups (G, ·)
+and (H, ∗), we employ Theorem 11 in a similar fashion to that used in section ??.
+That is, we successively compare the number of patterns of the same size and the
+same number of distinct elements.
+Observe that, rather than considering the entire i′ ×j ′ pattern-tuple of (A, B), we
+could instead, for instance, focus on only one component at a time, which simplifies
+the resulting invariant properties. With this in mind, we let Pi′ ,j ′ (A, B)(k) denote
+the k-th component of the ordered n-tuple Pi′ ,j ′ (A, B). It is obvious then that,
+in the context of Lemma 9, we have Pi′ ,j ′ (A, B)(k) = Pi′ ,j ′ (α(A), β(B))(k) . This
+leads to some further notation:
+Notation 13. Let (G, ·) be a quasigroup of order n, and let i, j, i′ , j ′ , k, pk be
+integers such that 1 ≤ i, j, k ≤ n, 1 ≤ i′ ≤ i, 1 ≤ j ′ ≤ j and pk ≥ 0. We let
+(G, i, j, i′ , j ′ , k, pk ) denote the set:
+(G, i, j, i′ , j ′ , k, pk ) =
+{(A, B) : A, B ⊆ G, |A| = i, |B| = j and Pi′ ,j ′ (A, B)(k) = pk }
+Note that we have effectively proved the following corollary:
+Corollary 14. Let (G, ·), (H, ∗), i, j, i′ , j ′ , k, n be as in Lemma 9, and let pk be a
+non-negative integer. Then
+|(G, i, j, i′ , j ′ , k, pk )| = |(H, i, j, i′ , j ′ , k, pk )| .
+We now combine the notions of patterns and frequencies, by first expanding
+the notation AB(i′ , j ′ , k), described at the beginning of this section. The idea is
+that, for a given (A, B) ∈ G(i, j, Pi′ ,j ′ ), we want to see how the frequency-tuples
+F (A′ , B ′ ) are distributed, for each (A′ , B ′ ) ∈ AB(i′ , j ′ , k) (1 ≤ k ≤ n). To this end,
+for a frequency-tuple F of size k, we let AB(i′ , j ′ , k, F ) = {(A′ , B ′ ) ∈ AB(i′ , j ′ , k) :
+F (A′ , B ′ ) ≈ F }. This effectively partitions the collection of i′ × j ′ sub-blocks of
+the A · B block, according to both their number of distinct elements and their
+frequency-tuples. We refer to this partition as the i′ × j ′ frequency distribution
+Fi′ ,j ′ (A, B) of the A · B block.
+Now since each of these properties – number of distinct elements, frequencytuples, and pattern-tuples – is preserved under isotopism, then it follows that the
+number of i × j blocks with both a given pattern-tuple Pi′ ,j ′ and a given frequency
+distribution Fi′ ,j ′ , is likewise preserved under isotopism. We could, of course, extend
+these properties recursively, by looking at sub-blocks of sub-blocks, and so on.
+It is an interesting question whether such a recursive extension would suffice to
+completely classify all (finite) loops.
+All of the invariants in this section can be straightforwardly computed by appropriate recursive algorithms, which we have implemented in the Lisp environment
+of the overall bootstrapping algorithm. The general idea is to recursively inspect
+two loops by exhaustively computing sub-block, frequency, and pattern invariants,
+and combinations thereof, until a discriminating property has been found.
+
+12
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+6. Coefficient Isomorphism Invariants
+Drawing on existing mathematical results, we note that there are 14 groups of
+size 8 or smaller up to isomorphism. Moreover, they are usually classified either
+in terms of a parameterisation consisting of a family that they belong to and their
+size, e.g., the cyclic group of order 5 (C5 ), the dihedral group of order 8 (D4 ), etc.,
+or in terms of a cross product of such parameterised groups, e.g., C2 × C4 . In order
+to extend our classification approach, we have looked at the automatic generation
+of parameterisations of finite algebraic structures. This is motivated by a desire to
+have classification theorems apply not only to single orders of algebraic structures,
+but to be homogeneous across orders.
+Our first approach has been to look at parameterisations of algebraic structures
+in terms of a list of set sizes, where each set contains elements of the structures
+with particular properties. For instance, groups up to size 6 can be classified
+up to isomorphism by using a parameterisation in terms of two coefficients: the
+number of elements and the number of self-inverse elements (x s.t. x = x−1 ). The
+choice of counting set sizes is motivated by the desire to use counting, as this is
+an important tool in producing classification results, which we have not yet tried
+with isomorphism classifications. Moreover, there is a standard – if cumbersome –
+way of formalising such set-size results in first order logic, which enables us to get
+proofs of our results from automated theorem provers.
+Suppose we start with a set of algebraic structures A = {A1 , . . . , An } and a list
+of element-type concepts C = {c1 , . . . , ck }. An element-type concept is a boolean
+test on an element in an algebraic structure, for instance whether the element is
+idempotent (x ∗ x = x). We then define the profile of a given a ∈ A with respect
+to C as: P (a) = h|{x ∈ a : c1 (x)}|, . . . , |{x ∈ a : ck (x)}|i. We further say that C
+represents an element-type parameterisation of A if no pair of algebraic structures
+in A have the same profile. If A contains representatives of each isomorphism class
+up to a certain size n for a specific algebraic structure, then the parameterisation
+can be used to classify that structure up to size n, and this classification can be
+proved (as described below).
+We constructed such classifying parameterisations for loops up to size 5, groups
+up to size 8 and quasigroups up to size 4 as follows (for clarity, we will use the
+groups up to size 8 as an illustrative example). We started with a set of groups,
+A, with each member being a representative of a different isomorphism class, and
+all the isomorphism classes covered. We used A in the background knowledge for
+the HR automated theory formation system. Details of how HR works have been
+given in section 3. For our purposes here, HR is a concept generator, i.e., given
+some background concepts such as the multiplication operator in groups, HR will
+invent concepts such as commutativity, etc. In particular, HR is able to generate
+hundreds of element-type concepts.
+We ran HR for 1000 theory formation steps. From the resulting theory, we
+extracted the set, C, of element-type concepts and we used these to automatically
+construct a parameterisation P as follows: The first concept in the parameterisation
+list is chosen as the overall size of the algebraic structure, largely for reasons of
+comprehensibility. We then check the parameterisation against A, and remove
+from A any structures a for which the profile of a is different from all the others.
+We then iteratively add to P the concept c ∈ C which differentiates the largest
+number of pairs of structures from A. Note that we say c differentiates a1 and a2
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+Domain and
+Classes Achieved
+(Sizes)
+Groups (1-8)
+14
+14
+Loops (1-5)
+11
+11
+Loops (1-6)
+120
+86
+Quasigroups (1-4)
+42
+42
+Table 1. Parameterisation details in
+
+13
+
+Steps
+
+Element Classifiers Time
+Types
+(s)
+1000
+32
+3
+28
+1000
+32
+3
+10
+40000
+736
+11
+2903
+10000
+523
+5
+215
+loop, group and quasigroup theory
+
+iff |{x ∈ a1 : c(x)}| =
+6 |{x ∈ a2 : c(x)}|. Each time a new concept is added, P
+is checked against A, and – as before – any structure which has a unique profile
+is removed. This iteration continues until either A is empty (in which case a full
+parameterisation has been constructed), or there are no concepts left to try. In the
+output, each structure a is presented with only the concepts needed to distinguish
+it from the others. The conjunction of this set of concepts is a classifying concept
+for the isomorphism class represented by a.
+We ran the same experiment for loops up to size 5. For quasigroups up to size
+4, we increased the number of theory formation steps to 10000, and for loops up to
+size 6, we increased it to 40000. The results are presented in table 1. We see that
+the method was able to produce full parameterisations in a reasonable time (on a
+2.1GHz machine) for the groups, quasigroups and loops to size 5 datasets. However,
+it only achieved a partial classification of 86 of the 120 loop classes up to size 6.
+Note that the Element-types column above describes the total number of elementtypes produced by HR, while the Classifiers columns describes the number of these
+which were used in the parameterisation. The group theory parameterisation was
+particularly simple, in terms of counting 3 elements types, namely (i) elements
+themselves (ii) self-inverse elements and (iii) elements which appear on the diagonal
+of the multiplication table. The sizes 1 to 5 loop theory parameterisation also
+required counting only 3 element types: (a) elements themselves (b) elements on
+the diagonal of the multiplication table and (c) elements, x such that ∃ y (y ∗ x =
+id∧y ∗y = x). We think it is an achievement to be able to classify all 42 quasigroups
+up to size 4 by counting only 5 element types, and to classify 86 of the 120 loops up
+to size 6 by counting 11 element types. We present the full classification theorem
+achieved for quasigroups of size 4 in section 7.
+To prove that the conjunctions of set sizes represent classifying concepts, we first
+translate the set-size properties into full first order logic by expressing the counting
+argument in a formal way. For instance, we define the property of having two
+self-inverse elements (in group theory) as
+∃x, y x 6= y ∧ x−1 = x ∧ y −1 = y ∧ (∀z z −1 = z → (z = x ∨ z = y)).
+We then need to solve two types of problems: (1) proving that the given conjunction
+of set-size properties is an invariant under isomorphism for a particular type of
+algebraic structure, regardless of the size of the structures, and therefore serves as
+a discriminant, and (2) that the discriminant uniquely defines an isomorphism class
+for algebraic structures of a given size.
+Problems of type (1) are easy to formalise as ∀A1 , A2 P(A1 ) ∧ P(A2 ) ∧ P (A1 ) ∧
+¬P (A2 ) → A1 6∼
+= A2 , where P describes the axiomatic properties of the algebraic
+structures and P is the discriminant under examination. They can be expressed
+
+14
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+in first order logic by considering the sets A1 and A2 as arbitrary but different
+constants and formulating their axiomatisations with disparate operations. Proving these theorems is relatively easy and we used the first order prover Spass [21].
+Problems of type (2) are less trivial since they are essentially second order theorems: we have to show that all algebraic structures that have property P are also
+isomorphic to the representant (which we call AR ), i.e.:
+∀A [P(A) ∧ P (A)] → [∃φ bijective(φ) ∧ homomorphic(φ) ∧ φ(A) = AR ].
+However, since we are in a finite domain, we can explicitly formulate the problem
+in propositional logic: We give AR in terms of its elements and multiplication table
+and then formulate all possible bijective mappings from an arbitrary structure A
+onto the elements of AR . However, since the number of mappings to consider is
+n!, where n is the size of the structures A and AR , the technique quickly becomes
+infeasible, even for small n. We therefore use a computer algebra device by restricting the mappings to consider a generating system of AR , i.e., a set of elements
+that can generate all other elements of the structure together with all generating
+equations. While the problem formulation can still be relatively lengthy, we found
+that we could solve problems up to size 8 using the CVC-3 [2] system. In our
+experiments, we were successful in fully automatically generating and proving the
+necessary theorems for quasigroups of up to size 4, loops up to size 5, as well as the
+majority of the 86 loops 6 problems. For groups up to size 8, however, our system
+failed to produce three problem formulations due to their size. On a positive note,
+all problems for which a formulation could be produced were shown to be correct
+by CVC-3 in less than 1 minute. We are currently optimising our routines to more
+efficiently produce larger problem formalisations, and we expect to solve the size 8
+problems in due course.
+7. Classification Theorems
+Isomorphism results
+•
+•
+•
+•
+•
+
+Quasigroups of order 3
+Quasigroups of order 4
+Quasigroups of order 5
+Idempotent Quasigroups of order 6
+Quasigroups of order 6 with additional property ∃x ∀y (y ◦ x) ◦ (x ◦ y) = x.
+(The property is a generalised form of the QG3 property ∀x ∀y (y ◦ x) ◦
+(x ◦ y) = x.)
+• Quasigroups of order 7 with the additional property QG9 ∀x ∀y (((y ◦ x) ◦
+x) ◦ x) = y. (Not finished)
+• Loops of order 5
+• Loops of order 6
+• Idempotent Loops of order 7 (not finished)
+Isotopism results
+• Loops of order 6
+• Loops of order 7
+Isomorphism Classification Theorem for Quasigroups of order 4
+We are given the following properties of quasigruops:
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+15
+
+P1 :∀b ∀c (b ◦ (b ◦ c)) = c
+P2 :∀b ∃c (c ◦ c) = b
+P3 :∀b ((b ◦ b) ◦ (b ◦ b)) = (b ◦ b)
+P4 :∀b ∀c (c ◦ b) = (b ◦ c)
+P5 :∃b (b ◦ b) = b
+P6 :∀b ∀c (c ◦ b) = (b ◦ c)
+P7 :∀b ∀c (c ◦ b) = (b ◦ c)
+P8 :∀b ((b ◦ b) ◦ (b ◦ b)) = (b ◦ b)
+P9 :∀b ∃c ((c ◦ b) ◦ c) = b
+P10 :∀b ∃c (c ◦ b) = c
+P11 :∀b ∃c (b ◦ c) = c
+P12 :∀b ∃c ((c ◦ b) ◦ (c ◦ b)) = c
+P13 :∃b (b ◦ b) = b
+P14 :∀b ∃c (c ◦ b) = c
+P15 :∃b (b ◦ b) = b
+P16 :∀b ∃c (c ◦ (b ◦ c)) = b
+P17 :∀b ((b ◦ b) ◦ b) = b
+P18 :∀b (b ◦ b) = b
+P19 :∀b ∃c (c ◦ c) = b
+P20 :∀b ∃c ∃d ((c ◦ d) = b ∧ (¬(d ◦ d) = b))
+P21 :∀b ∀c ((¬(b ◦ c) = b) ∨ (c ◦ c) = c)
+P22 :∀b ∃c (c ◦ b) = c
+P23 :∃b (b ◦ b) = b
+P24 :∀b ((b ◦ b) ◦ (b ◦ b)) = (b ◦ b)
+P25 :∃b (b ◦ b) = b
+P26 :∃b ∃c ((b ◦ c) = b ∧ ((¬(b ◦ b) = c) ∧ (c ◦ b) = b))
+P27 :∀b ((¬(b ◦ (b ◦ b)) = b) ∨ ((b ◦ b) ◦ b) = b)
+P28 :∀b ∀c ((¬(b ◦ c) = b) ∨ ((b ◦ b) = c ∨ (¬(c ◦ b) = b)))
+P29 :∀b ∃c ((c ◦ (c ◦ b)) = b ∧ (¬(b ◦ c) = (c ◦ b)))
+P30 :∀b ∃c ((¬(c ◦ (c ◦ b)) = b) ∧ (b ◦ c) = (c ◦ b))
+P31 :∀b ∃c ((b ◦ c) ◦ (b ◦ c)) = c
+P32 :∀b ∃c (c ◦ b) = c
+P33 :∀b ((b ◦ b) ◦ (b ◦ b)) = (b ◦ b)
+P34 :∃b (b ◦ b) = b
+P35 :∃b ∃c ((b ◦ c) = c ∧ (¬(b ◦ b) = b))
+P36 :∃b ((b ◦ (b ◦ b)) = b ∧ (¬((b ◦ b) ◦ b) = b))
+
+Then quasigroups of order 4 are characterised up to isomorphism by one of the
+following conjunction of properties (and their negations):
+(P1 ∧ P3 ∧ P6 )
+(P1 ∧ P3 ∧ ¬P6 )
+(P1 ∧ ¬P3 ∧ P7 )
+(P1 ∧ ¬P3 ∧ ¬P7 ∧ P12 )
+(P1 ∧ ¬P3 ∧ ¬P7 ∧ ¬P12 ∧ ¬P19 ∧ P25 )
+(P1 ∧ ¬P3 ∧ ¬P7 ∧ ¬P12 ∧ ¬P19 ∧ ¬P25 )
+(P1 ∧ ¬P3 ∧ ¬P7 ∧ ¬P12 ∧ P19 )
+(¬P1 ∧ P2 ∧ ¬P5 ∧ P10 )
+(¬P1 ∧ P2 ∧ ¬P5 ∧ ¬P10 )
+
+16
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+(¬P1 ∧ P2 ∧ P5 ∧ ¬P11 )
+(¬P1 ∧ P2 ∧ P5 ∧ P11 ∧ ¬P18 )
+(¬P1 ∧ P2 ∧ P5 ∧ P11 ∧ P18 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ P9 ∧ P16 ∧ ¬P17 )
+(¬P1 ∧ ¬P2 ∧ P4 ∧ ¬P8 ∧ P13 )
+(¬P1 ∧ ¬P2 ∧ P4 ∧ ¬P8 ∧ ¬P13 )
+(¬P1 ∧ ¬P2 ∧ P4 ∧ P8 ∧ ¬P14 ∧ ¬P20 )
+(¬P1 ∧ ¬P2 ∧ P4 ∧ P8 ∧ ¬P14 ∧ P20 )
+(¬P1 ∧ ¬P2 ∧ P4 ∧ P8 ∧ P14 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ ¬P21 ∧ ¬P26 ∧ ¬P32 ∧ ¬P35 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ ¬P21 ∧ ¬P26 ∧ ¬P32 ∧ P35 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ ¬P21 ∧ ¬P26 ∧ P32 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ ¬P21 ∧ P26 ∧ ¬P33 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ ¬P21 ∧ P26 ∧ P33 ∧ ¬P36 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ ¬P21 ∧ P26 ∧ P33 ∧ P36 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ P21 ∧ ¬P27 ∧ P28 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ P15 ∧ P21 ∧ P27 ∧ ¬P28 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ ¬P15 ∧ P22 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ ¬P15 ∧ ¬P22 ∧ ¬P29 ∧ P30 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ ¬P9 ∧ ¬P15 ∧ ¬P22 ∧ P29 ∧ ¬P30 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ P9 ∧ ¬P16 ∧ ¬P17 ∧ ¬P23 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ P9 ∧ ¬P16 ∧ ¬P17 ∧ P23 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ P9 ∧ ¬P16 ∧ P17 ∧ P24 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ P9 ∧ ¬P16 ∧ P17 ∧ ¬P24 ∧ P31 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ P9 ∧ ¬P16 ∧ P17 ∧ ¬P24 ∧ ¬P31 ∧ P34 )
+(¬P1 ∧ ¬P2 ∧ ¬P4 ∧ P9 ∧ ¬P16 ∧ P17 ∧ ¬P24 ∧ ¬P31 ∧ ¬P34 )
+
+Isotopism Classification Theorem for Loops of Order 6
+We are given the following properties of loops:
+P1 :
+P2 :
+P3 :
+P4 :
+P7 :
+P10 :
+P12 :
+P15 :
+
+∀x, y1 , y2 (x/y1 )·(((x/y1 )·(y2 \x))·(y2 \x)) = ((x/y1 )·(y2 \x))·((x/y1 )·(y2 \x))
+∀x, y1 , y2 (x/y1 )·(((x/y1 )·(y2 \y1 ))·(y2 \y1 )) = ((x/y1 )·((x/y1 )·(y2 \x)))·(y2 \x)
+∀x, y1 , y2 (x/y1 ) = ((x/y1 )·(y2 \x))·(y2 \x)
+|G(3, 3, 4)| = 0 P5 :
+|G(3, 3, 3)| = 0 P6 :
+|G(2, 3, 3)| = 0
+|G(2, 2, 2)| = 7 P8 :
+|G(2, 3, 3)| = 8 P9 :
+|G(2, 2, 2)| = 0
+|G(2, 2, 2)| = 9 P11 : |G(4, 4, P2,2 )| = 0 ∧ P2,2 = (0, 1, 12, 23, 0, 0)
+|G(3, 3, 3)| = 8 P13 : |G(2, 2, 2)| = 5 P14 : |G(2, 3, 3)| = 4
+|G(3, 2, 3)| = 4 P16 : |G(2, 2, 2)| = 4 P17 : |G(2, 2, 2)| = 11
+
+Then loops of order 6 are characterised up to isotopism by one of the following
+conjunctions of properties:
+(¬P1 ∧ ¬P2 )
+(¬P1 ∧ P2 ∧ P3 )
+(¬P1 ∧ P2 ∧ ¬P3 )
+(P1 ∧ P4 ∧ P5 ∧ ¬P6 ∧ P7 )
+(P1 ∧ P4 ∧ P5 ∧ ¬P6 ∧ ¬P7 )
+(P1 ∧ P4 ∧ P5 ∧ P6 ∧ P7 )
+(P1 ∧ P4 ∧ P5 ∧ P6 ∧ ¬P7 ∧ P8 )
+(P1 ∧ P4 ∧ P5 ∧ P6 ∧ ¬P7 ∧ ¬P8 )
+(P1 ∧ P4 ∧ ¬P5 ∧ P9 )
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+17
+
+(P1 ∧ P4 ∧ ¬P5 ∧ ¬P9 ∧ ¬P10 )
+(P1 ∧ P4 ∧ ¬P5 ∧ ¬P9 ∧ P10 ∧ P11 )
+(P1 ∧ P4 ∧ ¬P5 ∧ ¬P9 ∧ P10 ∧ ¬P11 )
+(P1 ∧ ¬P4 ∧ P6 ∧ P7 )
+(P1 ∧ ¬P4 ∧ P6 ∧ ¬P7 ∧ P12 )
+(P1 ∧ ¬P4 ∧ P6 ∧ ¬P7 ∧ ¬P12 )
+(P1 ∧ ¬P4 ∧ ¬P6 ∧ ¬P13 ∧ P14 ∧ P15 )
+(P1 ∧ ¬P4 ∧ ¬P6 ∧ ¬P13 ∧ P14 ∧ ¬P15 )
+(P1 ∧ ¬P4 ∧ ¬P6 ∧ ¬P13 ∧ ¬P14 )
+(P1 ∧ ¬P4 ∧ ¬P6 ∧ P13 ∧ P16 )
+(P1 ∧ ¬P4 ∧ ¬P6 ∧ P13 ∧ ¬P16 ∧ ¬P14 )
+(P1 ∧ ¬P4 ∧ ¬P6 ∧ P13 ∧ ¬P16 ∧ P14 ∧ P17 )
+(P1 ∧ ¬P4 ∧ ¬P6 ∧ P13 ∧ ¬P16 ∧ P14 ∧ ¬P17 )
+
+Isomorphism Classification Theorem for Quasigroups up to Order 4
+We are given the following five functions which return coefficients of element types
+for quasigroups, Q:
+f1 (Q) = |{b : b ∈ Q}|
+f2 (Q) = 0 if 6 ∃x x ∗ x = x or f2 (Q) = |{b : ∃d (d ∗ d = b)}| otherwise
+f3 (Q) = |{b : ∃c ∃d (c ∗ b = b ∗ c = d ∧ c ∗ d 6= b ∧ b ∗ d 6= c))}|
+f4 (Q) = |{b : ∃c ∃d (c ∗ d = d ∗ c = b ∧ b ∗ c 6= d))}|
+f5 (Q) = |{b : (b ∗ b) ∗ b = b}|
+
+Then, quasigroups up to and including size 4 are characterised up to isomorphism
+by the following parameterisations:
+1.1)
+3.1)
+3.3)
+3.5)
+4.2)
+4.4)
+4.6)
+4.8)
+4.10)
+4.12)
+4.14)
+4.16)
+4.18)
+4.20)
+4.22)
+4.24)
+4.26)
+4.28)
+4.30)
+4.31)
+4.32)
+4.33)
+4.34)
+4.35)
+
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+
+1
+3 ∧ f2
+3 ∧ f2
+3 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+
+0
+3 ∧ f3
+1 ∧ f3
+4 ∧ f3
+2 ∧ f3
+3 ∧ f3
+3 ∧ f3
+1 ∧ f3
+2 ∧ f3
+4 ∧ f3
+0 ∧ f3
+2 ∧ f3
+1 ∧ f3
+0 ∧ f3
+0 ∧ f3
+3 ∧ f3
+3 ∧ f3
+0 ∧ f3
+0 ∧ f3
+3 ∧ f3
+3 ∧ f3
+1 ∧ f3
+1 ∧ f3
+
+=0
+=0
+=2
+=4
+=0
+=1
+= 2 ∧ f4
+= 2 ∧ f4
+= 0 ∧ f4
+= 4 ∧ f4
+= 2 ∧ f4
+= 2 ∧ f4
+= 3 ∧ f4
+= 3 ∧ f4
+= 3 ∧ f4
+= 2 ∧ f4
+= 2 ∧ f4
+= 2 ∧ f4
+= 2 ∧ f4
+= 2 ∧ f4
+= 3 ∧ f4
+= 3 ∧ f4
+
+=4
+=0
+=3
+=4
+=4
+=0
+=4
+=3
+=0
+=3
+= 2 ∧ f5
+= 2 ∧ f5
+= 2 ∧ f5
+= 2 ∧ f5
+= 2 ∧ f5
+= 2 ∧ f5
+
+2.1)
+3.2)
+3.4)
+4.1)
+4.3)
+4.5)
+4.7)
+4.9)
+4.11)
+4.13)
+4.15)
+4.17)
+4.19)
+4.21)
+4.23)
+4.25)
+4.27)
+4.29)
+=
+=
+=
+=
+=
+=
+
+0
+2
+1
+2
+2
+1
+
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+f1
+
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+
+2
+3 ∧ f2
+3 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+4 ∧ f2
+
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+=
+
+3 ∧ f3
+1 ∧ f3
+1 ∧ f3
+4 ∧ f3
+0 ∧ f3
+2 ∧ f3
+1 ∧ f3
+2 ∧ f3
+0 ∧ f3
+4 ∧ f3
+2 ∧ f3
+2 ∧ f3
+1 ∧ f3
+0 ∧ f3
+0 ∧ f3
+3 ∧ f3
+3 ∧ f3
+
+=2
+=2
+=4
+=3
+=0
+=3
+= 0 ∧ f4
+= 0 ∧ f4
+= 4 ∧ f4
+= 0 ∧ f4
+= 2 ∧ f4
+= 0 ∧ f4
+= 0 ∧ f4
+= 3 ∧ f4
+= 3 ∧ f4
+= 3 ∧ f4
+= 3 ∧ f4
+
+=0
+=2
+=2
+=0
+=2
+=0
+=2
+=0
+=2
+=2
+=3
+
+18
+
+SORGE, COLTON, MCCASLAND, AND MEIER
+
+8. Conclusions
+References
+[1] Rajeev Alur and Doron Peled, editors. Computer Aided Verification, 16th International Conference, CAV 2004, volume 3114 of LNCS, Boston, MA, USA, 2004. Springer Verlag.
+[2] Clark Barrett and Sergey Berezin. CVC Lite: A New Implementation of the Cooperating
+Validity Checker. In Alur and Peled [1], pages 515–518.
+[3] S Colton. Automated Theory Formation in Pure Mathematics. Springer, 2002.
+[4] S Colton, A Bundy, and T Walsh. Automatic identification of mathematical concepts. In
+Machine Learning: Proceedings of the 17th International Conference, 2000.
+[5] Simon Colton, Andreas Meier, Volker Sorge, and Roy McCasland. Automatic Generation
+of Classification Theorems for Finite Algebras. In David Basin and Michael Rusinowitch,
+editors, Automated Reasoning — 2nd International Joint Conference, IJCAR 2004, volume
+3097 of LNAI, pages 400–414, Cork, Ireland, 2004. Springer Verlag.
+[6] Simon Colton and Stephen Muggleton. Mathematical Applications of Inductive Logic Programming. Machine Learning, 64:25–64, 2006.
+[7] Etta Falconer. Isotopy Invariants in Quasigroups. Transactions of the American Mathematical
+Society, 151(2):511–526, 1970.
+[8] H. Ganzinger, G. Hagen, R. Nieuwenhuis, A. Oliveras, and C. Tinelli. DPLL(T): Fast Decision
+Procedures. In Alur and Peled [1], pages 175–188.
+[9] The GAP Group. GAP – Groups, Algorithms, and Programming, Version 4.3, 2002.
+http://www.gap-system.org.
+[10] L Kronecker. Auseinandersetzung einiger Eigenschaften der Klassenanzahl idealer komplexer
+Zahlen. Monatsbericht der Berliner Akademie, pages 881–889, 1870.
+[11] W McCune. Mace4 Reference Manual and Guide. Argonne National Laboratory, 2003.
+ANL/MCS-TM-264.
+[12] W. McCune. Otter 3.3 Reference Manual. Technical Report ANL/MCS-TM-263, Argonne
+National Laboratory, 2003.
+[13] Andreas Meier and Volker Sorge. Applying SAT Solving in Classification of Finite Algebras.
+Journal of Automated Reasoning, 35(1–3):201–235, 2005.
+[14] T Mitchell. Machine Learning. McGraw Hill, 1997.
+[15] M. Moskewicz, C. Madigan, Y. Zhao, L. Zhang, and S. Malik. Chaff: Engineering an efficient
+SAT Solver. In Proc. of the 39th Design Automation Conference (DAC 2001), pages 530–535,
+Las Vegas, USA, 2001.
+[16] Alexander Riazanov and Andrei Voronkov. Vampire 1.1. In Rejeev Gor´
+e, Alexander Leitsch,
+and Tobias Nipkow, editors, Automated Reasoning — 1st International Joint Conference,
+IJCAR 2001, volume 2083 of LNAI, pages 376–380, Siena, Italy, 2001. Springer Verlag.
+[17] Stephan Schulz. E: A Brainiac theorem prover. Journal of AI Communication, 15(2–3):111–
+126, 2002.
+[18] J. Slaney. FINDER, Notes and Guide. Center for Information Science Research, Australian
+National University, 1995.
+[19] J Slaney, M Fujita, and M Stickel. Automated reasoning and exhaustive search: Quasigroup
+existence problems. Computers and Mathematics with Applications, 29:115–132, 1995.
+[20] V Sorge, A Meier, R McCasland, and S Colton. The automatic construction of isotopy invariants. In Third International Joint Conference on Automated Reasoning, 2006.
+[21] C Weidenbach, U Brahm, T Hillenbrand, E Keen, C Theobald, and D Topic. SPASS Version 2.0. In A Voronkov, editor, Proc. of the 18th International Conference on Automated
+Deduction (CADE–18), volume 2392 of LNAI, pages 275–279. Springer, 2002.
+[22] J. Zhang and H. Zhang. SEM User’s Guide. Department of Computer Science, University of
+Iowa, 2001.
+
+CLASSIFICATION RESULTS VIA AUTOMATED REASONING
+
+School of Computer Science, University of Birmingham, UK
+E-mail address: V.Sorge@cs.bham.ac.uk
+URL: http://www.cs.bham.ac.uk/~vxs
+Department of Computing, Imperial College London, UK
+E-mail address: sgc@doc.ic.ac.uk
+URL: http://www.doc.ic.ac.uk/~sgc
+School of Informatics, University of Edinburgh, UK
+E-mail address: rmccasla@inf.ed.ac.uk
+URL: http://www.inf.ed.ac.uk/~rmccasla
+¨ cken, Germany
+DFKI GmbH, Saarbru
+E-mail address: ameier72@web.de
+URL: http://www.ags.uni-sb.de/~ameier
+
+19
+
+

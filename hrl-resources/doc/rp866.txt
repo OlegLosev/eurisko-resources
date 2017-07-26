@@ -1,0 +1,1200 @@
+The Use of Classification in Automated Mathematical Concept Formation
+Simon Colton, Stephen Cresswell and Alan Bundy
+Department of Artificial Intelligence
+University of Edinburgh
+(simonco@dai.ed.ac.uk, stephenc@dai.ed.ac.uk, bundy@dai.ed.ac.uk)
+
+Abstract
+Concept formation programs aim to produce a high yield of
+concepts which are considered interesting. One intelligent way
+to do this is to base a new concept on one or more concepts
+which are already known to be interesting. This requires a
+concrete notion of the ‘interestingness’ of a particular concept.
+Restricting the concepts formed to mathematical definitions in
+finite group theory, we derive three measures of the importance
+of a concept. These measures are based on how much the
+concept improves a classification of finite groups.
+
+Introduction
+One approach to automatic mathematical concept formation
+is to perform a heuristic search through a space of sentences
+which define mathematical concepts. In the space, there will
+be some sentences which are rubbish, some which are plausible but not very exciting, and some which are important. In
+order to be able to do an effective search, reducing the number of rubbish sentences, and increasing the yield of important
+concepts, it is necessary to have a notion of ‘interestingness,’
+which can provide a reason to accept or reject a newly formed
+concept. We can then use the heuristic of preferring paths in
+the search space from an interesting concept, and discouraging
+paths from uninteresting concepts in the hope that interesting
+concepts lead to further interesting concepts.
+The most cited work in automated mathematical concept
+formation is Lenat’s work on his AM1 computer program
+which invented new definitions and made conjectures based
+on empirical evidence. This was an exploratory program designed to work in elementary set theory which actually delved
+into elementary number theory. The notion of interestingness
+was used to maintain an agenda of tasks to do next, but was
+based on many things and is difficult to pin down.
+Other attempts to formalise the notion of interestingness
+concentrated on reducing the search space so that exploration
+only occurred in a narrow band of concepts. With each of
+the newly formed concepts having a similar nature, it is easier
+to make a comparison of two concepts, and interestingness
+can be measured more easily. For instance, in the BACON2
+programs written by Langley et al, the concepts formed were
+polynomial relations between variables in physical systems.
+A concept was interesting if the polynomial relation was observable in the data, and uninteresting if not. In this case, they
+were able to guarantee some level of interestingness by look-
+
+ing at the data first, spotting patterns and trends and forming
+the new relations in this data driven manner.
+Another example of narrowing the search space is Sims’
+IL3 program, which accepted specifications for an operator
+(for instance the multiplication operator on Conway numbers), and formed concepts towards this goal. The number of
+the specifications satisfied by the invented concept gives an
+indication of its importance, and the process can stop once
+one has been invented which satisfies all the specifications.
+Therefore, finding an effective measure of interestingness
+of concepts is a two step process; imposing a similar format
+between all the concepts produced, and then defining why
+one concept in this general format is better than another in the
+same format.
+To begin to impose a similar format between the concepts,
+we first restricted the mathematical domain in which the concepts were formed to finite group theory. This choice was due
+to our mathematical background and the fact that many other
+algebras, such as ring theory, Galois theory and infinite group
+theory depend on the concepts from finite group theory. We
+further restricted the type of concept formed to the definitions
+in finite group theory, loosely speaking, the sentences which
+appear under the ‘definition’ heading of finite group theory
+texts. As detailed later, more similarity is added to these sentences by thinking of them all as functions mapping a group
+to some output.
+Having decided to work with the definitions from finite
+group theory, it is possible to state that a major reason why
+the theory was constructed in the first place was to classify
+finite groups. This has historical backing, as in 1980, the classification of finite simple groups was achieved, which must
+surely be regarded as one of the major intellectual achievements ever.4 Finite simple groups can be used to construct any
+finite group, in a similar way to prime numbers being used to
+construct any integer. Hence the classification of finite simple
+groups goes a long way to classifying finite groups, and the
+classification of groups is a major driving force behind the
+formation of concepts in group theory.
+If the reason to form concepts is to produce a classification
+of finite groups, we can judge how important a particular
+concept is by how much it improves a classification. By
+thinking of a classification as a way to describe objects, it
+is possible to specify three intrinsic measures of how good a
+particular classification is. These amount to determining;
+3
+
+1
+
+See [Davis & Lenat 82].
+2
+See [Langley et al 87].
+
+See [Sims 90].
+To quote John Humphreys in [Humphreys 96]. For details of
+the classification of finite simple groups, see [Gorenstein 82].
+4
+
+ How well the descriptions differentiate between two objects.
+ How closely each description represents the object.
+ How succinctly the descriptions can be stated.
+The work here develops calculations which can be performed
+to measure these aspects of a classification, and how much of
+an improvement a particular concept makes. This allows us to
+associate three values to each concept, the acuity improving
+value, the representation improving value and the representation space expansion value. These can be used to measure
+the interestingness of any concept in the theory.
+Note that, from this point, we will abbreviate ‘finite group’
+to just ‘group’.
+
+Classifications
+The first step to introducing a formal notion of interestingness
+is to add some homogeneity to the concepts so that the similar
+structure makes it easier to compare two concepts. As previously stated, the concepts being formed here are definitions
+in group theory. The three most common ways of introducing
+new definitions in group theory books are as follows:
+A) By specialising the concept of group using a black and
+white test on the group. For instance: "A group, G, is Abelian
+if and only if 8 a; b 2 G; a  b = b  a."
+B) By specifying a calculation which can be performed on the
+group. For instance: "The centre of a group, G, is given by
+
+Z (G) = fa 2 G : 8 b 2 G; a  b = b  ag:"
+
+C) By detailing a construction which is possible from a group.
+For instance: "Given a group, G, then H is a subgroup of G
+if and only if H  G and H forms a group itself."
+It is possible to think of the first and last formats in terms of
+the second. Firstly, the black and white test on groups can be
+written as a boolean function, which takes a group as input,
+and outputs ‘true’ or ‘false’. For instance, we could write the
+Abelian property of groups given above as:
+
+IsAbelian(G) =
+
+
+
+true
+false
+
+if 8 a; b 2 G; a  b = b  a
+otherwise
+
+Secondly, to use constructions as a function on a group we
+can make a function which outputs all the possible examples
+of the construction for a given input group. Eg.
+
+SubgroupCollection(G) = fH : H is a subgroup of Gg:
+Then, as soon as a construction definition is given, we can
+make this second, functional, definition which can be used to
+assess the construction definition.
+Note that in practice there are other things we can do with
+the construction definition. For instance, we could make a
+function which tests whether a given group has any examples
+of a particular construction. Eg.
+(
+
+HasSubgroup(G) =
+
+true
+false
+
+if 9 H such that
+H is a subgroup of G
+otherwise
+
+Whatever we choose to do with the construction, the result
+is always a function which takes a group as input and gives
+
+some kind of output. Hence all the sentences given in the
+definitions can be written as functions taking a single group
+as input, and outputting something based on the group. To
+add more similarity to the format of the concept, we make
+the restriction that this output is a nested vector. This is
+true anyway of the functions made from definitions of type
+A and C above, and we only have to worry about those of
+type B, which are the functions occurring naturally in group
+theory. As group theory is built heavily on set theory, most
+of the outputs are elements, sets or groups, all of which can
+be written as nested vectors, and in practice this imposition is
+not too restrictive.
+We now have a starting point for a formalisation, and can
+continue by noting that the output of a function can be used
+to describe any input group. For instance, given a particular
+group, G, instead of saying "G is Abelian", we can say:
+"IsAbelian(G) = true". Further, a set of such functions can
+be used to build a more complete description of groups. We
+can then use these descriptions to classify individual groups
+within a set of groups. This can be formalised as follows;
+Definition 1
+
+ A classifying function in group theory is a unary function
+which takes a single group as input, and outputs a nested
+vector.
+
+ A classifying theory of groups, C , is a vector of (the names
+of) classifying functions, C
+
+< f1 ; : : :; fk >.
+ Given a group, G, then the description of G by C , represented by descC (G); is the vector of output values given when
+G is used as input to all the functions in C . ie.
+descC (G) =< f1 (G); : : :; fn (G) > :
+=
+
+ Given a set of groups, S , the classification of S by C ,
+represented by classC (S ), is the set of descriptions of the
+members of S . ie.
+classC (S ) = fdescC (G) : G 2 S g:
+Example 1
+The following are classifying functions in group theory:
+
+Order(G) = jGj
+IsAbelian(G) =
+
+[The size of the underlying set].
+
+
+true
+false
+
+if 8 a; b 2 G; a  b = b  a
+otherwise
+
+NSIE (G) = jfa 2 G : a  a = 1gj
+(NSIE stands for the Number of Self Inverse Elements).
+and using S
+
+G1
+
+1
+2
+3
+
+1
+1
+2
+3
+
+2
+2
+3
+1
+
+=
+
+fG1; G2; G3; G4g, with
+
+3
+3
+1
+2
+
+G2
+
+1
+2
+3
+4
+
+1
+1
+2
+3
+4
+
+2
+2
+3
+4
+1
+
+3
+3
+4
+1
+2
+
+4
+4
+1
+2
+3
+
+G3
+
+1
+2
+3
+4
+5
+6
+
+1
+1
+2
+3
+4
+5
+6
+
+2
+2
+3
+4
+5
+6
+1
+
+3
+3
+4
+5
+6
+1
+2
+
+4
+4
+5
+6
+1
+2
+3
+
+5
+5
+6
+1
+2
+3
+4
+
+6
+6
+1
+2
+3
+4
+5
+
+G4
+
+1
+2
+3
+4
+5
+6
+
+1
+1
+2
+3
+4
+5
+6
+
+2
+2
+1
+6
+5
+4
+3
+
+3
+3
+5
+1
+6
+2
+4
+
+4
+4
+6
+5
+1
+3
+2
+
+5
+5
+3
+4
+2
+6
+1
+
+6
+6
+4
+2
+3
+1
+5
+
+it is easy to calculate:
+
+Order(G1 ) = 3 IsAbelian(G1 ) = true NSIE (G1 ) = 1
+Order(G2 ) = 4 IsAbelian(G2 ) = true NSIE (G2 ) = 2
+Order(G3 ) = 6 IsAbelian(G3 ) = true NSIE (G3 ) = 2
+Order(G4 ) = 6 IsAbelian(G4 ) = false NSIE (G4 ) = 4
+So, if we let C = fOrder; IsAbelian; NSIE g, we get:
+descC (G1 ) =< 3; true; 1 >; descC (G2) =< 4; true; 2 >,
+descC (G3 ) =< 6; true; 2 >; descC (G4) =< 6; false; 4 >,
+and this gives us:
+
+classC (S ) = f< 3; true; 1 >; < 4; true; 2 >;
+< 6; true; 2 >; < 6; false; 4 >g:
+Measures of Importance
+Having defined a classification of a set of groups, we can now
+find some measurable properties of it, and compare the classification given by a single function against that given by a
+set of functions, to gauge the importance of the single function. It is therefore necessary to identify what is desirable in
+a classification. To help with this, there are two special classifications which represent the worst and best cases. Firstly,
+there is the trivial classification, which describes each group
+with the same sentence, "G is a group". Secondly, there is the
+explicit classification which describes each group by giving
+its group table.
+
+Acuity of a Classification
+If we look at the trivial classification, we see that it describes
+every group in the same way, which is clearly a defect. This
+identifies the first purpose of a classification of groups, to describe them, and it would be desirable to have a classification
+which describes each group differently. We can approximate how well the descriptions differentiate between any two
+groups by looking at a set of groups, and judging how many
+have different descriptions. This leads to the following definitions. (Note that each measure introduced is normalised to
+give a value between 0 and 1, with 0 being the worst case, and
+1 being the best case.)
+Definition 2
+
+ Given a set of m groups, S , and a classifying theory, C ,
+then a particular group, G 2 S , is uniquely identified in
+S by C if there is no other group, H 2 S , which has the
+same description by C as G. ie. 6 9H 2 S s.t. descC (H ) =
+
+can approximate this using S with the S
+is given by:
+
+S acuity(C ) =
+
+
+
+jclassC (S )j?1 Otherwise
+m?1
+
+[Note that classC (S ) does not necessarily have m members,
+because if two groups have the same description using C , then
+as classC (S ) is a set, the description will only appear once in
+the set, making jclassC (S )j < m.]
+
+ Given a classifying function, f 2 C , then the acuity improving value of f in C approximated using S , represented
+by S aivC (f ), is a measure of the acuity of the function if
+considered alone. It is given by:
+S aivC (f ) =
+
+
+
+S acuity(<f>) if S
+S acuity(C )
+
+acuity(C ) > 0
+Otherwise
+
+0
+
+Note that by writing the description of the group instead
+of its group table, we are actually writing it in a code, which
+provides a link between this work and information theory. 5
+The information source entropy of a code measures the average probability of a codeword occurring, and as such is
+similar to the acuity measure given above. As we are thinking
+of the descriptions as a classification of groups, rather than a
+method of coding them, we use the acuity terminology instead
+of referring to the entropy of a code.
+Example 2
+Using S and C from the previous example, we see that each
+Gi has a different description using C , and so they are all
+uniquely identified by C . As this is the ideal case, we should
+find that the acuity of C on S is 1. We can check this:
+There are 4 groups in S , so m = 4, and we have already
+calculated classC (S ), which had 4 elements.
+1
+Hence S acuity(C ) = jclassmC?(S1 )j?1 = 44?
+?1 = 1;
+and we see that C forms a complete classification of S . We
+can use this to work out the acuity improving values of the
+three classifying functions in C . Noting that
+
+class<f> (S ) = ff (G) : G 2 S g;
+
+we see that
+
+class<Order> (S ) = f3; 4; 6g;
+class<IsAbelian>(S ) = ftrue, falseg;
+class<NSIE> (S ) = f1; 2; 4g:
+j?1 = 3?1 = 2 ;
+Hence S acuity(< Order >) = jclass<Order>
+4?1
+3
+3
+and with similar calculations, we find that
+
+S acuity(< IsAbelian >) = 13 ; S acuity(< NSIE >) = 23 :
+So we can calculate:
+(<Order>)
+=
+S aiv(Order) = S acuity
+S acuity(C )
+
+say that C forms a complete classification of S .
+
+and similarly,
+
+ The acuity of a classifying theory is a measure of the
+number of groups which are uniquely identified by
+
+C.
+
+We
+
+if m = 1
+
+1
+
+descC (G):
+
+ If all the groups in S are uniquely identified by C , then we
+
+acuity of C , which
+
+S aiv(IsAbelian) = 13
+5
+
+and
+
+As described in [Pierce 80].
+
+2
+
+2
+3
+1 = 3
+
+S aiv(NSIE ) = 23 .
+
+Representation Content of a Classification
+Look now at the explicit classification of groups, where each
+group is described by giving its group table. From this description, it is possible to read the underlying set of elements,
+and we can find the product a  b for every a and b in the
+group. As groups are abstract entities themselves it is not obvious that this description presents the group in full, but this
+is the case. Given the group table, we know (or can find out)
+everything about the group, and any description from which
+we can read the underlying set and group operation  gives an
+explicit classification of groups.
+Hence the second purpose of a classification is to represent groups. Some representations, like the group table, are
+explicit, and the underlying set and group operation can be
+written down with no work. Other representations will require
+a search to find the underlying set and group operations (or
+equivalently a search to find the group table). Using the description as constraints on the search through possible group
+tables, one description might rule out a lot of possibilities,
+making the search manageable, but another might not rule out
+so many possibilities, making the search less efficient. The
+size of this search can therefore be used to measure how much
+information the descriptions contain about the groups they
+describe, and hence how well they represent the groups.
+Note that if we know the order of the group, a search for
+the group table of the group will be finite, and, while losing
+generality slightly, things are made much easier if we assume
+that the order of the group is a constraint which is always
+given in the description. Given the assumption that the order
+of the group is known to be n, one implausible way that a
+mathematician might construct a group table for a group is to
+write down all the possible multiplication tables for a set of
+n elements, and check
+each one to see if it fits the description
+2
+given. There are nn possible multiplication tables, and noting
+that 416 ' 4:3  109 , we see that this method is impractical
+for groups of any decent size.
+A much more plausible method would be to fill in the group
+table one entry at a time, and check that the incomplete multiplication table satisfies the description. This means that the
+description of the group has to be interpreted as ways of ruling
+out incomplete multiplicationtables. This interpretation is not
+always straightforward but is usually possible. The advantage
+to this method is that once an incomplete multiplication table
+has been rejected by the description, any larger table built by
+adding more elements to this table will also be rejected, and
+so there is no point trying those possibilities. This has the
+potential to drastically cut down the search space, and we see
+that the problem of finding the group table given a non-explicit
+description of the group is a Constraint Satisfaction Problem
+(CSP).6
+Now, in constrained searches, two major components of
+a search strategy are (i) the order of the variables to make
+assignments to (in our case, the order in which the entries
+in the group table are filled in), and (ii) the order in which
+the possible values are assigned to the variables (in our case
+the order of the set members to try in the table entries). For
+instance, a particular search strategy might assign entries in
+the top row of the table, left to right, then the second row left
+6
+
+See [Tsang 93].
+
+to right and so on. For every entry, it might try to assign the
+number 1, if this fails, then it might try the number 2, and
+so on. While these orderings are necessary to find a solution
+in practice, if we measure the size of the constrained search
+for a particular search strategy, this may add a bias in favour
+of one description, and the value will not be intrinsic to the
+description.
+A fairer method is to find all the incomplete multiplication
+tables which the description rejects, and measure the increase
+over the number of multiplication tables which are rejected
+using the group axioms alone. This will measure the number
+of times that we can say for certain that a table with any
+number of entries can be rejected, and will give an estimate of
+how large the search will be using any search method. This
+can be formalised as follows:
+Definition 3
+
+ An incomplete multiplicationtable of order n [Shorthand:
+imt(n)]
+
+is a multiplicationtable for a closed binary operation
+on the first n integers, with 1 or 2 or : : : or n2 entries filled in.
+
+ Given a set of constraints, X , then the violation number
+for X on the set of imt(n)’s is given by:
+
+VX (n) = jfT : T is an imt(n) and T violates X gj:
+
+ Note that the group axioms impose constraints on the imt’s
+and VAxioms (n) denotes the violation number of the group
+axioms (and the order of the group) on imt(n)’s.
+
+ Given a group of order n, G, and a classifying theory, C ,
+
+then descC (G) imposes constraints on the imt(n)’s. They
+must be used alongside the constraints given by the group
+axioms, as the classifying functions are defined on groups,
+and so the group axioms are assumed. Hence, when finding
+the violation number in this case (denoted VdescC (G) (n; k)),
+the group axiom constraints are also used.
+
+ Further, the group table of G could be used to impose con-
+
+straints on the imt(n)’s. In this case, there are only n Ck
+incomplete multiplication tables with k entries filled in which
+do not violate the constraints (ie. the possible k-tuples lif2
+ted from the group table). There are also n Ck nk possible
+imt(n)’s with k entries filled in. Hence, writing VExplicit (n)
+for the violation number of the group table of G on the set of
+imt(n)’s, we find that
+2
+
+n 
+X
+2
+
+VExplicit (n) =
+
+k=1
+
+n2 C nk ? n2 C
+k
+k
+
+
+
+n
+X
+2
+
+=
+
+k=1
+
+n k ? 1 ) n Ck :
+
+(
+
+2
+
+ The closeness of representation of G using C , represented
+by crC (G) is a measure of how many more imt’s are rejected
+using the constraints given by descC (G) than just using the
+group axiom constraints. It is normalised using the Explicit
+constraints, and given by:
+V
+(n) ? V
+(n)
+crC (G) = VdescC (G)(n) ? V Axioms(n) :
+Explicit
+Axioms
+
+ Next, given a set of m groups, S , we can define the representation content of C approximated using S as:
+
+S RC (C ) = m1
+
+X
+
+G2S
+
+crC (G);
+
+ Given a classifying function, f 2 C , The representation
+
+of imt’s with only 2 entries was generated and the proportions
+
+P2 and Q2 were recorded, and this was repeated until Pk and
+Qk were recorded for k = 1; : : :; 16. The sample sizes were
+50,000, which is more than is needed for the low values of k,
+but is a small sample for the higher values of k.7
+The results were:
+
+k
+
+improving value of f in C approximated using S , represented by S rivC (f ), is a measure of the representation content
+of the function if considered alone. It is given by:
+
+S rivC (f ) =
+
+
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+
+S RC (<Order;f>) if S
+S RC (C )
+
+RC (C ) > 0
+Otherwise
+
+0
+
+Example 3
+We are going to be using the set of groups, S , and the classifying theory, C , from the previous examples, and we will
+be calculating S RC (C ), S riv(Order), S riv(IsAbelian)
+and S riv(NSIE ).
+
+Firstly look at the group G1 of order 3. We need to find
+crcC (G1), and so we require VdescC (G1 ) (3), VAxioms (3) and
+VExplicit (3). Now, descC (G1) =< 3; true; 1 > and to
+find VdescC (G1 ) (3) we have to find the number of incomplete multiplication tables which either violate the group
+axioms or this description. To tell if an imt violates the
+IsAbelian(G1 ) = true part of the description, we just have
+to find two elements such that a  b 6= b  a. Also, an imt
+violates the NSIE (G1 ) = 1 part of the description if it has
+two or three self inverse elements, or no self inverse elements.
+Of course, if an entry of the multiplication table is not filled
+in, we can make no assumptions about the value that entry
+will have, and this has to be taken into account. For details
+of how the axioms are violated by an imt, see [Colton 97].
+A Prolog program was written which enumerated all the incomplete multiplication tables of order 3, testing each one
+first against the axiom constraints only, and then against the
+axiom and the description constraints. The following results
+were recorded:
+
+VAxioms (3) = 254767
+
+and
+
+VdescC (G ) (3) = 256929.
+1
+
+VExplicit (3) = 261632;
+
+0.0000
+0.0633
+0.3132
+0.6128
+0.8335
+0.9428
+0.9843
+0.9963
+0.9994
+0.9999
+1.0000
+1.0000
+1.0000
+1.0000
+1.0000
+1.0000
+
+VˆAxioms (4) =
+and
+
+VˆdescC (G ) (4) =
+2
+
+16
+X
+
+16
+
+k=1
+16
+X
+
+?
+?
+
+256929 254767
+261632 254767 =
+
+0:315 (3
+
+d:p):
+
+Next, look at the group G2 of order 4. Here the set of incomplete multiplication tables of order 4 is too large to enumerate
+and test every imt, so estimates of the violation numbers were
+made using a randomly generated sample set of imt’s. The
+estimates were calculated by first generating a sample set of
+imt’s with only 1 entry, and recording the proportion, P1 of
+imt’s which violate the group axioms, and the proportion, Q1
+of imt’s which violate the description of G4 . Then a sample set
+
+and
+
+Ck (4k ? 1)Pk
+
+16
+
+k=1
+
+VAxioms (4)
+
+Ck (4k ? 1)Qk ;
+
+which estimate the total number of imt’s which violate the
+constraints. Then, using
+Vˆ
+(4) ? VˆAxioms (4)
+crˆ C (G2 ) = descC (G2)
+;
+VExplicit (4) ? VˆAxioms (4)
+as an estimate for crC (G2 ), we calculated:
+crˆ C (G2) = 0:561 (3d:p):
+
+Using a similar sampling and approximation process, we recorded:
+and cr
+ˆ C (G4 ) = 0:786,
+
+and this gave us enough information to estimate S
+
+using the formula given in the definition. This allows us to
+calculate:
+C (G1 ) (3)?VAxioms(3)
+crC (G1) = VVdesc
+Explicit (3)?VAxioms(3)
+=
+
+Qk
+
+0.0000
+0.0262
+0.2142
+0.4969
+0.7479
+0.8971
+0.9668
+0.9909
+0.9983
+0.9997
+1.0000
+1.0000
+1.0000
+1.0000
+1.0000
+1.0000
+
+These were then used to approximate
+VdescC (G2 ) (4) by calculating
+
+crˆ C (G3 ) = 0:959
+
+We can also calculate
+
+Pk
+
+Sˆ RC (C ) =
+=
+
+RC (C ):
+
+:315 + 0:561 + 0:959 + 0:786)
+0:655:
+1
+(0
+4
+
+Finally, using the same processes, but using only the single
+functions IsAbelian and NSIE to describe the groups, it
+was possible to estimate that:
+
+Sˆ riv(IsAbelian) = 0:383
+
+and Sˆ
+
+riv(NSIE ) = 0:296:
+
+Further, because we have to include the order of the group in
+the constraints for VAxioms , it is clear that
+
+S riv(Order) = 0.
+7
+
+For details of the standard error, see [Colton 97].
+
+Interpreting these results, we see that as the order of the
+group increases, the constraining power of the axioms decreases, and so there is more possibility for the description
+constraints to reject imt’s which the axioms accept. This accounts for the increase in the value of crC (G) as the order of
+the group increases.
+
+ Given a particular classifying function, g 2 C , then the
+representation space expansion value of g in C using S ,
+represented by S rsevC (g) is a measure of the proportion of
+the total representation space that g requires. It is given by:
+S rsev(g) = S repspace(< g >):
+
+Representation Space of a Function
+
+Example 4
+
+So far we have defined a classification as a way of describing groups, and have derived two measures to see how good
+those descriptions are. Firstly we measure how good the descriptions are at telling two groups apart, and secondly, we
+measure how easily we can recover an explicit representation
+(eg. the group table) from the descriptive representation. In
+both cases if we describe every group with its group table, then
+the acuity and representation content are both 1, ie. this is a
+perfect way of describing groups. However, writing a group
+table every time to represent the group is a very cumbersome
+way to go about things, and so it is preferable to have a more
+subtle description of the group. This can be viewed as one
+reason why a classification is sought in the first place.
+Therefore, if two ways of describing groups are equally
+good at differentiating groups and the descriptions can be
+used to retrieve explicit representations equally well, then if
+the first description is more subtle, it will be preferred to the
+second. Measuring how subtle a description is amounts to
+measuring how difficult it is to write down. We can now
+use the fact that the output of the classifying functions was
+restricted to be a nested vector. As each description is just a
+collection of outputs, we can measure how many vectors there
+are and how many elements they contain, and this will give
+us an idea of how much space the description takes to write
+down. This is formalised as follows:
+
+The outputs from the Order, IsAbelian and NSIE functions
+are all single atoms, either the word true, or the word false,
+or an integer. Hence the nested vector outputs in these cases
+contain only one element and so we find that, with S and C
+as before;
+
+Definition 4
+
+ Given a classifying function, f , and a group, G, then f (G)
+
+will be a nested vector. If we then flatten this vector completely into a list of atoms, and call the flattened vector L,
+then the storage space required to describe G with f , represented by storf (G) is the size of L. ie.
+
+storf (G) = jLj:
+
+ Given a classifying theory, C , then the storage space required by G using C , represented by storC (G) is a measure
+of the space required to describe G using all the functions
+available in C , and is given by:
+storC (G) =
+
+X
+
+f 2C
+
+storf (G):
+
+ Given a set
+
+of m groups, S , the representation space
+required for S using C , represented by S repspace(C ), is a
+measure of the average amount of space needed to write down
+the descriptions of the members of S , when using C . It is
+given by:
+
+S repspace(C ) = m1
+
+X
+
+:
+G2S storC (G)
+1
+
+P
+
+storC (Gi) = f 2C storf (Gi ) = 1 + 1 + 1 = 3
+for i = 1; 2; 3; 4.
+?
+
+So, S repspace(C ) = 14 13 + 13 + 13 + 13 = 13
+and it is easy to check that:
+
+S rsev(Order) = 1; S rsev(IsAbelian) = 1
+and S rsev(NSIE ) = 1;
+We can contrast these with the Centre function given by:
+Centre(G) = fx 2 G : 8 y 2 G; x  y = y  xg
+as here, the output is a set, which can be written as a vector.
+Calculations show that:
+
+Centre(G1) =< 1; 2; 3 >; Centre(G2 ) =< 1; 2; 3; 4 >;
+Centre(G3) =< 1; 2; 3; 4; 5; 6 > and Centre(G4 ) =< 1 >
+Hence
+
+storCentre(G1) = 3; storCentre (G2) = 4;
+storCentre(G3) = 6; and storCentre(G4) = 1.
+From these, using the set of 4 groups, S , as before, we can
+calculate
+
+S rsev(Center) = 14
+
+?1
+3
+
++ 14 + 16 + 11
+
+
+
+7
+
+= 16
+
+:
+
+Conclusions and Further Work
+Given the assumption that the classification of groups is a major driving force behind the formation of finite group theory,
+the definitions of concepts found there have been interpreted
+as descriptions of groups. Following on from this, we have
+been trying to formalise how well the descriptions differentiate
+between two objects, how closely each description represents
+the object, and how succinctly the descriptions can be stated.
+These three properties of classifications would appear to be
+intrinsic but it is unlikely that values could be calculated for
+them in practice for a general classification.
+By imposing certain restrictions, we have been able to formalise enough to calculate some values. Although the example
+calculations are fairly poor approximations, due to the small
+sample of groups used, it is possible to compare the classification given by three functions, Order, IsAbelian and NSIE
+against an explicit classification and the trivial classification.
+
+Firstly, instead of the explicit classification which gives the
+group table for each group, we will use the function
+
+Explicit(G) = f< a; b; a  b >: a; b 2 Gg,
+as this has output which can be written as a nested vector.
+Also, the trivial classification will be thought of as using the
+function IsGroup(G), for which the output is always ‘true’
+if a group is input. Then the values for acuity, representation
+content and representation space are approximately:
+
+Explicit
+C
+Trivial
+
+Acuity
+1
+1
+0
+
+Repn Content
+1
+0.66
+0
+
+Repn Space
+0.02
+0.33
+1
+
+Remembering that these values have 0 as the worst case and
+1 as the best case, we see that in order to decrease the space
+required to represent the groups, the classification loses some
+of the content, which will make it harder to retrieve the group
+operation. With the addition of more groups to the sample, we
+would find that the classification would also lose some acuity,
+and would describe two or more distinct groups in the same
+way. Note also that, although the trivial classification takes
+the minimal amount of space to describe each group, it gives
+no information about a group whatsoever.
+As part of a larger project to perform automated concept
+formation in group theory, regarding each of the concepts as
+functions, it is more important to judge how much each function adds to the classification. This can be done by comparing
+a classification produced by only using the single function
+against a classification using all the functions. Again this has
+been turned into concrete calculations of the acuity improving
+value (aiv), the representation improving value (riv) and the
+representation space expansion value (rsev) of each function.
+The three functions in our example classification gave the
+following values:
+
+Order
+IsAbelian
+NSIE
+
+aiv
+0.67
+0.33
+0.67
+
+riv
+0
+0.38
+0.29
+
+rsev
+1
+1
+1
+
+Now, as we can measure how good a particular concept
+(function) is, it is possible to write heuristic methods which
+produce new functions, with the heuristic designed to increase
+the average aiv, riv or rsev of the functions. One such heuristic
+is to start with a known concept which has a high aiv and
+syntactically mutate it using a template8 into another concept.
+The hope is that the new concept will also have a high aiv.
+Hence if the acuity of the overall classification is lower than
+we require, we can use a known concept with a high aiv to
+produce another concept. [With the known functions in the
+examples looked at, we would probably chose to use the NSIE
+function to produce another concept]. Similarly whenever the
+representation content is too low we can use a concept with a
+high riv to produce another concept and if the representation
+space is too low, we can use a concept with a high rsev.
+8
+
+For a description of the templates, see [Colton 97].
+
+The writing and testing of the heuristic production rules
+as a computer program9 is an ongoing project. Further work
+will also include relating these rather esoteric definitions to
+the more general work of information theory and constraint
+satisfaction problems. The link with information theory is
+possible because by representing a group with a description,
+we are writing it in a code. Then having the desired acuity of
+1 is equivalent to having a uniquely decodable code, having a
+representation content of 1 is equivalent to having an instantaneous code, and the representation space of the description
+corresponds to the average length of the codewords in variable
+length codes. The method chosen to decode the descriptions
+is to solve a constraint satisfaction problem using the group
+axioms and the description of the group as constraints on a
+search over the space of incomplete multiplication tables.
+
+Acknowledgements
+This project has been funded by EPSRC research grant GR/L
+11724.
+
+References
+[Colton 97]
+
+S Colton. Classification driven theory
+formation in mathemarics. Technical
+report, Department of Artificial Intelligence, University of Edinburgh, 1997.
+[Davis & Lenat 82] R Davis and D Lenat. KnowledgeBased Systems in Artificial Intelligence.
+McGraw-Hill Advanced Computer Science Series, 1982.
+[Gorenstein 82]
+D Gorenstein. Finite Simple Groups:
+An Introduction to Their Classification.
+Plenum Press, New York, 1982.
+[Humphreys 96]
+J Humphreys. A Course in Group Theory. OUP, 1996.
+[Langley et al 87] P Langley, H A Simon, G L Bradshaw,
+and J M Zytkow. Scientific Discovery Computational Explorations of the Creative Processes. MIT Press, 1987.
+[Pierce 80]
+J Pierce. An Introduction to Information
+Theory. Dover Publications, 1980.
+[Sims 90]
+M Sims. IL: An Artificial Intelligence
+Approach to Theory Formation in Mathematics. Unpublished PhD thesis, Department of Computer Science, Rutgers
+University, 1990.
+[Tsang 93]
+E Tsang. Foundations of Constraint Satisfaction. Academic Press, London and
+San Diego, 1993.
+
+9
+
+Named HR after Hardy and Ramanujan.
+
+

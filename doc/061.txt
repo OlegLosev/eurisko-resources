@@ -1,0 +1,1500 @@
+AUTOMATED THEORY FORMATION IN MATHEMATICS 1
+Douglas B. Lenat
+Computer Science Department
+Carnegie-Mellon U n i v e r s i t y
+P i t t s b u r g h , Pa. 1 5 2 1 3
+
+Abstract
+of f u l l y automatic t h e o r y f o r m a t i o n in some scientific field.
+"1 his i n c l u d e s t w o a c t i v i t i e s : (i) discovering relationships
+a m o n g k n o w n c o n c e p t s (e.g., by formal manipulations, or by
+n o t i c i n g r e g u l a r i t i e s in empirical data), and (ii) defining new
+c o n c e p t s for i n v e s t i g a t i o n .
+Meta-Dendral [Buchanan 7 5 ]
+p e r f o r m s o n l y the f i r s t of these; most domain-independent
+c o n c e p t l e a r n i n g p r o g r a m s (Winston 70] p e r f o r m only the
+l a t t e r of t h e s e : w h i l e t h e y do create new concepts, the
+i n i t i a t i v e is not t h e i r s but rather is that of a human
+" t e a c h e r " w h o a l r e a d y has the concepts in mind.
+
+A program called " A M " is d e s c r i b e d which c a i r i e s on simple
+m a t h e m a t i c s r e s e a r c h : defining, and s t u d y i n g new concepts
+u n d e r the guidance of a large body of heuiistic rules. The
+250 h e u r K t u s communicate via an agenda mechanism, a
+g l o b a l p r i o r i t y queue of small bisk', for the p r o g r a m to
+pei f o i m and t e a s o n s w h y each task is plausible (e.g., "Find
+PENCRAHZTION. of
+'prnes',
+because
+turued
+out
+to be
+so u s e f u l a Conccpi"). Fach concept is an active, s t r u c t u r e d
+k n o w l e d g e module. One b u n d l e d vei y incomplete modules
+are
+i n i t i a l l y s u p p l i e d , each one c o r r e s p o n d i n g to an
+elementary
+set t h e o r e t i c
+concept
+(e.g.,
+union).
+This
+p r o v i d e s a d e f i n i t e but immense space which AM begins to
+e x p l o r e . In one b o o r , AM rediscovers hundreds of common
+concepts
+(including
+singleton
+sets,
+natural
+numbers,
+a r i t h m e t i c ) and t h e o r e m s (e.g., unique factorization).
+
+What we are d e s c r i b i n g is a computet p r o g r a m which
+defines
+new
+concepts,
+investigates
+them,
+notices
+r e g u l a r i t i e s in the data about them, and c o n j e c t u r e s
+r e l a t i o n s h i p s b e t w e e n them. This new information is used
+b y t h e p r o g r a m t o e v a l u a t e the n e w l y - d e f i n e d concepts,
+c o n c e n t r a t e u p o n the most i n t e r e s t i n g ones, and i t e r a t e the
+e n t i r e p r o c e s s . This paper describes such a p r o g r a m : AM.
+
+1. INTRODUCTION
+
+1.2. CHOICE OF DOMAIN
+R e s e a r c h in distinct fields of science and mathematics o f t e n
+proceeds slightly differently.
+Not only are the concepts
+d i f f e r e n t , so are most of the p o w e r f u l heuristics. So it was
+r e a s o n a b l e that this f i r s t attempt should be limited to one
+narrow
+domain.
+Elementary mathematics was chosen,
+beeausc?:
+1. t h e r e are no u n c e r t a i n t i e s in the raw data (e.g.,
+a r i s i n g f r o m e r r o r f u l measuring devices).
+2. Reliance on e x p o r t s ' i n t r o s p e c t i o n is a p o w e r f u l
+t e c h n i q u e for c o d i f y i n g the judgmental rules needed
+to w o r k e f f e c t i v e l y in a field. By choosing a familiar
+f i e l d , it was possible for the author to rely p r i m a r i l y
+on p e r s o n a l i n t r o s p e c t i o n for such heuristics.
+3. The m o r e formal a science is, the easier it is to
+a u t o m a t e (e.g., the less one needs to use natural
+l a n g u a g e to communicate information).
+4. A m a t h e m a t i c i a n has the freedom to e x p l o r e -- or to
+g i v e up on -- w h a t e v e r he wants to. There is no
+specific p r o b l e m to s o l v e , no fixed "goal".
+5.
+Unlike
+some
+fields
+(e.g.,
+propositional
+logic),
+e l e m e n t a r y math r e s e a r c h has an abundance (many
+h u n d r e d s ) of p o w e r f u l heuristic rules available.
+
+1.1. HISTORICAL MOTIVATION
+S c i e n t i s t s o f t e n face the difficult task of f o r m u l a t i n g
+n o n t r i v i a l r e s e a r c h p r o b l e m s which are soluble.
+In most
+b r a n d i e s of science, it is usually easier to tackle a specific
+g i v e n p r o b l e m t h a n t o p r o p o s e i n t e r e s t i n g yet managable
+new
+q u e s t i o n s to i n v e s t i g a t e .
+For example, contrast
+solving t h e Missionaries and Cannibals p r o b l e m w i t h the
+m o r e i l l - d e f i n e d r e a s o n i n g which led to inventing! it. The
+f i r s t t y p e of a c t i v i t y is formalizable and admits a d e d u c t i v e
+s o l u t i o n ; t h e s e c o n d is inductive and judgmental.
+As
+a n o t h e r e x a m p l e , c o n t r a s t proving a given theorem v e r s u s
+proposing it in the f i r s t place.
+A w e a l t h of AI r e s e a r c h has been focussed upon the
+f o r m e r t y p e o f a c t i v i t y : d e d u c t i v e p r o b l e m solving (see,
+e.g., [ B l e d s o e 7 1 ] , [Nilsson 7 1 ] , [Newell & Simon 72]).
+A p p r o a c h e s to inductive inference have also been made.
+Some r e s e a r c h e r s have t r i e d to attack the p r o b l e m in a
+c o m p l e t e l y d o m a i n - i n d e p e n d e n t way (see, e.g., [ W i n s t o n
+70]).
+Other
+AI
+researchers
+believe
+that
+"expert
+k n o w l e d g e " must be p r e s e n t if inductive reasoning is to be
+d o n e at t h e level w h i c h humans are capable of. Indeed, a
+f e w r e c e n t A I p r o g r a m s have i n c o r p o r a t e d such k n o w l e d g e
+( i n t h e f o r m of j u d g m e n t a l rules gleaned f r o m human
+experts)
+and
+s u c c e s s f u l l y c a r r i e d out
+quite complex
+i n d u c t i v e t a s k s : medical diagnosis [ S h o r t l i f f e 7 4 ] , mass
+s p e c t r a i d e n t i f i c a t i o n [Feigenbaum 7 1 ] , clinical dialogue
+[ D a v i s 7 6 ] , d i s c o v e r y of new mass s p e c t r o s c o p y rules
+[Buchanan 75].
+
+T h e l i m i t a t i o n s of math as a domain are closely i n t e r t w i n e d
+w i t h its a d v a n t a g e s . Having no ties to real w o r l d data can
+be v i e w e d as a l i a b i l i t y , as can having no clear " r i g h t " or
+" w r o n g " behavior.
+Since math has been w o r k e d on for
+m i l l c n i a by some of each c u l t u r e ' s greatest minds, it is
+u n l i k e l y that a small e f f o r t like AM would make many
+s t a r t l i n g new discoveries.
+Nevertheless, it was d e c i d e d
+that t h e a d v a n t a g e s o u t w e i g h e d the limitations.
+
+T h e " n e x t s t e p " i n this p r o g r e s s i o n o f tasks w o u l d b e that
+
+1.3
+
+T hie w o r k was supported in part by the Defense Advanced Research
+Projects Agency ( M 1 6 2 0 - 7 3 - C - 0 0 7 4 ) and monitored by the Air r o r c e
+Office of Scientific Research
+
+Specialized
+
+I N I T I A L A S S U M P T I O N S AND HYPOTHESES
+
+T h e AM p r o g r a m "got off the g r o u n d " only because a
+n u m b e r of s w e e p i n g assumptions w e r e made about how
+m a t h r e s e a r c h c o u l d be p e r f o r m e d by a computer p r o g r a m :
+1. V e r y l i t t l e n a t u r a l language processing capabilities are
+
+Systems-4 Lenat
+833
+
+r e q u i r e d . As it runs, AM is monitored by a human
+"user". AM Keeps the user informed by instantiating
+E n g l i s h s e n t e n c e templates. 1 he user's input is r a r e
+and can be successfully s t e r e o t y p e d .
+2 F o r m a l r e a s o n i n g (including p r o o f ) is not indispensable
+when
+doing
+theory
+formation
+in
+elementary
+m a t h e m a t i c s . In the same spirit, we need not w o r r y in
+advance about the occurence of contradictions.
+3. Each mathematical concept can be r e p r e s e n t e d as a
+list of facets (aspects, slots, parts, p r o p e r t y / v a l u e
+pairs).
+Tor each new piece of Knowledge gained,
+t h e r e w i l l be no t r o u b l e in finding which facet of
+w h i c h c o n c e p t it should he s t o r e d in.
+4. The basic a c t i v i t y is to choose some facet of some
+c o n c e p t , and t h e n t r y to fill in new entries to s t o r e
+t h e r e ; this will occasionally cause new concepts to be
+d e f i n e d . The h i g h - l e v e l decision about which facet of
+w h i c h concept to worK on next can be: handled by
+m a i n t a i n i n g an "ordered agenda" of such tasKs.
+The
+t e c h n i q u e s for actually c a r r y i n g out a tasK are
+c o n t a i n e d w i t h i n a large collection of heuristics.
+b.
+Each
+heuristic
+has
+a well d e f i n e d
+domain
+of
+a p p l i c a b i l i t y , w h i c h coincides p e r f e c t l y w i t h one of
+AM's c o n c e p t s . We say the heuristic "belongs t o " that
+concept
+6. Heuristics s u p e r i m p o s e ; they never interact s t r o n g l y
+w i t h each o t h e r . If one concept CI is a specialization
+of concept C?, then C l ' s heuristics are more p o w e r f u l
+and s h o u l d he t r i e d first.
+7. The reasons s u p p o r t i n g a tasK (on the agenda of
+f a c e t / c o n c e p t tasKs to be c a r r i e d out) superimpose
+p e i f e c t l y . "they never change w i t h time, and it maKes
+no d i f f e r e n c e in what order they w e r e noticed. It
+s u f f i c e s to have a single, positive number which
+c h a r a c t e r i z e s tire value of the reason.
+8. t h e tasKs on the agenda are completely independent.
+No tasK "waKes u p " another. Only the general position
+(near the t o p , near the bottom) is of any significance.
+9. The set of heuristics need not g r o w , as new concepts
+are
+discovered.
+All
+common-sense
+knowledge
+r e q u i r e d is assumed to be already present w i t h i n the
+i n i t i a l l y - g i v e n b o d y of heuristic rules.
+It is w o r t h r e p e a t i n g that all the above points are merely
+c o n v e n i e n t falsehoods. Their combined presence made AM
+d o a b l e ( b y one p e r s o n , in one year).
+One
+point
+of
+agreeement
+b e t w e e n W e i / e n b a u m and
+l e d e r b e i g [ I e d e r b e r g 7 6 ] is that AI can succeed in
+a u t o m a t i n g o n l y those activities for which t h e r e exists a
+" s t r o n g t h e o r y " of how that activity is done by people.
+Point #4 a b o v e is a claim that such a clean, simple model
+e x i s t s for math r e s e a r c h : a search process g o v e r n e d by a
+l a r g e c o l l e c t i o n of houristic rules. Here is a simplified
+s u m m a r y of that model:
+1. t h e o r d e r in w h i c h a math textbook presents a
+t h e o r y is almost the exact opposite of the order in
+w h e h it
+war. actually developed.
+In a t e x t ,
+definitions
+and
+lemmata
+are
+given
+with
+no
+m o t i v a t i o n , and t h e y t u r n out to be just the ones
+r e q u i r e d for the next big theorem, whose proof
+magically f o l l o w s . But in real life, a mathematician
+w o u l d b e g i n by examining some a l r e a d y - K n o w n
+c o n c e p t s , t r y i n g to find some r e g u l a r i t y involving
+them,
+formulating
+those
+as
+conjectures
+to
+i n v e s t i g a t e f u r t h e r , and using them to motivate
+some s i m p l i f y i n g new definitions.
+2. Each s t e p the r e s e a r c h e r taKes (see #1) involves
+c h o o s i n g f r o m a huge set of alternatives -- that is,
+s e a r c h i n g . He uses judgmental c r i t e r i a (heuristics)
+to choose the " b e s t " alternative. This saves his
+s e a r c h f r o m the combinatorial explosion.
+3.
+Non-formal
+criteria
+(aesthetic
+interestingness,
+
+Sppcialized
+
+e m p i r i c a l i n d u c t i o n , analogy, utility estimates) are
+much more i m p o r t a n t than formal methods.
+4.
+All
+such
+heuristics
+can
+be
+viewed
+as
+s i t u a t i o n / a c t i o n ( I F / I H L N ) rules. There is a common
+c o r e of (a f e w h u n d r e d ) heuristics, basic to all
+fields of math at all levels. In addition to these,
+each f i e l d has several specific, p o w e r f u l rules.
+5. N a t u r e is m e t a p h y s i c a l l y pleasant: It is fair, u n i f o r m ,
+regular.
+Statistical considerations are valid and
+v a l u a b l e w h e n t r y i n g to find r e g u l a r i t y in math
+data. Simplicity and s y n e r g y and s y m m e t r y abound.
+
+2. DESIGN OF THE 'AM' PROGRAM
+A p u r e p r o d u c t i o n system may be considered to consist of
+t h t e e c o m p o n e n t s : data memory, a set of rules, and an
+i n t e r p r e t e r . Since AM is more or less a r u l e - b a s e d s y s t e m ,
+it too can be c o n s i d e r e d as having three main design
+c o m p o n e n t s : how it r e p r e s e n t s math knowledge (its f r a m e like c o n c e p t / f a c e t s scheme), how it enlarges its k n o w l e d g e
+base (its c o l l e c t i o n of heuristic rules), and how it controls
+t h e f i r i n g of these rules (via the agenda mechanism). These
+f o r m the s u b j e c t s of the following three subsections.
+
+2 . 1 . REPRESENTATION OF CONCEPTS
+The task of the AM p r o g r a m is to define plausible new
+m a t h e m a t i c a l c o n c e p t s , and investigate them, Each concept
+is r e p r e s e n t e d i n t e r n a l l y as a bundle of slots or "facets".
+Each facet c o r r e s p o n d s to some aspect of a concept, to
+some q u e s t i o n we might want to ask about the concept.
+Since each concept is a mathematical e n t i t y , the kinds of
+q u e s t i o n s One might ask are fairly constant from concept to
+c o n c e p t . A set of 2b facets was t h e r e f o r e fixed once and
+f o r all. B e l o w is that list of facets which a concept C may
+h a v e . For each facet, we give a typical question about C
+whic h it a n s w e r s .
+Name: What shall wo call C w h e n talking w i t h the user?
+Generalizations:
+Which
+other
+concepts
+have
+less
+r e s t r i c t i v e (i.e., w e a k e r ) definitions than C?
+S p e c i a l i s a t i o n s : Which concepts satisfy C's d e f i n i t i o n plus
+some additional constraints?
+Examples; What things that satisfy C's definition?
+Isa's: Which concepts' definitions does C itself satisfy?
+l n - d o m a i n of: Which o p e r a t i o n s can o p e r a t e on C's?
+I n - r a n g e of: Which operations result in C's. w h e n run?
+V i e w s : How can we v i e w some X as if it w e r e a C?
+I n t u i t i o n s : What abstract, analogic r e p r e s e n t a t i o n s are
+Known for C?
+A n a l o g i e s : A r e t h e r e any similar concepts?
+Conjec's,: What are some potential theorems involving C?
+D e f i n i t i o n s : How can we tell if x is an example of C?
+A l g o r i t h m s : What exactly do we do if we want to
+e x e c u t e the o p e r a t i o n C on a given argument?
+D o m a i n / R a n g e : What kinds of arguments can o p e r a t i o n C
+be e x e c u t e d on? What kinds of values will it r e t u r n ?
+W o r t h : How valuable is C? (overall, aesthetic, u t i l i t y , etc.)
+I n t e r e s t i n g n e s s : What special features can make a C
+e s p e c i a l l y interesting? Especially b o r i n g 9
+In a d d i t i o n , each facet F of concept C can possess a f e w
+l i t t l e s u b f a c e t s w h i c h contain heuristics for dealing w i t h
+t h a t facet of C's:
+F.Fillin: What
+f o r facet
+F.ChecK: How
+F.Suggest: If
+(related
+
+are some methods for filling in new e n t r i e s
+F of a concept which is a C?
+do we v e r i f y / d e b u g potential entries?
+AM bogs clown, what are some new tasKs
+to facet F of concept C) to consider doing?
+
+Systems-4: Lennt
+
+In the Lisp implementation of AM, each (oncopt is
+maintained as an atom with an attribute/value list
+(property list). Each facet, and its list of entries is just a
+property and its associated value. As an example, here is
+a rendition of the Sets concept. It is meant to correspond
+to the notion of a collection of elements.
+
+c o n t a i n s a list of e n t r i e s , a list of equivalent algorithms.
+Each a l g o r i t h m must have t h r e e separate p a r t s :
+1. D e s c r i p t o r s : Recursive, Linear, or Iterative? Quick or
+Slow? Opaque or Transparent? Destructive?
+2. R e l a t o r s : Is, this just a special case of some other
+c o n c e p t ' s algorithm? Which others does this one call
+o n 7 is this similar to any other algorithms?
+3. P r o g r a m : A small, executable piece of Lisp code. It
+may be used for actually " r u n n i n g " the algorithm; it
+may also be i n s p e c t e d , copied, reasoned about, etc.
+T h e r e arc multiple algorithms because different ones have
+d i f f e r e n t p r o p e r t i e s : some are v e r y quick in some cases,
+some are a l w a y s slow but are v e r y cleanly w r i t t e n and
+h e n c e easier to r e a s o n about, etc.
+Another
+facet possessed only by active concepts is
+Domain/range.
+It is a list of e n t r i e s , each of the f o r m
+•D1 D2... Di --> R>, which means that the concept takes a list
+of a r g u m e n t s , the first one being an example of concept
+D1, t h e s e c o n d of D2,..., the last argument being an example
+of c o n c e p t Di, and if the a l g o u t h m (any e n t r y on the
+A l g o r i t h m s f a c e t ) is r u n on this argument list, then the
+v a l u e it r e t u r n s will be an example of concept R. We may
+say that the Domain of the concept is the Cartesian
+p r o d u c t D1 xD2x...xDi, and that the Range of the concept is
+R.
+f o r e x a m p l e , the D o m a i n / i a n g e of
+Set-union is
+* Sets Sets -* Sets~>; S e t - u n i o n takes a pair of sets as its
+a r g u m e n t list, and r e t u r n s a set as its value.
+
+To d e c i p h e r the Definitions facet, t h e r e are a few things
+y o u must k n o w . Facet F of concept C will occasionally be
+a b b r e v i a t e d as C.F. In those cases w h e r e F is " e x e c u t a b l e " ,
+t h e n o t a t i o n C.F will r e f e r to applying the c o r r e s p o n d i n g
+function.
+Go the f i r s t e n t r y in the Definitions facet is
+r e c u r s i v e because it contains an embedded call on the
+f u n c t i o n S e t . D e f i n i t i o n . Since t h e r e are three separate but
+e q u i v a l e n t d e f i n i t i o n s , AM may choose whichever one it
+w a n t s w h e n it r e c u r s . AM can choose one via a random
+s e l e c t i o n scheme, or always t r y to recur into the same
+d e f i n i t i o n as it was just in, or perhaps suit its choice to the
+f o r m of the argument at the moment. All concepts possess
+executable
+definitions
+(lisp
+predicates),
+though
+not
+n e c e s s a r i l y e f f e c t i v e ones. When given an argument x,
+S e t . d e f i n i t i o n will r e t u r n True, False, or will eventually be
+i n t e r r u p t e d by a timer (indicating that no conclusion was
+r e a c h e d a b o u t w h e t h e r or not x is a set).
+T h e V i e w s , I n t u i t i o n s , and Analogies facets must be
+d i s t i n g u i s h e d f r o m each o t h e r . Views is concerned w i t h
+t r a n s f o r m a t i o n s b e t w e e n t w o specific concepts (e.g., how
+to v i e w any p r e d i c a t e as a set, and vice versa). An e n t r y
+on the A n a l o g i e s facet is a mapping from a set of concepts
+to a s e f of c o n c e p t s (e.g., b e t w e e n {bags, h a g - u n i o n , b a g i n t e r s e c t i o n , . . . } and {numbers, addition, minimum,...!; or
+b e t w e e n { p r i m e s , f a c t o r i n g , numbers...} a n d {simple g r o u p s ,
+f a c t o r i n g i n t o s u b g r o u p s , groups...}). Intuitions deals w i t h
+t r a n s f o r m a t i o n s b e t w e e n a bunch of concepts and one of a
+f e w l a r g e , s t a n d a r d scenarios (e.g., intuit the relation " > " as
+p l a y i n g on a s e e - s a w ; intuit a set by d r a w i n g a Venn
+d i a g r a m ) . I n t u i t i o n s are c h a r a c t e r i z e d by being (i) opaque
+( A M c a n n o t i n t r o s p e c t on them, delve into their code), (ii)
+o c c a s i o n a l l y f a l l i b l e , (iii) v e r y quick, and (iv) c a r e f u l l y
+h a n d c r a f t e d in advance (since AM can not pick up new
+i n t u i t i o n s via m e t a p h o r s to the real w o r l d , as we can).
+Since " S e t s " is a static concept, it had no Algorithms facet
+(as d i d , e.g., " S e t - u n i o n " ) . The Algorithms facet of a concept
+Snecialized
+
+Once t h e r e p r e s e n t a t i o n of Knowledge is s e t t l e d , t h e r e
+r e m a i n s the actual choice of what knowledge to put into
+t h e p r o g r a m initially. One hundred elementary concepts
+w o r e s e l e c t e d , c o r r e s p o n d i n g roughly to what Piaget might
+h a v e c a l l e d " p r e n u m e r i c a l knowledge". Figure J p r e s e n t s a
+g r a p h of t h e s e c o n c e p t s , showing their i n t e r r e l a t i o n s h i p s
+of G e n o r a l i z a t i o n / S p e c i a l i a t i o n and Fxamples/Isa's. There
+is much static; s t r u c t u r a l knowledge (sets, t r u t h - v a l u e s ,
+c o n j e c t u r e s . . . ) and much knowledge about simple activities
+(boolean
+relations,
+composition
+of
+relations,
+set
+operations,...). Notice that t h e r e is no notion of proof, of
+f o r m a l r e a s o n i n g , or of numbers or arithmetic.
+
+2.2.
+
+TOP-LEVEL CONTROL: THE AGENDA
+
+AM's basic a c t i v i t y is to find new entries for some facet of
+some c o n c e p t . But w h i c h particular one should it choose to
+d e v e l o p next?
+Initially, t h e r e are over one h u n d r e d
+c o n c e p t s , each w i t h about t w e n t y blank facets; thus the
+" s p a c e " f r o m w h i c h to choose is of size t w o thousand. As
+m o r e c o n c e p t s get d e f i n e d , this number increases.
+IPs
+w o r t h h a v i n g AM s p e n d some time deciding which basic
+task to w o r k on n e x t , for t w o reasons: most of the tasks
+w i l l never get e x p l o r e d , and only a few of the tasKs will
+a p p e a r (to the human user) rational things to w o r k on at
+the moment.
+M u c h i n f o r m a l e x p e r t Knowledge is r e q u i r e d to c o n s t r a i n
+t h e s e a r c h , to q u i c k l y z e r o in on one of these few v e r y
+g o o d tasks to tackle next. This is done in two stages:
+1. A list of plausible f a c e t / c o n c e p t pairs is maintained.
+No task can get o n t o this "agenda" unless t h e r e is
+some r e a s o n w h y w o r k i n g on that facet of that
+concept would be worthwhile.
+2. Fach task on this agenda is assigned a p r i o r i t y r a t i n g ,
+b a s e d on t h e number (and strengths) of reasons
+s u p p o r t i n g it. This allows the e n t i r e agenda to be
+k e p t o r d e r e d b y plausibility.
+The f i r s t of t h e s e constrainings is much like replacing a
+legal m o v e g e n e r a t o r w i t h a plausible move g e n e r a t o r , in a
+h e u r i s t i c s e a r c h p r o g r a m , The second kind of constraint is
+a k i n to using a h e u r i s t i c evaluation function to select the
+
+S y s t e m s - 4 : Lenat
+835
+
+Over half of the current task's tunc allotment, is used up;
+T h e r e are some known examples of S t r u c t u r e s ;
+Some known generalization of the current concept (the
+concept mentioned as part o| the current task) has
+a completely empty Kxamplcs facet;
+A task recently worked on had the form "Fill in facet F
+of C", f o r any F, where C, is the current concept;
+T h e user has used this program at least once he fore;
+It t u r n e d out that the laxity of constraints on the f o r m of
+t h e h e u r i s t i c rules p r o v e d excessive: it made it v e r y
+d i f f i c u l t f o r AM to analyze and modify its o w n heuristics.
+
+T h e a c t u a l t o p - l e v e l ( o n t r o l policy is to plucK the t o p task
+( h i g h e s t p r i o r i t y r a t i n g ) f r o m the agenda, and then execute
+it. W h i l e a task e x e c u t e s , some new bisks may he p r o p o s e d
+(and m e r g e d i n t o the agenda), some new concept', may get
+c r e a t e d , and ( h o p e f u l l y ) some entries for the specified
+f a c e t of t h e s p e c i f i e d concept will he found and filled in.
+Once a task ir. c h o s e n , the p r i o r i t y rating of that task now
+s e r v e s a n e w f u n c t i o n : it is taken as an estimate of how
+m u c h c o m p u t a t i o n a l r e s o u r c e to devote to w o r k i n g on this
+task. 1 he task a b o v e , in the box, might he allotted 35 c p u
+s e c o n d s and 3 5 0 list cells, because its rating was 3 5 0 .
+W h e n e i t h e r r e s o u r c e is exhausted, w o r k on the task halts.
+The t a s k is r e m o v e d f r o m the agenda, and the cycle begins
+a n e w ( A M s t a r t s w o r k i n g on whichever task is now at the
+t o p of t h e agenda).
+
+2.3.
+
+LOW-LEVEL CONTROL: THE HEURISTICS
+
+A f t e r a task is s e l e c t e d f r o m the agenda, how is it
+"executed"?
+A concise answer would be: AM selects
+r e l e v a n t h e u r i s t i c s and executes them; they satisfy the
+t a s k via s i d e - e f f e c t s . This really just splits our original
+q u e s t i o n i n t o t w o new ones: How are relevant heuristics
+l o c a t e d ? What does it mean for a heuristic to be e x e c u t e d
+a n d t o a c h i e v e something?
+
+2.3.1
+
+How Relevant Heuristics are Located
+
+Each h e u r i s t i c is r e p r e s e n t e d as a c o n d i t i o n / a c t i o n rule.
+The c o n d i t i o n or l e f t - h a n d - s i d e of a rule tests to see
+w h e t h e r t h e r u l e is applicable to the task on hand. The
+a c t i o n or r i g h t - h a n d - s i d e of the rule consists of a list of
+a c t i o n s to p e r f o r m if the rule is applicable. Eg.,
+IF the
+and
+and
+and
+THKN
+and
+
+c u n e n t task is to check examples of a concept X,
+(Forsome Y) Y is a generahzation of X,
+Y has al least 10 known examples
+all examples of Y are also examples of X,
+conjecture: X is really no more speciali/.ed than Y,
+add that conjecture as a new entry on the
+Kxamples facet of the ConJOCK concept,
+and add the following task to the agenda:
+"Check examples of Y"
+f o r this reason: Y may analogously t u r n out to be
+equal to one of its supposed genetalizations.
+
+It
+is the h e u r i s t i c s " right hand sides which actually
+accomplish
+the
+selected
+task; that
+process
+will
+be
+d e s c r i b e d in t h e next subsection. The left sides are the
+r e l e v a n c y c h e c k e r s , and w i l l be focussed on now:
+S y n t a c t i c a l l y , t h e left side must be a p r e d i c a t e , a Lisp
+f u n c t i o n w h i c h a l w a y s r e t u r n s True or False. It must be a
+c o n j u n c t i o n P 1 A P 2 A P 3 A „ . of smaller predicates Pi, each of
+w h i c h must be quick and must have no side e f f e c t s . Here
+a r e some t y p i c a l c o n j u c t s w h i c h might appear inside a left
+hand side:
+Spoclali
+
+zed
+
+f r o m a " p u r e p r o d u c t i o n s y s t e m " v i e w p o i n t , we have
+a n s w e r e d t h e q u e s t i o n of locating relevant heuristics.
+N a m e l y , we e v a l u a t e the left sides of all the r u l e s , and see
+w h i c h ones r e s p o n d " T r u e " . But AM contains hundreds of
+h e u r i s t i c s , and r e p e a t e d l y evaluating each one's c o n d i t i o n
+w o u l d use up t r e m e n d o u s amounts of time. AM is able to
+q u i c k l y select a set of potentially relevant r u l e s , rules
+w h o s e left sides are t h e n evaluated to test for true
+relevance.
+The s e c r e t is that each rule is s t o r e d
+s o m e w h e r e a p r o p o s to its "domain of applicability". The
+p r o p e r place to s t o r e the rule is d e t e r m i n e d by the f i r s t
+c o n j u n c t on its left hand side. Consider this h e u r i s t i c :
+IF
+
+the riitTr.nl ta^k \* to find examples of a c t i v i t y F,
+and a fast a l g o r i t h m for computing F is known,
+T H E N one.way to get examples of F is to run F on
+l a n d o m l y chosen examples of the Domain of F.
+The v e r y f i r s t c o n j u n c t of a rule's left side is always
+s p e c i a l . It s p e c i f i c s the domain of applicability ( p o t e n t i a l
+r e l e v a n c e ) of the h e u r i s t i c , by naming a particular facet of
+a p a r t i c u l a r c o n c e p t to which this rule is relevant (in the
+a b o v e r u l e , the domain of relevance is t h e r e f o r e the
+E x a m p l e s facet of the A c t i v i t y concept). AM uses such f i r s t
+c o n j u n c t s as p r e - p r e c o n d i l i o n s : A potentially r e l e v a n t rule
+c a n be l o c a t e d by its first conjunct alone. Then, its left
+h a n d side is f u l l y e v a l u a t e d , to indicate w h e t h e r it's truly
+r e l e v a n t . Here are a f e w t y p i c a l expressions w h i c h could
+be first conjuncts:
+T h e c u r r e n t task (the one just selected from the agenda)
+is of the f o r m " ( d u c k the Domain/range facet of
+concept X", where X is some surjectivc f u n c t i o n ;
+T h e c u r r e n t task matches " F i l l in boundary examples of
+X " , where X is an operation on pairs of sets;
+T h e c u r r e n t task is " F i l l in examples of Primes";
+The k e y o b s e r v a t i o n is that a heuristic t y p i c a l l y applies to
+all examples of a particular concept C.
+The rule above has
+C = A c t i v i t y ; it's r e l e v a n t to each individual a c t i v i t y .
+W h e n a task is c h o s e n , it specifies a concept C and a facet
+F t o b e w o r k e d on. A M t h e n "ripples u p w a r d " t o gather
+p o t e n t i a l l y r e l e v a n t r u l e s : it looks on facet F of concept C
+to see if any r u l e s are tacked on t h e r e , it looks on facet F
+of
+each
+generalization
+of
+C,
+on
+each
+of
+their
+g e n e r a l i s a t i o n s , etc. If the c u r r e n t task w e r e "Check the
+D o m a i n / r a n g e of U n i o n - o - U n i o n , then AM w o u l d r i p p l e
+u p w a r d f r o m U n i o n - o - U n i o n , along the Generalization facet
+e n t r i e s , g a t h e r i n g h e u r i s t i c s as it went.
+The p r o g r a m
+w o u l d a s c e r t a i n w h i c h concepts claim U n i o n - o - U n i o n as one
+of t h e i r e x a m p l e s . These concepts include C o m p o s e - w i t h self, Compose, Operation, Active, Any-concept, Anything.
+AM w o u l d collect heuristics that tell how to check the
+D o m a i n / r a n g e of
+any composition, how to deal w i t h
+D o m a i n / r a n g e f a c e t s of any concept, etc. Of c o u r s e , the
+
+This o p e r a t i o n is the result of composing s e t - u n i o n w i t h
+i t s e l f . It p e r f o r m s X (x,y,z) xu(yuz).
+Systems-4:
+836
+
+Lenat
+
+further out it ripples, the more general (and hence weaker)
+the heuristics tend to be. Here is one heuristic, tacked
+onto the Domain/range facet of Operation, which would be
+garnered if the selected task were "Check Domain/range of
+Union o-Union":
+IF the
+and
+and
+THKN
+the
+
+n i n n u t task is "Check the Domain/range of F",
+an entry on that facet has the form <D D...1) -> H>,
+concept R is a generalization of r n n c r p l I),
+it is w o r t h spending time checking whether or not
+range of F rnight he simply I), instcad of R.
+
+Suppose one entry on Union-o -Union's Domain/range facet
+was "<Nonempty-sets Nonempty-sets Nonempty-sets -+
+Sets>". Then the above heuristic would be truly relevant
+(all three conjuncts on its left hand side would be
+satisfied), and it would pose the question: Is the union of
+three nonempty sets always nonempty? Empirical evidence
+would eventually confirm this, and the Domain/range facet
+of Union-o-Union would then contain that fact,
+Merc is another way to look at the heuristic-gathering
+process. All the concepts known to AM are arranged in a
+big hierarchy, via subsetof links (Specializations) and
+element-of links (Isa). Since each heuristic is associated
+with one individual concept (its domain of applicability),
+there is a hierarchy induced upon the set of heuristics.
+Heritability properties hold: a heuristic tacked onto concept
+C is applicable to working on all "lower" concepts. This
+allows us to efficiently analogically access the relevant
+heuristics simply by chasing upward links in the hierarchy.
+Note that the task selected from the agenda provides an
+explicit pointer to the "lowest" -- most specific
+concept;
+AM ripples upward from it. Thus concepts are gathered in
+order of increasing generality; hence so are the heuristics.
+Below are summarized the three main points that comprise
+AM's scheme for finding relevant heuristics in a "natural"
+way and then using them:
+1. Fach heuristic is tacked onto the most general
+concept for which it applies: it is given as large a
+. domain of applicability as possible. This will maximize
+its generality, while leaving its power untouched.
+2. When the current task deals with concept C, AM
+ripples upward from C, tracing along Generalization
+and Isa links, to quickly find all concepts which claim C
+as one of their examples. Heuristics attached to all
+such concepts are potentially relevant.
+3. All heuristics are represented as condition/action
+rules. Once the potentially relevant rules are located
+(in step 2), AM evaluates eacIVs left hand side, in
+order of increasing generality. The rippling process
+automatically gathers the heuristics in this order.
+Whenever a rule's left side returns True, the rule is
+known to be truly relevant, and its right side is
+immediately executed.
+2.3.2 What Happens When Heuristics Are Executed
+When a rule is recognized as relevant, its right side is
+executed. How does this accomplish the chosen task?
+The right side, by contrast to the left, may take a great
+deal of time, have many side, effects, and the value it
+returns is always ignored. The right side of a rule is a
+series of little Lisp functions, each of which is called an
+action.
+Semantically,
+each
+action
+performs
+some
+processing which is appropriate in some way to the kinds
+of situations in which the rule's left side would have been
+satisfied (returned True). The only constraint which each
+action must satisfy is that it have one of the following
+three kinds of side-effects, and no other kinds:
+1. It suggests a new task to add to the agenda.
+
+Specialized
+
+2.
+3.
+Dear
+such
+
+It dictates how some new concept is to be defined.
+It adds some entry to some facet of some concept.
+in mind that the right side of a single rule is a List of
+actions. Let's now treat these three kinds of actions:
+
+73.7A H e u r i s t i c s Suggest New Tasks
+
+The left side of a rule triggers. Scattered among the list of
+"things to do" on its right side are some suggestions for
+future tasks. These new tasks are then simply added to
+the agenda. The suggestion for the task includes enough
+information about the task to make it easy for AM to
+assemble its parts, to find reasons for it, to numerically
+evaluate those reasons, etc. For example, here is a typical
+rule which proposes a new task. It says to generalize a
+predicate if it appears to be returning True very rarely:
+IF the c u r r e n t task was "Fill in examples of X",
+and concept X is a Predicate,
+and over 100 items are known in the domain of X,
+and at least 10 cpu sees, have been spent so far,
+and X has returned T r u e at least once,
+and X returned False over 20 times as often as T r u e ,
+T H K N add the following task to the agenda:
+" F i l l in g c n e r a l t a t i o n s of X"
+f o r the following reason:
+"X is rarely satisfied; a slightly Iess restrictive
+concept might he much more ml cresting"
+T h i s reason has a rating which is the False/True ratio
+
+Let's see one instance where this rule was used. AM
+worked on the task "Fill in examples of List-Equality". One
+heuristic (displayed in Sec. 2.3.1, and again in detail in Sec.
+2.3.2.3) said to randomly pick elements from that
+predicate's domain and simply run the predicate. Thus AM
+repeatedly plucked random pairs of lists, and tested
+whether or not they were equal. Needless to say, not a
+high percentage returned True (in practice, 2 out of 242).
+This rule's left side was satisfied, and it executed. Its right
+side caused a new task to be formulated: "Fill in
+generalizations of List-Equality". The reason was as stated
+above in the rule, and that reason got a numeric rating of
+2 4 0 / 2 = 120. That task was then assigned an overall
+rating (in this case, just 120) and merged into the agenda.
+It sandwiched in between a task with a rating of 128 and
+one with a 104 priority rating. Incidentally, when this task
+was finally selected, it led to the creation of several
+interesting concepts, including the predicate which we
+might call "Same-length".
+73.7,2 H e u r i s t i c s C r e a t e New Concepts
+
+One of the three kinds of allowable actions on the right
+side of a heuristic rule is to create a specific new concept.
+For each such creation, the heuristic must specify how the
+new concept is to be constructed. The heuristic states the
+Definition facet entries for the new concept, plus usually a
+few other facets' contents. After this action terminates,
+the new concept will "exist". A few of its facets will be
+filled in, and many others will be blank. Some new tasks
+may exist on the agenda, tasks which indicate that AM
+ought to spend some time filling in some of those facets in
+the near future. Here is a heuristic rule which results in a
+new concept being created:
+IF the c u r r e n t task was "Fill in examples of F"
+and F is an operation, f r o m domain A into range B,
+and more than 100 items are known examples of A,
+and more than 10 range items (examples of B) were
+found by applying F to these domain elements,
+and at least one of these range items 'b' is a d i s t i n guished member (especially, an extremum) of B,
+T H K N f o r each such 'b'B, create the following concept:
+
+Systens-4:
+837
+
+Lenat
+
+u n i o n ( t h e r e are no such rules), relevant to finding
+e x a m p l e s of S e t - o p e r a t i o n s , of Operations, of any A c t i v i t y ,
+of any C o n c e p t , of A n y t h i n g . Here is one rule applicable to
+any A c t i v i t y :
+IF the curreut task is to f i l l in examples of F,
+and F is an operation, say with domain I),
+and there is a fast known algorithm for F,
+T H K N one way to get examples of F is lo run F'S
+a l g o r i t h m on randomly chosen examples of I).
+
+and the reason for this n e a t ion is: "lt's worth
+i n v e s t i g a t i n g A's whieh havr unusual F-values"
+and add five new tasks to the anemia,
+of the f o r m "Kill in faeet x of F - i n v e i s r - o i - h "
+where x is Coinertures, Generlions,
+S p e c i a l i z a t i o n , Kxamples, and Isa's;
+f o r the following reason:
+" T h i s conecpt was newly synthesized; it is e r u r i a l lo find where it 'fits in' to the hierarehy"
+T h r reason's rating is just W o r l h ( F i n v e r s e - o f - b ) .
+
+Of c o u r s e , in the l i s p implementation, this s i t u a t i o n - a c t i o n
+r u l e is not c o d e d quite so neatly.
+It w o u l d be more
+f a i t h f u l l y t r a n s l a t e d as f o l l o w s :
+
+One use of this heuristic was w h e n t h r c u r r e n t task was
+"F ill in e x a m p l e s of Divisors~of". The h e u r i s t i c s left side
+w a s s a t i s f i e d because: Divisors of is an o p e r a t i o n ( f r o m
+N u m b e r s to Sets of numbers), and far more than the
+r e q u i r e d 1 0 0 d i f f e r e n t numbers are k n o w n , and more than
+10 d i f f e r e n t sets of factors were located altogether, and
+s o m e of t h e m w e r e in fact distinguished by being e x t r e m e
+k i n d s of sets (e.g., singletons, empty sels, doubletons,
+t r i p l e t o n s , . . . ) . A f t e r its left side t r i g g e r e d , the right side of
+t h e r u l e was e x e c u t e d , f o u r new concepts w e r e c r e a t e d
+i m m e d i a t e l y . Here is one of them:
+N A M K : Divisors-ol - I n v r r s e o K Ooubleton
+j
+O K F I N I T I O N : X (a) Divisors of(a) is a Don Melon
+GENKKAU/ATI0NS:
+
+Numbers
+
+W O R T H : 100
+I N T K R K S T : Any conjecture involving both
+this eoneept and eilher Divisors-of or Times
+
+|
+
+This is a c o n c e p t r e p r e s e n t i n g a certain class of numbers,
+in fact t h e n u m b e r s we call "primes". The heuristic rule is
+of c o u r s e a p p l i c a b l e to any kind of o p e r a t i o n , not just
+n u m e r i c o n e s . As another instance of its use, consider what
+h a p p e n e d w h e n t h e c u r r e n t task was 'Till in examples of
+S e t - i n t e r s e c t " . This rule caused AM to notice that some
+p a i r s of sets w e r e mapping over into the most e x t r e m e of
+all s e t s : t h e e m p t y set. The rule then had AM define the
+n e w c o n c e p t we w o u l d call "disjointness": pairs of sets
+having empty intersection.
+T h e r e is just a t i n y bit of " t h e o r y " behind how these
+c o n c e p t - c r e a t i n g rules w e r e designed. A facet of a new
+c o n c e p t is f i l l e d in immediately iff both (i) it's trivial to fill
+in at c r e a t i o n - t i m e , and (ii) it would be v e r y difficult to fill
+in l a t e r o n . The f o l l o w i n g facets are typically filled in right
+a w a y : D e f i n i t i o n s , A l g o r i t h m s , Domain/range, W o r t h . Each
+o t h e r facet is e i t h e r left unmentionod by the rule, or else
+is e x p l i c i t l y made the subject of a new task which gets
+a d d e d to t h e agenda.
+For instance, the heuristic rule
+a b o v e w o u l d p r o p o s e many new tasks at the moment that
+P r i m e s w e r e c r e a t e d , including "Fill in c o n j e c t u r e s about
+P r i m e s " , "Fill in specializations of Primes", etc.
+
+IF C U R R - T A S K malehes (FILLIN EXAMPLES F*-anything),
+and F isa A e t i v i l y ,
+and l.he A l g o r i t h m s farel of F is not blank,
+T H K N c a r r y o u t t h e following proredure:
+1. Find the domain of F, and rail it D;
+2. Find examples of D, and rail them K;
+3. Find a fast a l g o r i t h m to compute F; call it A;
+4. Repeatedly:
+4a. Choose any member of E, and call it K l .
+4b. Run A on E1, and call the result X.
+4e. Check whether <E1,X> satisfies the definition
+of F.
+4d. If so, then add ' I ' l l -> X> to the Kxarnples
+facet of F.
+4e. If not, then add <'K1 -> X> to the N o n examples facet of F.
+L e t ' s see e x a c t l y how this rule found examples of Setu n i o n . S t e p (1) says to locate the domain of S e t - u n i o n .
+The facet l a b e l l e d D o m a i n / r a n g e , on the S e t - u n i o n concept,
+c o n t a i n s t h e e n t r y (SET SFT -> SLT), which indicates that
+t h e d o m a i n is a pair of sets. That is, S e t - u n i o n is an
+o p e r a t i o n w h i c h accepts (as its arguments) t w o sets.
+Since the domain elements are sets, step (?) says to locate
+e x a m p l e s of sets. The facet labelled Examples, on the Sets
+c o n c e p t , p o i n t s to a list of about 30 d i f f e r e n t sets. This
+i n c l u d e s { 7 } , {A,B,C,D,F), {}, {A,{fB}},...
+S t e p (3) i n v o l v e s n o t h i n g more than accessing some e n t r y
+t a g g e d w i t h the d e s c r i p t o r "Quick" on the Algorithms facet
+of S e t - u n i o n . One such e n t r y is a recursive l i s p f u n c t i o n of
+t w o a r g u m e n t s , w h i c h halts w h e n the first argument is the
+e m p t y s e t , and o t h e r w i s e pulls an element out of that set,
+S e t - i n s e r t s it into the second argument, and then recurs on
+t h e n e w values of the t w o sets. For convenience, w e ' l l
+r e f e r to this a l g o r i t h m as UNION.
+We t h e n e n t e r the loop of Step (4). Step (4a) has us
+c h o o s e one pair of our examples of sets, say the first t w o
+( 7 } and (A,B,C,D,E). Step (4b) has us r u n UNION on these
+t w o s e t s . The result is {A,B,C,D,F,7}. Step (4c) has us g r a b
+an e n t r y f r o m the Definitions facet of S e t - u n i o n , and r u n it.
+A t y p i c a l d e f i n i t i o n is this formal one:
+(X (S1 S2 S3)
+(AND
+(For all x in S I , x is in S3)
+(For all x in S2, x is in S3)
+(For all x in S3, x is in S1 or x is in S2))))
+
+2 3 . 2 3 Heuristics Fill in Entries for a Specific Facet
+If the task p l u c k e d f r o m the agenda w e r e "Fill in examples
+of S e t - u n i o n " , it w o u l d not be too much to hope for that by
+t h e time all t h e heuristic rules had finished executing, some
+e x a m p l e s of that o p e r a t i o n w o u l d indeed exist on the
+Examples facet of the S e t - u n i o n concept. Let's see how
+this can happen.
+A M s t a r t s b y r i p p l i n g u p w a r d f r o m S e t - u n i o n , looking for
+h e u r i s t i c s w h i c h are relevant to finding examples of S e t -
+
+Specialized
+
+It is r u n on t h e t h r e e arguments S1={Z}, S2={A,B,C,D,E},
+S3~{A,B,C,D,E,Z}. Since it r e t u r n s " T r u e " , we p r o c e e d to
+S t e p <4d). The c o n s t r u c t <{Z}, {A,B,C,D,E} -> {A,B,C,D,E,Z}>
+is a d d e d to t h e Examples facet of Set-union.
+At t h i s s t a g e , c o n t r o l r e t u r n s to the beginning of the Step
+( 4 ) l o o p . A n e w pair of sets is chosen, and so on. The
+l o o p e n d s w h e n e i t h e r the time or space allotted to this
+
+Svstems-4:
+838
+
+Lenat
+
+rule is e x h a u s t e d . AM w o u l d then break away at a "clean"
+point ( j u s t after finishing a cycle of the Step (4) loop) and
+w o u l d m o v e on to a new heuristic rule for filling in
+examples of Set-union.
+
+3. RESULTS
+3.1. EXCERPT OF THE 'AM' PROGRAM RUNNING
+R e p e a t e d l y , the t o p task is plucked from the agenda, and
+h e u r i s t i c s are e x e c u t e d in an attempt to satisfy it. AM has
+a modest f a c i l i t y that p r i n t s out a d e s c r i p t i o n of these
+a c t i v i t i e s as t h e y occur. Here is a tiny e x c e r p t :
++
+
+* T a s k : **
+Fill in Examples of the concept "Divisors-of".
+3 Reasons:
+( 1 ) No k n o w n examples of Divisors-of yet.
+(2) Times ( r e l a t e d to D i v i s o r s - o f ) is now v. int.
+(3) Focus of a t t e n t i o n : AM just defined Divisors-of.
+26 e x a m p l e s f o u n d , in 9 secs, e.g., Divisors- of(6)={ 1,2,3,6}.
+
+** T a s k i ** Consider nos. having small sets of Divisors-of.
+2 Reasons:
+(1) W o r t h w h i l e to look for extreme cases.
+(2) Focus: AM just w o r k e d on Divisors-of.
+Filing in e x a m p l e s of numbers w i t h 0 divisors.
+0 e x a m p l e s f o u n d , in 4.0 seconds.
+C o n j e c t u r e : no numbers have precisely 0 divisors.
+Filling in e x a m p l e s of numbers w i t h 1 divisors.
+J e x a m p l e s f o u n d , in 4 sees, e.g., Divisors o f ( l ) = {1J.
+C o n j e c t u r e : 1 is the only number w i t h exactly 1 divisor.
+Filling in e x a m p l e s of numbers w i t h 2 divisors.
+24 e x a m p l e s f o u n d , in 4 sees. Divisors- of (13)={ 1,13}.
+No o b v i o u s c o n j e c t u r e . May merit more study.
+C r e a t i n g a new c o n c e p t : " N u m b e r s - w i t h - 2 - d i v i s o r s " .
+Filling in e x a m p l e s of numbers w i t h 3 divisors.
+1 1 e x a m p l e s f o u n d , in 4 secs. D i v i s o r s - o f ( 4 9 ) = { 1,7,49}.
+All nos. w i t h 3 d i v i s o r s are also Squares. Unexpected!.
+C r e a t i n g a new c o n c e p t : " N u m b e r s - w i t h - 3 - d i v i s o r s " .
+* * Task: * * Consider s q u a r e - r o o t s o f N o s - w i t h - 3 - d i v i s o r s .
+2 Reasons:
+(1) N u m b e r s - w i t h - 3 divisors unexpectedly t u r n e d
+out to all be Perfect Squares as well.
+(?) Focus: AM just defined N o s - w i t h - 3 - d i v i s o r s .
+All s q u a r e - r o o t s of N u m b e r s - w i t h - 3 -divisors seem to be
+Numbers-with-2-divisors.
+E.g., D i v i s o r s ( 1 6 9 ) = Divisors(13) = {1,13}.
+E v e n t h e c o n v e r s e of this seems empirically to be t r u e .
+The chance of coincidence is below acceptable limits.
+B o o s t i n g the W o r t h r a t i n g of b o t h concepts.
+**
+
+T a s K : * * Consider the squares o f N o s - w i t l v - 3 - d i v i s o r s .
+3 Reasons:
+(1) Squares of N o s - w i t h - 2 ~ d i v i s o r s w e r e v. int.
+(2) S q u a r e - r o o t s of N o s - w i t h - 3 - d i v i s o r s w e r e int.
+(3) Focus: A M just w o r k e d o n N o s - w i t h - 3 - d i v i s o r s .
+
+3.2. OVERALL PERFORMANCE
+N o w that w e ' v e seen how AM w o r k s , and w e ' v e been
+e x p o s e d to a bit of " l o c a l " results, let's take a moment to
+d i s c u s s t h e t o t a l i t y of the mathematics which AM c a r r i e d
+o u t . AM b e g a n its investigations w i t h scanty knowledge of
+a h u n d r e d e l e m e n t a r y concepts of finite set t h e o r y (see
+Fig. 1). Most of the obvious s e t - t h e o r e t i c concepts and
+r e l a t i o n s h i p s w e r e quickly f o u n d (e.g., de Morgan's laws;
+s i n g l e t o n s ) , but no s o p h i s t i c a t e d set t h e o r y was ever done
+
+Specialized
+
+(e.g., d i a g o n a l i z a t i o n ) .
+Rather, AM d i s c o v e r e d n a t u r a l
+numbers
+and
+w e n t off e x p l o r i n g elementary number
+t h e o r y . A r i t h m e t i c o p e r a t i o n s w e r e soon found (as analogs
+to s e t - t h e o r e t i c o p e r a t i o n s ) , and AM made rapid p r o g r e s s
+in d i v i s i b i l i t y t h e o r y . See Fig. 2. Prime pairs, Diophantine
+e q u a t i o n s , t h e unique f a c t o r i z a t i o n of numbers into primes,
+Goldbach's. c o n j e c t u r e -- these w e r e some of the nice
+d i s c o v e r i e s by AM. Many concepts which we know to be
+c r u c i a l w e r e never u n c o v e r e d , h o w e v e r : remainder, gcd,
+g r e a t e r - t h a n , i n f i n i t y , p r o o f , etc. These "omissions", could
+h a v e b e e n d i s c o v e r e d by the existing heuristic rules in AM.
+1 he p a t h s w h i c h w o u l d have r e s u l t e d in their d e f i n i t i o n
+w e r e s i m p l y n e v e r r a t e d high enough t o e x p l o r e .
+All t h e d i s c o v e r i e s mentioned (including those in Fig. 2)
+w e r e made in a r u n lasting one cpu hour ( I n t e r l i s p + 100k,
+Sumex P O P - 1 0 Kl). Two h u n d r e d jobs in t o t o w e r e selected
+f r o m t h e agenda and e x e c u t e d . On the average, a job was
+g r a n t e d 30 c p u seconds, but actually used only 18 seconds.
+f or a t y p i c a l j o b , about 35 rules w e r e located as
+p o t e n t i a l l y r e l e v a n t , and about a dozen actually f i r e d . AM
+b e g a n w i t h 115 concepts and ended up w i t h t h r e e times
+that
+many.
+Of the s y n t h e s i z e d concepts, half w e r e
+t e c h n i c a l l y t e r m e d " l o s e r s " ( b o t h by the author and by
+A M ) , and half the remaining Ones w e r e only marginal.
+A l t h o u g h A M f a r e d well according t o several d i f f e r e n t
+m e a s u r e s of p e r f o r m a n c e (see Section 3.4), of great
+s i g n i f i c a n c e are its Limitations. As AM ran longer and
+l o n g e r , t h e c o n c e p t s it d e f i n e d w e r e f u r t h e r and f u r t h e r
+f r o m t h e p r i m i t i v e s it began w i t h . E.g., " p r i m e - p a i r s " w e r e
+d e f i n e d using " p r i m e s " and "addition", the former of which
+w a s d e f i n e d f r o m " d i v i s o r s - o f " , which in t u r n came f r o m
+" m u l t i p l i c a t i o n " , w h i c h arose from "addition", which was
+d e f i n e d as a r e s t r i c t i o n of "union", which (finally!) was a
+p r i m i t i v e c o n c e p t that we had supplied ( w i t h heuristics) to
+A M i n i t i a l l y . When A M subsequently needed help w i t h
+p r i m e p a i r s , it was f o r c e d to rely on rules of thumb
+s u p p l i e d o r i g i n a l l y about uniomng. Although the h e r i t a b i l i t y
+p r o p e r t y of h e u r i s t i c s did ensure that those rules w e r e
+still v a l i d , the t r o u b l e was that they w e r e too general, too
+w e a k to deal e f f e c t i v e l y w i t h the specialized notions of
+p r i m e s and arithmetic.
+f or i n s t a n c e , one g e n e r a l rule indicated that AuB w o u l d be
+i n t e r e s t i n g if it possessed p r o p e r t i e s absent both from A
+a n d f r o m 0. This t r a n s l a t e d into the prime-pair case as "If
+p+q=r,
+and p,q.r are primes. Then r is interesting if it has
+properties not possessed by p or by q." The search for
+c a t e g o r i e s of such i n t e r e s t i n g primes r was of course
+b a r r e n . It s h o w e d a fundamental lack of understanding
+a b o u t n u m b e r s , a d d i t i o n , o d d / e v e n - n e s s , and primes.
+The k e y d e f i c i e n c y was the lack of adequate m e r a - r u l e s
+['Davis 7 6 ] : h e u r i s t i c s w h i c h reason about heuristics: keep
+t r a c k of t h e i r p e r f o r m a n c e , modify them, create new ones,
+etc.
+A s i d e f r o m the p r e c e d i n g major limitation, most of the
+other
+p r o b l e m s p e r t a i n to missing knowledge: Many
+c o n c e p t s o n e might consider basic to discovery in math are
+a b s e n t f r o m A M ; analogies w e r e u n d e r - u t i l i z e d ; physical
+i n t u i t i o n was h a n d - c r a f t e d o n l y ; the interface to the user
+w a s far f r o m ideal; etc. A large e f f o r t is u n d e r w a y this
+y e a r at C a r n e g i e - M e l l o n U n i v e r s i t y , comprised of Greg
+H a r r i s , Doug Lenat, Elaine Rich, Jim Saxe, and H e r b e r t
+S i m o n , t o o v e r c o m e these limitations.
+
+Systens-4:
+839
+
+Lenat
+
+3.3.
+
+3.3.5
+
+EXPERIMENTS_WJTHJAM'
+
+Can AM W o r k in the New Domain of Plane Geometry?
+
+One v a l u a b l e aspect of AM is that it is amenable to many
+k i n d s of e x p e r i m e n t s . A l t h o u g h AM is too ad hoc for
+n u m e r i c r e s u l t s to have much significance, the qualitative
+results
+of
+such
+experiment',
+may
+have
+some
+valid
+implications
+for
+math r e s e a r c h , for
+automating math
+r e s e a r c h , and f o r designing "scientist assistant" programs.
+
+One d e m o n s t r a t i o n of AM's g e n e r a l i t y (e.g., that its
+" A c t i v i t y " h e u r i s t i c s r e a l l y do apply to any a c t i v i t y ) w o u l d
+be to c h o o s e some new mathematical f i e l d , add some
+c o n c e p t s f r o m that domain, and then let AM loose to
+d i s c o v e r n e w things. Only one experiment of this t y p e was
+a c t u a l l y c a r r i e d out on the AM p r o g r a m .
+
+3.3.1
+
+t w e n t y c o n c e p t s f r o m e l e m e n t a r y plane g e o m e t r y w e r e
+d e f i n e d f o r AM (including Point, Line, Angle, Triangle,
+[quality
+of
+points/lines/angles/triangles).
+No
+new
+h e u r i s t i c s w e r e added t o AM.
+
+Must the WORTH numbers be finely tuned?
+
+Each of t h e 115 initial concepts had, supplied by the
+a u t h o r , a r a t i n g number ( 0 - 1 0 0 0 ) signifying its o v e r a l l
+w o r t h . T h e w o r t h ratings affect the overall p r i o r i t y values
+of t a s k s on the agenda.
+Just how sensitive is AM*s
+b e h a v i o r to t h e initial settings of the W o r t h numbers?
+To t e s t t h i s , a simple experiment was p e r f o r m e d . All the
+c o n c e p t s ' W o r t h facets were set to 2 0 0 initially. By and
+l a r g e , t h e same d i s c o v e r i e s w e r e made as b e f o r e . But
+there
+were
+now
+long
+periods of
+blind wanderings
+( e s p e c i a l l y near the beginning of the run).
+Once AM
+h o o k e d i n t o a line of p r o d u c t i v e developments, it advanced
+at t h e o l d r a t e . During such chains of discoveries, AM was
+g u i d e d by massive quantities of symbolic reasons for the
+t a s k s it c h o s e , not by nuances in numeric ratings. As these
+s p u r t s of d e v e l o p m e n t died o u t , AM would wander around
+a g a i n u n t i l t h e next one s t a r t e d .
+
+3.3.2
+
+How Valuable is the Presence of Symbolic 'Reasons'?
+
+O n l y o n e e f f e c t of note was o b s e r v e d : When a task is
+p r o p o s e d w h i c h already exists on the agenda, t h e n it
+m a t t e r s v e r y much w h e t h e r the task is being suggested for
+a n e w r e a s o n or not. If the reason is an old, a l r e a d y k n o w n o n e , t h e n the p r i o r i t y of the task on the agenda
+s h o u l d n ' t rise v e r y much. But if it is a brand new reason,
+t h e n t h e t a s k ' s r a t i n g should be boosted tremendously.
+The i m p o r t a n c e of this effect argues strongly in favor of
+h a v i n g symbolic justification of the rank of each task in a
+p r i o r i t y q u e u e , not just "summarizing" each task's set of
+r e a s o n s by a single number.
+
+3.3.4
+
+3.4.
+
+EVALUATING THE 'AM' PROGRAM
+
+We may w i s h to evaluate AM using various c r i t e r i a .
+o b v i o u s o n e s , w i t h capsule r e s u l t s , appear b e l o w :
+
+How Finely Tuned is the Agenda?
+
+The t o p f e w candidates on the agenda almost always
+a p p e a r to be reasonable things to do at the time. But
+w h a t if, i n s t e a d of picking the t o p - r a t e d task, AM selected
+o n e r a n d o m l y f r o m the top 20 tasks on the agenda? In
+t h a t c a s e , AM's r a t e of d i s c o v e r y is slowed only by about a
+f a c t o r of 3. But the apparent "rationality " of the p r o g r a m
+(as p e r c e i v e d by a human onlooker) disintegrates.
+
+3.3.3
+
+AM w a s able to f i n d examples of all the supplied c o n c e p t s ,
+*md to use t h e character of such empirical data to
+d e t e r m i n e r e a s o n a b l e directions to p r o c e e d in its r e s e a r c h .
+AM d e r i v e d the concepts of congruence and similarity of
+t r i a n g l e s , plus many other w e l l - k n o w n concepts.
+An
+u n u s u a l r e s u l t was the r e p e a t e d d e r i v a t i o n of the concept
+of " t i m b e r l i n e " : this is a predicate on t w o triangles, w h i c h
+is t r u e iff t h e y s h a r e a common v e r t e x and angle, and if
+t h e i r o p p o s i t e sides are parallel. AM also came up w i t h a
+c u t e g e o m e t r i c i n t e r p r e t a t i o n of Goldbach's c o n j e c t u r e :
+A n y angle (0 - 1 8 0 ° ) can be approximated to w i t h i n 1° as
+t h e sum of t w o angles each of a prime number of degrees.
+
+Some
+
+1. By AM's ultimate achievements.
+Besides d i s c o v e r i n g
+many w e l l - k n o w n useful concepts, AM d i s c o v e r e d some
+w h i c h a r e n ' t w i d e l y k n o w n : maximally-divisible n u m b e r s ,
+n u m b e r s w h i c h can be uniquely r e p r e s e n t e d as the sum of
+t w o primes, timberline.
+?. By the c h a r a c t e r of the differences b e t w e e n initial and
+f i n a l s t a t e s . AM moved all the way f r o m finite set t h e o r y
+to d i v i s i b i l i t y t h e o r y , f r o m sets to numbers to i n t e r e s t i n g
+k i n d s of n u m b e r s , f r o m skeletal concepts (none of which
+had any Examples filled in) to completed concepts.
+'3, By t h e q u a l i t y of the r o u t e AM took to accomplish this
+mass of r e s u l t s .
+Only about half of AMY f o r a y s w e r e
+d e a d - e n d s , and most of those looked promising initially.
+4. By the c h a r a c t e r of the human — machine interactions.
+AM w a s n e v e r p u s h e d far along this dimension.
+5.
+By its i n f o r m a l reasoning abilities. AM was able to
+q u i c k l y " g u e s s " the t r u t h value of c o n j e c t u r e s , to estimate
+t h e o v e r a l l w o r t h of each new concept, to z e r o in on
+p l a u s i b l e t h i n g s to do each cycle, and to notice g l a r i n g
+a n a l o g i e s (sometimes).
+
+What if C e r t a i n Concepts are Excised?
+
+As e x p e c t e d , e l i m i n a t i n g c e r t a i n concepts did seal off whole
+s e t s of d i s c o v e r i e s to the system. For example, excising
+[ q u a l i t y p r e v e n t e d A M f r o m discovering Cardinality. One
+s u r p r i s i n g r e s u l t was that many common concepts get
+d i s c o v e r e d in s e v e r a l w a y s . For instance, multiplication
+a r o s e in no f e w e r t h a n four separate chains of discoveries.
+
+6. By t h e r e s u l t s of e x p e r i m e n t s -- and the
+e x p e r i m e n t s c o u l d be p e r f o r m e d at all on AM.
+
+fact
+
+that
+
+7. By f u t u r e implications of this project. Only time will tell
+w h e t h e r this kind of w o r k will impact on how mathematics
+is t a u g h t (e.g., explicit teaching of heuristics?), on how
+e m p i r i c a l r e s e a r c h is c a r r i e d out by scientists, on our
+u n d e r s t a n d i n g of such phenomena as d i s c o v e r y , l e a r n i n g ,
+a n d c r e a t i v i t y , etc.
+8. By c o m p a r i s o n s to o t h e r , similar systems. Some of the
+techniques
+AM
+uses
+were
+pioneered
+earlier:
+e.g,
+p r o t o t y p i c a l models [ G e l e r n t e r 6 3 ] , and analogy [Evans
+6 8 ] , [Kling 71].
+T h e r e have been many attempts t o
+
+Specialized
+
+Systems-4:
+840
+
+Lenat
+
+i n c o r p o r a t e heuristic knowledge? into a theorem p r o v e r
+[ W a n g 6 0 ] , [ G u a r d 6 9 ] , [Bledsoe 7 1 ] , [ B r o l z , - 7 4 ] , [ B o y o r &
+M o o r e 7b).
+Most of the apparent differences, b e t w e e n
+t h e m and AM v a n i s h u p o n close examination: The g o a l d t i v e n c o n t r o l s t r u c t u r e of these systems is a compiled
+f o r m of AM's; r u d i m e n t a r y "focus of a t t e n t i o n " mechanism.
+"I he fact that their o v e r a l l a c t i v i t y is typically labelled as
+d e d u c t i v e is a misnomer (since c o n s t r u c t i n g a difficult proof
+is u s u a l l y in p r a c t i c e quite inductive). Even the character
+of the i n f e r e n c e processes are analogous: The p r o v e r s
+t y p i c a l l y c o n t a i n a couple binary inference rules, like
+Modus P o n e n s , w h i c h are r e l a t i v e l y isky to apply but can
+y i e l d hip r e s u l t s ; AM's f e w " b i n a r y " o p e r a t o r s have the
+same c h a r a c t e r i s t i c s : Compose, Canonize, Logically-combine
+( d i s j o i n and c o n j o i n ) . The deep distinctions b e t w e e n AM
+and
+the
+" h e u r s t i c t h e o r e m p r o v e r s " are these: the
+u n d e r l y i n g m o t i v a t i o n s (heuristic modelling vs. building
+t o o l s for p r o b l e m solving), the richness of the knowledge
+base ( h u n d r e d s of heuristics vs. only a f e w ) , and the
+amount of emphasis on formal methods.
+T h e o r y f o r m a t i o n systems in any field have been f e w .
+M e t a - D e n d r a l [Buchanan 7b] r e p r e s e n t s pethaps the best
+of t h e s e . Rut e v e n this system is given a fixed set of
+t e m p l a t e s for r u l e s which it wishes to find, and a fixed
+v o c a b u l a r y of mass s p e c t r a l concepts to plug into those
+h y p o t h e s i s t e m p l a t e s ; w h e r e a s AM selectively enlarges its
+v o c a b u l a r y of math concepts. Also, AM must gather its
+o w n d a t a , but this is much easier in math than in organic
+c hem.
+T h e r e has b e e n v e r y little published thought about
+" d i s c o v e r y " f r o m an algorithmic point of view; even clear
+t h i n k e r s like Polya and Poincate' treat mathematical ability
+as a s a c r e d , almost mystic quality, tied to the unconscious.
+The w r i t i n g s of p h i l o s o p h e r s and psychologists invariably
+a t t e m p t to examine human performance and belief, which
+are far m o r e managable than c r e a t i v i t y in t3ro. Amarel
+[J 9 6 7 ] n o t e s it may be possible to learn from " t h e o r e m
+f i n d i n g " p r o g r a m s how to tackle the general task of
+a u t o m a t i n g scientific r e s e a r c h . AM has been one of the
+f i r s t a t t e m p t s to c o n s t r u c t such a program.
+
+3.5.
+
+FINAL CONCLUSIONS
+
+-> AM is a d e m o n s t r a t i o n that a few hundred general
+heuristic
+r u l e s suffice to guide an automated math
+r e s e a r c h e r as it e x p l o r e s and expands a large but
+i n c o m p l e t e k n o w l e d g e base of math concepts.
+AM
+d e m o n s t r a t e s that some aspects of c r e a t i v e research can
+be e f f e c t i v e l y modelled as heuristic search.
+-> This w o r k has also i n t r o d u c e d a control s t r u c t u r e based
+u p o n an o r d e r e d agenda of small research tasks, each
+w i t h a list of s u p p o r t i n g reasons attached.
+-> The main l i m i t a t i o n of AM was its inability to synthesize
+p o w e r f u l n e w heuristics for the new concepts it defined.
+-> T h e main successes w e r e the few novel ideas it came up
+w i t h , t h e ease w i t h w h i c h a new task domain was fed to
+t h e s y s t e m , and — most i m p o r t a n t l y — the o v e r a l l
+r a t i o n a l s e q u e n c e s of behavior AM e x h i b i t e d .
+
+Specialized
+
+ACKNOWLEDGEMENT
+This r e s e a r c h was i n i t i a t e d as my Ph.D. thesis at S t a n f o r d
+U n i v e r s i t y , and I wish to deeply thank my advisers and
+c o m m i t t e e m e m b e r s : Bruce Buchanan, Paul Cohen, Edward
+F e i g e n b a u m , C o r d e l l Green, Donald Knuth, and Allen Newell.
+In a d d i t i o n , I gladly acknowledge the ideas I have r e c e i v e d
+in d i s c u s s i o n s w i t h A v r a Conn and w i t h Herbert Simon.
+
+REFERENCES
+A m a r e l , Saul, On Representations and Modelling in Problem
+Solving,
+and
+On
+Future
+Directions
+for
+Intelligent
+Systems, RCA Labs Scientific Report No. 2, Princeton,
+N.J., 1 9 6 7 .
+B l e d s o e , W.
+W.,
+Splitting and Reduction
+Heuristics in
+Automatic
+Theorem
+Proving, Artificial
+Intelligence
+2,
+1 9 7 1 , pp. 55-77.
+B o y e r , Robert S., and J S. Moore, Proving Theorems about
+Lisp Pu.ncti.ons, JACM, V. 2 2 , No. 1, January, 1975, pp.
+129 144.
+B r o t z , Douglas K., Embedding Heuristic Problem Solving
+Methods in a Mechanical Theorem Prover, S t a n f o r d U.
+R e p o r t STAN C S 7 4 - 4 4 M , August, 1 9 7 1 .
+Buchanan, Bruce
+G., Applications of Artificial. Intelligence
+to Scientific Reasoning, Second USA-Japan Computer
+C o n f e r e n c e , p u b l i s h e d by AFIPS and IPS I, T o k y o , 1975,
+pp. 1 8 9 - 1 9 4 .
+Davis, Randall, Applications of Meta Level Knowledge to the
+Construction, Maintenance, and Use of Large Knowledge
+Bases, SAIL A I M - 2 7 1 , Artificial Intelligence L a b o r a t o r y ,
+S t a n f o r d U n i v e r s i t y , July, 1976.
+Evans
+Thomas
+G.,
+A
+Program
+for
+the
+Solution
+of
+Geometric- Analogy
+Intelligence
+Test
+Questions,
+in
+( M i n s k y , M a r v i n , ed.), Semantic Information Processing,
+The MIT Press, Cambridge," Massachuisetts, 1 9 6 8 , pp.
+2 71-353.
+H e i g e n b a u m , E d w a r d , 0. Buchanan, and J. I.ederberg, On
+Generality and Problem
+Sohung:
+A Cose Study Using
+1 he DENDRAL Program, in (Mellzcr and Michie, eds.)
+Machine Intelligence 6, .1971, pp 165 190.
+G c l e r n t e r , K, Realization of a
+Geometry-Thcorem
+Proving
+Machine, in (Feigenbaum and Felclman, eds.) Computers
+and I h o u g h t j McGraw Hill Book Company, New York,
+1963, pp. 134-152.
+G u a r d , James R., et al., Semi Automated Mathematics, JACM
+16, J a n u a r y , 1 9 6 9 , pp. 4 9 - 6 2 .
+Klin};, R o b e r t Elliot, Reasoning by Analogy with Applications
+to Heurcstic Problem Solving: A Case Study, Stanford AI
+Memo A I M - 1 4 7 , August, 1 9 7 1 .
+L e d e r b e r g , Joshua, Review of J. Wcizenbaums's Computer
+P o w e r and Human Reason, W. H. Freeman, ST., 1976.
+L e n a t , Douglas B., AM: An Artificial Intelligence Approach
+to Discovery in Mathematics as Heuristic Search, SAIL
+A I M - 2 8 6 , A r t i f i c i a l Intelligence L a b o r a t o r y , S t a n f o r d
+U n i v e r s i t y , July, 1 9 7 6 .
+N e w e t l , A l l e n , and H e r b e r t Simon, Human Problem Solving,
+P r e n t i c e - H a l l , E n g l c w o o d Cliffs, New Jersey," 1972.'
+Nilsson,
+Nils,
+Problem
+Solving Methods
+in
+Artificial
+LnteJIiRonce, McGraw Hill", N.Y., 1 9 7 1 .
+S h o r t l i f f c , E.
+H., MYCIN — A rule-based computer program
+for
+advising
+physicians
+regarding antimicrobial therapy
+selection, S t a n f o r d Al Memo 2 5 1 , October, 1974.
+Wanp„ Hao, Toward Mechanical Mathematics, IBM Journal of
+R e s e a r c h and Development, Volume 4, Number 1,
+J a n u a r y , 1 9 6 0 , pp. 2 - 2 2 .
+Winston,
+Patrick,
+Learning
+Structural
+Descriptions
+from
+Examples, T R - 2 3 1 , MIT AI Lab, September, 1970.
+
+Svstems-4:
+841
+
+Lenat
+
+FIGURE 1:
+
+Concepts Initially Given to AM
+
+Specializod
+
+FIGURE 2: Concepis Discovcvci by AM
+
+Systems-4:
+842
+
+Lonat
+
+

@@ -1,0 +1,1380 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>
+Refactorable Numbers - A Machine Invention
+</title>
+</head>
+
+<!-- start of heading banner stuff -->
+<body background="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/www_tile.gif">
+<p>
+</p><center>
+<table width="75%" border="0">
+<tbody><tr><td>
+<img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/neil.gif"></td>
+<td><font size="+2">
+<a href="https://cs.uwaterloo.ca/journals/JIS/index.html">Journal of Integer Sequences,</a>
+Vol. 2 (1999), Article 99.1.2</font></td>
+</tr>
+</tbody></table>
+</center>
+<p>
+<!-- end of heading banner stuff -->
+
+</p><center> <h2>
+Refactorable Numbers - A Machine Invention
+</h2></center>
+
+<center>
+<h3>
+<a href="http://www.dai.ed.ac.uk/%7Esimonco">Simon Colton</a><br>
+Mathematical Reasoning Group<br>
+Institute of Representation and Reasoning<br>
+Division of Informatics<br>
+University of Edinburgh<br>
+80 South Bridge, Edinburgh, EH1 1HN SCOTLAND<br>
+Email address:
+<a href="mailto:simonco@dai.ed.ac.uk">simonco@dai.ed.ac.uk</a><br>
+</h3>
+</center>
+
+<dl>
+   <dt><strong><font size="+1">Abstract:</font></strong>
+The
+<a href="http://dream.dai.ed.ac.uk/group/simonco/hr/">HR</a> (or Hardy-Ramanujan)
+program invents and analyses definitions in areas of pure
+mathematics, including finite algebras, graph theory and number
+theory. While working in number theory, HR recently invented a new
+integer sequence, the refactorable numbers, which are defined
+and developed here. A discussion of how HR works, along with details of
+well known sequences reinvented by HR and other new sequences
+invented by HR is also given.
+   <p>
+</p></dt></dl>
+
+
+<p>
+</p><h2><u>Contents</u></h2>
+<p>
+</p><ol>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#refactorables">Refactorable Numbers</a></li>
+<ul>
+<li><a href="#membership">Membership Theorems</a></li>
+    <li><a href="#pairs">Pairs and Triples of Refactorable Numbers</a></li>
+    <li><a href="#distribution">Distribution</a></li>
+</ul>
+<li><a href="#hr">HR - Automatic Concept Formation</a></li>
+<ul>
+<li><a href="#number">HR Working in Number Theory</a></li>
+    <li><a href="#recent">Recent Developments</a></li>
+</ul>
+<li><a href="#other">Other Sequences</a></li>
+<ul>
+<li><a href="#re-invent">Re-invented Sequences</a></li>
+    <li><a href="#newseqs">New Sequences Invented by HR</a></li>
+</ul>
+<li><a href="#conclusions">Conclusions</a></li>
+<li><a href="#acknowledgements">Acknowledgements</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#add">Addenda, April 19, 1999</a></li>
+</ol>
+
+<p>
+</p><h2>
+<a name="intro"></a>
+<u>1. Introduction</u>
+</h2>
+
+<p>
+The following sequence of integers has recently been accepted into the
+<a href="http://oeis.org/">OnLine
+Encyclopedia of Integer Sequences</a>, <a href="#sloane">[9]</a>:
+<br><br>
+</p><center>
+<hr>
+[<a href="http://oeis.org/A033950">A033950</a>]:
+1, 2, 8, 9, 12, 18, 24, 36, 40, 56, 60, 72, 80, 84, 88, 96, 104, 108, 128, 132, 136, 152, 156, ...
+<hr>
+<br>
+</center>
+The sequence is interesting for two reasons:
+<ul>
+<li>
+It has a simple definition: those integers <em>n</em> for which the number of
+divisors of <em>n</em> divides <em>n</em>.
+</li>
+<li>
+It was invented by a computer program.
+</li>
+</ul>
+
+<p>
+This note gives some results about the refactorables, followed by a
+discussion of the 
+<a href="http://dream.dai.ed.ac.uk/group/simonco/hr/">HR</a>
+program which invented them and a look at some of
+the other sequences HR has invented or reinvented.
+
+</p><p>
+</p><h2>
+<a name="refactorables"></a>
+<u>2. Refactorable Numbers</u>
+</h2>
+
+<p>
+<strong>Notation.</strong>
+Throughout, the number of divisors of an integer, <em>n</em>, is written
+<em>τ</em>(<em>n</em>), the sum of the divisors of <em>n</em> is written <em>σ</em>(<em>n</em>)
+and the number of integers less than and coprime to <em>n</em> is written <em>φ</em>(<em>n</em>).
+
+</p><p>
+<strong>Definition.</strong>
+An integer, <em> n</em>, is a <strong>refactorable</strong> number if and only if <em>τ</em>(<em>n</em>)
+divides <em>n</em>.
+
+</p><p>
+<strong>Lemma 1. (Theorem 273 from <a href="#hardy">[4]</a>)</strong>
+If the prime factorization of <em> n</em> is
+<br>
+</p><center>
+<em>n</em> =
+<em>p</em><sub>1</sub><sup><em>m</em><sub>1</sub></sup> ... <em>p</em><sub><em>k</em></sub><sup><em>m</em><sub><em>k</em></sub></sup>
+</center>
+<br>
+then <em>n</em> has (<em>m</em><sub>1</sub> + 1) ... (<em>m</em><sub>k</sub> + 1)
+divisors.
+<p>
+<strong>Lemma 2.</strong>
+An odd integer <em>k</em> is refactorable if and only if 2<em>k</em> is refactorable.
+</p><p>
+<strong>Proof.</strong> Suppose
+<em>k</em> =
+<em>p</em><sub>1</sub><sup><em>m</em><sub>1</sub></sup> ... <em>p</em><sub><em>k</em></sub><sup><em>m</em><sub><em>k</em></sub></sup>
+&nbsp; By Lemma 1, if <em>k</em> is
+refactorable, (<em>m</em><sub>1</sub> + 1) ... (<em>m</em><sub>k</sub> + 1) divides <em>k</em>.
+Therefore the number of divisors of
+<em>2k</em>, namely 2(<em>m</em><sub>1</sub> + 1)...(<em>m</em><sub>k</sub> + 1),
+divides 2<em>k</em>, and so 2<em>k</em> is refactorable.
+The converse follows by reversing the steps of the argument.
+<font color="red">QED</font>.
+<br>
+
+</p><p>
+<strong>Theorem 1.</strong> There are infinitely many odd refactorable numbers,
+and infinitely many even refactorable numbers.
+</p><p>
+<strong>Proof.</strong> From Lemma 1, if <em>p</em> is a prime,
+<em>q</em> = <em>p</em><sup><em>p</em> - 1</sup> has <em> p </em>
+divisors, and so <em> q </em> is refactorable.  The result
+now follows from Lemma 2.
+<font color="red">QED</font>.
+
+</p><p>
+The set of integers of the form <em>p</em><sup><em>p</em> - 1</sup> forms a
+subsequence of the refactorable numbers:
+<br>
+</p><center>
+<hr>
+[<a href="http://oeis.org/A036878">A036878</a>]:
+2, 9, 625, 117649, 25937424601, 23298085122481, 48661191875666868481, ...
+<hr>
+</center>
+<p>
+A more interesting way to prove Theorem 1 is to take the integers
+in numerical order, find their prime factorizations and 
+apply the map:
+</p><center>
+<img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/img3.gif">
+</center>
+For example:
+<center>
+3 = 3<sup>1</sup> &nbsp; becomes &nbsp; 3<sup>3<sup>1</sup>-1</sup> = 9
+</center>
+and
+<center>
+6 = 2<sup>1</sup>3<sup>1</sup> &nbsp; becomes &nbsp; 2<sup>2<sup>1</sup>-1</sup>3<sup>3<sup>1</sup>-1</sup> = 18 
+</center>
+<p>
+ It is easy to see that the integers produced from this map
+must all be refactorable numbers, as they have
+<em>p</em><sub>1</sub><sup><em>m</em><sub>1</sub></sup> ... <em>p</em><sub><em>k</em></sub><sup><em>m</em><sub><em>k</em></sub></sup>
+divisors, and for any prime <em>p</em> and any integer <em>m</em> we have 
+<em>m</em> &lt;= <em>p</em><sup>m</sup>-1, so the number of divisors divides the integer
+itself.
+The result of the transformation on a
+even number is another even number, and the result on an odd number is
+another odd number. It follows that there are infinitely many even and odd refactorable
+numbers.
+</p>
+<p>
+This mapping of the integers onto the refactorables produces 
+another interesting sequence:
+<br><br>
+</p><hr>
+<center>
+[<a href="http://oeis.org/A036879">A036879</a>]:
+1, 2, 9, 8, 625, 18, 117649, 128, 6561, 1250, 25937424601, 56, 23298085122481, 235298, ...
+</center>
+<hr>
+<br>
+This sequence does not of course include  all refactorable numbers: it is easy
+to show that 12, for instance, does not belong to this sequence.
+<a name="membership"></a>
+<h3>2.1 Membership Theorems</h3>
+<p>
+Since primes have two divisors, 2 is the only
+prime refactorable number.
+
+</p><p>
+<strong>Theorem 2.</strong> All odd refactorable numbers are squares.
+
+</p><p>
+<strong>Proof.</strong> Suppose <em>n</em> is as in Lemma 1, and is odd and refactorable.
+Since each <em>m</em><sub><em>i</em></sub> + 1 must divide <em>n</em>,
+each <em>m</em><sub><em>i</em></sub> is even, so <em>n</em> is a square.
+<font color="red">QED</font>.
+
+</p><p>
+Theorem 2 makes it easy to search for odd refactorable numbers, which
+form this subsequence:
+<br><br>
+</p><hr>
+<center>
+[<a href="http://oeis.org/A036896">A036896</a>]:
+1, 9, 225, 441, 625, 1089, 1521, 2025, 2601, 3249, 4761, 5625, 6561, 7569, 8649, ...
+</center>
+<hr>
+<br>
+The odd numbers which square to give these are:
+<br><br>
+<hr>
+<center>
+[<a href="http://oeis.org/A036897">A036897</a>]:
+1, 3, 15, 21, 25, 33, 39, 45, 51, 57, 69, 75, 81, 87, 93, ...  
+</center>
+<hr>
+<br>
+(It is easy to see that 3 is the only prime in this series.)
+
+<p>
+<strong>Theorem 3.</strong> No perfect number is refactorable.
+</p><p>
+<strong> Proof.</strong>
+<br>
+(a) <u>Even perfect numbers.</u> Using Theorem 277 from <a href="#hardy">[4]</a>, 
+we know that if <em>k</em> is an even perfect number, it has the form
+2<sup><em>n</em>-1</sup>(2<sup><em>n</em></sup>-1),
+where 2<sup><em>n</em></sup>-1
+is a prime, <em>p</em>, and using Theorem 18 from <a href="#hardy">[4]</a>,
+we know that if 2<sup><em>n</em></sup>-1 is prime, then so is <em>n</em>.
+Using Lemma 1, we know that <em>k</em> = 2<sup><em>n</em>-1</sup><em>p</em> must have
+((<em>n</em>-1)+1)(1+1) = 2<em>n</em> divisors. If 2<em>n</em> divides <em>k</em> then
+either <em>n</em> = 2 or <em>n</em> = <em>p</em> (as <em>n</em> is a prime).
+If <em>n</em> = 2 then the perfect number is 6, which is not refactorable. If
+<em>n</em> = <em>p</em> then <em>n</em> = 2<sup><em>n</em></sup>-1, which is impossible for
+a prime <em>n</em>.
+<br>
+(b) <u>Odd perfect numbers.</u> No odd perfect numbers are known.
+If one were to exist, say <em>q</em>, with divisors
+<em>d</em><sub>1</sub> &lt; ... &lt; <em>d</em><sub><em>k</em></sub> = <em>q</em>, then each
+<em>d</em><sub><em>i</em></sub> must be odd, and by definition, <em>d</em><sub>1</sub>+
+... + <em>d</em><sub><em>k</em>-1</sub> = <em>q</em>. The sum of an even number of odd
+integers is even, so, as <em>q</em> is odd, we know that <em>k</em>-1 must
+be odd, so <em>q</em> has an even number of divisors. Therefore <em>q</em>
+cannot be refactorable as it is odd and cannot be divisible by an even
+number.
+<font color="red">QED</font>.
+<a name="pairs"></a>
+</p><h3>2.2 Pairs and Triples of Refactorable Numbers</h3>
+
+Because odd refactorables are square numbers, we cannot have
+four or more consecutive refactorables, since
+ positive squares always differ
+by more than 2. We cannot yet rule out triples of refactorable
+numbers, but we can show that it is very unlikely that they exist:
+
+<p>
+<strong>Theorem 4.</strong> If (<em>a</em>-1, <em>a</em>, <em>a</em>+1) is a triple of refactorable
+numbers, then <em>a</em> must be of the form:
+</p><p>
+<img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/img1.gif">
+<br>
+for some integer <em>n</em>.
+</p><p>
+
+</p><p>
+<strong> Proof.</strong> As odd refactorable numbers are square, and as no two
+square numbers differ by 2, <em>a</em> must be odd and a square, say
+<em>b</em><sup>2</sup>. An instance of the Fermat-Euler theorem (Theorem
+72 from <a href="#hardy">[4]</a>) states that <em>b</em><sup>2</sup> = 1 (mod 4), so
+<em>b</em><sup>2</sup> + 1 = 2 (mod 4). Therefore <em>a</em> + 1 is not
+divisible by 4 and so must have prime factorization <em>a</em> + 1 =
+2 <em>p</em><sub>1</sub><sup><em>m</em><sub>1</sub></sup> ... 
+<em>p</em><sub><em>k</em></sub><sup><em>m</em><sub><em>k</em></sub></sup>,
+where the <em>p<sub>i</sub></em>'s are distinct odd primes. This means
+that <em>τ</em>(<em>a</em>+1) = 2(<em>m</em><sub>1</sub>+1)...(<em>m</em><sub><em>k</em></sub>+1) and that
+each <em>m</em><sub><em>i</em></sub>+1 must be odd as <em>a</em>+1 is
+refactorable. So each <em>m</em><sub><em>i</em></sub> must be even and therefore
+<em>a</em>+1 is twice an odd square number. Therefore we can write <em>a</em>+1 =
+2<em>c</em><sup>2</sup>,  so <em>b</em><sup>2</sup> + 1 = 2<em>c</em><sup>2</sup>. This means
+that (<em>b</em>,<em>c</em>) must be a solution of the Diophantine equation
+<em>x</em><sup>2</sup> - 2<em>y</em><sup>2</sup> = -1. Theorem 244 of <a href="#hardy">[4]</a>
+states that the positive integer solutions to this equation are given by
+</p><p><img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/img7.gif">
+</p><p>for integers <em>n</em>.
+Expanding the coefficient of <em>x</em> on the right-hand side, we get:
+</p><p>
+<img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/img2.gif">
+</p><p>
+and so <em>a</em> is as in the statement of the theorem.
+<font color="red">QED</font>.
+
+</p><p>
+These numbers quickly become large. For example, if we take <em>n</em>
+= 10, then <em>a</em> = 2982076586042449. By considering <em>n</em> &lt;= 35,
+it is easy to show that there are no triples between 1 and
+10<sup>53</sup>, and it would not be difficult to take this number further.
+</p><p>
+<strong>Conjecture 1.</strong> There are no triples of refactorable numbers.
+
+</p><p>
+There are, however, pairs of refactorable numbers, although these are
+fairly rare. The only pairs of refactorable numbers between 1 and
+1,000,000 are:
+
+</p><p>
+</p><hr>
+<center>
+[<a href="http://oeis.org/A036898">A036898</a>]:
+(1 2), (8 9), (1520 1521), (50624 50625), (62000 62001), (103040 103041),
+<br>(199808 199809), (221840 221841), (269360 269361), (463760
+463761), (690560 690561), <br>(848240 848241), (986048 986049)
+</center>
+<hr>
+<p></p>
+
+<p>
+It is easy to see that if (<em>a</em>, <em>a</em>+1) is a pair of
+refactorable numbers, and <em>a</em> is even, then <em>a</em> is a
+multiple of four (from the Fermat-Euler theorem as in the proof of
+Theorem 4).
+</p>
+
+<p>
+If two refactorables are relatively prime, their
+product is also refactorable.  So the products of pairs of
+consecutive refactorables produces another (possibly finite)
+sequence of refactorables:
+</p>
+
+<p>
+</p><center><hr>
+[<a href="http://oeis.org/A036899">A036899</a>]:
+2, 72, 2311920, 2562840000, 3844062000, 10617344640, 39923436672, ...
+</center><hr>
+<p>
+<strong>Conjecture 2.</strong> There are infinitely many pairs of refactorable numbers.
+
+<a name="distribution"></a>
+</p><h3>2.3 Distribution</h3>
+<p>
+We cannot yet give an accurate measure for the number of
+refactorables less than a given <em>n</em>, but we can say how many
+there are with a given number of divisors:
+</p><p>
+<strong>Theorem 5.</strong> The number of refactorable numbers with <em>n</em>
+divisors is:
+</p><ul>
+<li> 1, if <em>n</em> = 1 or 4.
+</li>
+<li> <em>k</em>!, if <em>n</em> is the product of <em>k</em> distinct primes
+(ie. it is square-free:[<a href="http://www.research.att.com/cgi-bin/access.cgi/as/njas/sequences/eisA.cgi/?Anum=005117">A005117</a>]).
+</li>
+<li> infinite, otherwise.
+</li>
+</ul>
+
+<p>
+<strong>Proof.</strong> Clearly, 1 is the only refactorable number with one
+divisor. If an integer <em>s</em> has four divisors, then it must be of
+the form <em>p</em><sup>3</sup> or <em>pq</em> for distinct primes <em>p</em>,
+<em>q</em>. Taking the first case, if it is to be refactorable, then
+<em>p</em> = 2 and the refactorable number is
+8. There are no refactorables of the form <em>pq</em> because 4 cannot
+divide the product of two distinct primes.
+<br>
+If <em>n</em> is the product of <em>k</em> distinct primes,
+<em>n</em> = <em>p</em><sub>1</sub> ... <em>p</em><sub><em>k</em></sub>,
+then any integer <em>s</em> with
+<em>n</em> divisors must be of the form
+<em>s</em> = <em>a</em><sub>1</sub><sup><em>p</em><sub>1</sub> - 1</sup> ... 
+ <em>a</em><sub><em>k</em></sub><sup><em>p</em><sub><em>k</em></sub> - 1</sup>
+for distinct primes <em>a</em><sub>1</sub>, ..., <em>a</em><sub><em>k</em></sub>. If it is
+to be refactorable, then <em>n</em> must divide <em>s</em>, so
+{<em>a</em><sub>1</sub>, ..., <em>a</em><sub><em>k</em></sub>} = {<em>p</em><sub>1</sub>,
+..., <em>p</em><sub><em>k</em></sub>} and there are <em>k</em>! ways to choose the
+<em>a</em><sub><em>i</em></sub>'s from the <em>p</em><sub><em>i</em></sub>'s, hence <em>k</em>!
+possibilities for <em>s</em>.
+<br>
+Suppose now that <em>n</em> is not square-free, and
+<em>n</em> = <em>p</em><sub>1</sub><sup><em>m</em><sub>1</sub></sup> ... 
+<em>p</em><sub><em>k</em></sub><sup><em>m</em><sub><em>k</em></sub></sup>.
+Firstly, if <em>k</em> = 1, then <em>n</em> = <em>p</em><sup><em>m</em></sup> and
+<em>m</em> &gt; 1 . Then for any prime <em>q</em> which is not <em>p</em>, the
+integer <em>s</em> = <em>q</em><sup><em>p</em> - 1</sup><em>p</em><sup><em>p</em><sup><em>m</em> - 1</sup> - 1</sup> has
+<em>n</em> divisors. Further, <em>s</em> is refactorable unless
+</p><p>
+</p><center>
+<em>p</em><sup><em>m</em> - 1</sup> - 1 &lt; <em>m</em> &lt;=&gt; <em>p</em> = <em>m</em> = 2 &lt;=&gt; <em>n</em> = 4 ,
+</center>
+<p>
+and we have already dealt with the case where <em>n</em> = 4 .
+Secondly, if <em>k</em> &gt; 1, with say <em>m</em><sub><em>i</em></sub> &gt; 1, for any
+prime <em>q</em> not in {<em>p</em><sub>1</sub>, ..., <em>p</em><sub><em>k</em></sub>}, the
+integer
+</p><p>
+</p><center>
+<img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/img4.gif">
+</center>
+<p>
+has <em>n</em> divisors. Now <em>s</em> is also refactorable unless, as
+above, <em>p</em><sub><em>i</em></sub> = <em>m</em><sub><em>i</em></sub> = 2. If there is an
+<em>i</em> &gt; 2 for which <em>m</em><sub><em>i</em></sub> &gt; 1, then choosing this
+<em>i</em> in the construction above works. This leaves only the case
+where <em>n</em> = 2<sup>2</sup> <em>p</em><sub>2</sub> ... <em>p</em><sub><em>k</em></sub>. In this
+case, for any prime <em>q</em> not in {<em>p</em><sub>1</sub>,
+..., <em>p</em><sub><em>k</em></sub>}, the integer
+</p><p>
+</p><center>
+<img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/img5.gif">
+</center>
+<p>
+has 2<em>p</em><sub>2</sub> 2<em>p</em><sub>3</sub> ... <em>p</em><sub><em>k</em></sub> = <em>n</em> divisors,
+and is refactorable because <em>p</em><sub>2</sub> &gt; 2  implies <em>p</em><sub>2</sub> - 1
+&gt;=  2. <font color="red">QED</font>.
+
+</p><p>
+Theorem 5 tells us, for instance, that there are precisely two
+refactorable numbers with 6 divisors, namely 12 and 18, and
+precisely 6 refactorable numbers with 30 divisors, namely
+2<sup>1</sup>3<sup>2</sup>5<sup>4</sup>,
+2<sup>1</sup>3<sup>4</sup>5<sup>2</sup>,
+2<sup>2</sup>3<sup>1</sup>5<sup>4</sup>,
+2<sup>2</sup>3<sup>4</sup>5<sup>1</sup>,
+2<sup>4</sup>3<sup>1</sup>5<sup>2</sup> and 
+2<sup>4</sup>3<sup>2</sup>5<sup>1</sup>.
+
+</p><p>
+Also, for a given non-square-free integer 
+<em>n</em> =
+<em>p</em><sub>1</sub><sup><em>m</em><sub>1</sub></sup> ... <em>p</em><sub><em>k</em></sub><sup><em>m</em><sub><em>k</em></sub></sup> ,
+if we can write:
+</p><p>
+</p><center>
+<em>n</em> =
+(<em>m</em><sub>1</sub>+<em>t</em><sub>1</sub>) ... 
+(<em>m</em><sub><em>k</em></sub>+<em>t</em><sub><em>k</em></sub>) <em>a</em><sub>1</sub> ... 
+<em>a</em><sub><em>j</em></sub>
+</center>
+<p>
+for <em>j</em> &gt; 0, and some <em>t</em><sub><em>i</em></sub> &gt; 0, <em>a</em><sub><em>i</em></sub>
+&gt; 1, then for any set of primes, {<em>q</em><sub>1</sub>,
+ ..., <em>q</em><sub><em>j</em></sub>}, none of which are in {<em>p</em><sub>1</sub>,
+ ..., <em>p</em><sub><em>k</em></sub>}, the number:
+</p><p>
+</p><center>
+<img src="Refactorable%20Numbers%20-%20A%20Machine%20Invention_files/img6.gif">
+</center>
+<p>
+will have <em>n</em> divisors and be refactorable.
+
+</p><p>
+So, for instance, because 36 = 2<sup>2</sup> 3<sup>2</sup>,
+</p><p>
+36 = (2+1)(2+1)4 implies 36<em>p</em><sup>3</sup> has 36 divisors and is
+refactorable (for any prime <em>p</em> &gt; 3).
+<br>
+36 = (2+1)(2+1)2*2  implies 36<em>p</em><em>q</em> has 36
+divisors and is refactorable (for any primes <em>p</em>, <em>q</em> &gt; 3).
+<br>
+36 = (2+1)(2+2)3  implies 108<em>p</em><sup>2</sup> has 36 divisors and is
+refactorable (for any prime <em>p</em> &gt; 3).
+<br>
+36 = (2+2)(2+1)3  implies 72<em>p</em><sup>2</sup> has 36 divisors and is
+refactorable (for any prime <em>p</em> &gt; 3).
+<br>
+36 = (2+1)(2+4)2  implies 972<em>p</em> has 36 divisors and is
+refactorable (for any prime <em>p</em> &gt; 3).
+<br>
+36 = (2+4)(2+1)2  implies 288<em>p</em> has 36 divisors and is
+refactorable (for any prime <em>p</em> &gt; 3).
+
+</p><p>
+Note that the first such formula comes from the first
+non-square-free integer greater than 4, namely 8, and we find that
+8<em>p</em> is refactorable with 8 divisors, for any prime <em>p</em> &gt; 2.
+
+</p><p>
+To end the discussion on refactorable numbers, we give a table of
+the distribution of (i) refactorable numbers, (ii) odd
+refactorable numbers, (iii) even refactorable numbers, (iv) 
+pairs of refactorable numbers, and we compare these with the
+distribution of the primes and pairs of primes.
+
+</p><p>
+</p><center>
+<table cols="7" width="80" bgcolor="#FFCCCC" border="3" cellpadding="3" cellspacing="3">
+<tbody><tr>
+<td><em>n</em> at most</td>
+<td>primes</td>
+<td>refactorables</td>
+<td>odd refactorables</td>
+<td>even refactorables</td>
+<td>prime pairs</td>
+<td>refactorable pairs</td>
+</tr>
+
+<tr>
+<td>10</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+
+<tr>
+<td>10<sup>2</sup></td>
+<td>25</td>
+<td>16</td>
+<td>2</td>
+<td>14</td>
+<td>8</td>
+<td>2</td>
+</tr>
+
+<tr>
+<td>10<sup>3</sup></td>
+<td>168</td>
+<td>92</td>
+<td>5</td>
+<td>87</td>
+<td>35</td>
+<td>2</td>
+</tr>
+
+<tr>
+<td>10<sup>4</sup></td>
+<td>1229</td>
+<td>665</td>
+<td>15</td>
+<td>650</td>
+<td>205</td>
+<td>3</td>
+</tr>
+
+<tr>
+<td>10<sup>5</sup></td>
+<td>9592</td>
+<td>5257</td>
+<td>34</td>
+<td>5223</td>
+<td>1224</td>
+<td>5</td>
+</tr>
+
+<tr>
+<td>10<sup>6</sup></td>
+<td>78498</td>
+<td>44705</td>
+<td>87</td>
+<td>44618</td>
+<td>8169</td>
+<td>13</td>
+</tr>
+
+<tr>
+<td>10<sup>7</sup></td>
+<td>664579</td>
+<td>394240</td>
+<td>237</td>
+<td>394003</td>
+<td>58980</td>
+<td>27</td>
+</tr>
+
+<tr>
+<td>10<sup>8</sup></td>
+<td>5761455</td>
+<td>?</td>
+<td>650</td>
+<td>?</td>
+<td>440312</td>
+<td>75</td>
+</tr>
+
+<tr>
+<td>10<sup>9</sup></td>
+<td>50847534</td>
+<td>?</td>
+<td>1813</td>
+<td>?</td>
+<td>3424506</td>
+<td>187</td>
+</tr>
+
+<tr>
+<td>10<sup>10</sup></td>
+<td>455052511</td>
+<td>?</td>
+<td>5152</td>
+<td>?</td>
+<td>27412679</td>
+<td>468</td>
+</tr>
+
+<tr>
+<td>10<sup>11</sup></td>
+<td>4118054813</td>
+<td>?</td>
+<td>14889</td>
+<td>?</td>
+<td>224376048</td>
+<td>1219</td>
+</tr>
+</tbody></table>
+<br>
+Table 1: Distribution of refactorable numbers, odd and
+even refactorables and pairs of refactorables, compared with
+distribution of primes and prime  pairs.
+</center>
+
+<p>
+We used <a href="http://archives.math.utk.edu/software/msdos/number.theory/ubasic/.html">UBASIC</a>
+and <a href="http://www-gap.dcs.st-and.ac.uk/%7Egap/">GAP</a> to compile
+this table. Based on this empirical evidence, it appears that the number
+of refactorables is always at least half the number of primes. Using
+the prime number theorem, (Theorem 6 of <a href="#hardy">[4]</a>), we can conjecture that
+the number of refactorables less than <em>x</em> is at least <em>x</em>/(2 log(<em>x</em>)).
+
+</p><p>
+</p><h2>
+<a name="hr"></a>
+<u>3. HR - Automatic Concept Formation</u>
+</h2>
+<p>
+The research of the author includes understanding and automating the
+processes at work when mathematicians invent new concepts,
+specifically in finite group theory. This has culminated in the
+<a href="http://dream.dai.ed.ac.uk/group/simonco/hr/">HR</a>
+system, named after <a href="http://www-groups.dcs.st-and.ac.uk/%7Ehistory/Mathematicians/Hardy.html">Hardy</a>
+and
+<a href="http://www-groups.dcs.st-and.ac.uk/%7Ehistory/Mathematicians/Ramanujan.html">Ramanujan</a>, 
+to emphasize both a theory-driven and a
+data-driven approach to concept formation. HR starts with only the
+axioms of group theory and ends with definitions and models of
+concepts it has derived, such Abelian groups, cyclic groups, orders of
+elements and so on. It does this by:
+</p><ol>
+<li>Finding models of groups using the MACE model finder, <a href="#Mace">[5]</a>.</li> <li>Storing data from the group tables
+which details the core concepts in group theory, namely the group
+operation, the identity element and the inverses of elements.</li>
+<li>Manipulating this data in one of eight ways to produce a new
+data-table from one (or two) old ones.</li> <li>Assigning definitions
+to each new data-table using the information about how they were
+constructed.
+</li>
+</ol>
+<p>
+Most of the concepts HR invents are calculations which can be made
+directly from the group table of a finite group. However, it also
+makes sequences of groups, for instance, the sequence formed by
+taking the subgroup generated by the center of the previous group
+(which produces sequences of length two only).
+The sequences produced were mostly disappointing. For
+this reason, we looked towards number theory to see if it was possible
+to find more interesting sequences using HR's limited set of production
+rules.
+</p><p>
+<a name="number"></a>
+</p><h3>3.1 HR Working in Number Theory</h3>
+<p>
+In number theory, HR generated three initial tables for the integers
+up to 100:
+</p><ul>
+<li>The set of triples [<em>a</em>, <em>b</em>, <em>c</em>] for which <em>a</em> = <em>b</em> * <em>c</em>.
+</li>
+<li>The set of triples [<em>a</em>, <em>b</em>, <em>c</em>] for which <em>a</em> = <em>b</em> + <em>c</em>.
+</li>
+<li>The set of pairs [<em>a</em>, <em>b</em>] for which <em>b</em> is a digit in the
+decimal expansion of <em>a</em>.
+</li>
+</ul>
+These were quite arbitrary choices
+- other choices would lead to different concepts.
+HR performs concept formation in number theory using the
+same manipulations as in group theory. It also has three ways to
+produce sequences of numbers:
+<ol>
+<li>By taking the sequence of integers with a given property,
+e.g. the  prime numbers.</li>
+<li>By taking the output of some function on successive integers,
+e.g. the <em>τ</em> function.</li>
+<li>By finding those integers which, for some function, output an
+integer larger than any output for a smaller integer, i.e. those
+integers which set a record, such as the highly composite numbers.</li>
+</ol>
+<p>
+The first time HR was tried in number theory, it invented the
+refactorable numbers. When we first saw this sequence, we did not know
+how it was found, but it looked interesting - it had a mix of odd and even
+numbers, sufficiently many terms between one and a hundred, and no obvious
+pattern. Therefore we looked it up in the 
+<a href="http://oeis.org/">Online Encyclopedia</a>,
+and were
+surprised to find that it was not listed. Only then did we look at
+the output from HR to see its definition
+(expecting an unintuitive, complicated explanation), and
+were then even more surprised that this sequence was missing from the
+Encyclopedia.
+
+</p><p>
+We must point out that HR did only the easy part - it invented the
+concept - we have done all the rest of the above work. However,
+HR does make conjectures about refactorables. For example, it made
+the following conjecture, which we thought was true until a very large
+counterexample was found:
+
+</p><p>
+<strong>Conjecture.</strong>
+Given a refactorable number <em>n</em>, let
+<br><br>
+</p><center>
+<em>f</em>(<em>n</em>) = |{(<em>a</em>,<em>b</em>) in <strong>N</strong> × <strong>N</strong> :
+<em>a</em><em>b</em> = <em>n</em>, <em>a</em> =\= <em>b</em>}| .
+</center>
+<br>
+Then <em>f</em>(<em>n</em>) is <strong> not </strong> a divisor of <em>n</em> if and only if <em>n</em> is a square number. 
+
+<p>
+<strong>Proof of [==&gt;] </strong>
+Suppose <em> n </em> is refactorable, that <em>f</em>(<em>n</em>) does not divide
+<em> n </em> and that <em> n </em> is <strong> not </strong> a square.
+Then <em>f</em>(<em>n</em>) is equal to
+the number of divisors of <em> n</em>, and so must divide <em>n</em>, a contradiction.
+<br>
+<strong>Disproof of [&lt;==]</strong>
+36360900, 79388100 and 155600676 are the first three
+square refactorable number which are divisible by
+<em>f</em>(<em>n</em>).
+</p><p>
+
+Since HR only knew the
+factorizations of the integers up to 100, the conjecture was not implausible.
+</p><p>
+
+Note that there can be no odd refactorable
+numbers <em>n</em> for which <em>f</em>(<em>n</em>) divides <em> n</em>,
+because if <em> n </em> is odd and refactorable, it must be a square, and
+if so, <em>f</em>(<em>n</em>) is one less than the number of divisors of <em>n</em>,
+ so, as <em> n </em> is refactorable, <em>f</em>(<em>n</em>) + 1 must
+divide <em> n</em>, and as <em> n </em> is odd, we cannot have both 
+<em>f</em>(<em>n</em>) and <em>f</em>(<em>n</em>) + 1 dividing <em> n</em>, as one of these
+must be even.
+</p><p>
+
+We note that HR has in effect discovered the concept of square
+numbers, for which both <em>τ</em>(<em>n</em>) and <em>τ</em>(<em>n</em>)-1
+divide <em>n</em>.
+
+</p><p>
+The odd or even square refactorable numbers are:
+<br><br>
+</p><hr>
+<center>
+[<a href="http://oeis.org/A036907">A036907</a>]:
+1, 9, 36, 225, 441, 625, 1089, 1521, 2025, 2601, 3249, 3600, 4761, 5625, 6561, 7569, 8100, ...
+</center>
+<hr>
+<p>
+<a name="recent"></a>
+</p><h3>3.2 Recent Developments</h3>
+
+<h3>3.2.1 Data Mining Using the Encyclopedia</h3>
+
+<p>
+Having down-loaded a copy of the
+<a href="http://oeis.org/">Online Encyclopedia</a>,
+we have enabled HR
+to check each sequence it makes against the database and flag those
+which it has reinvented. After tidying up the data, we were also able
+to write an add-on program enabling HR to perform some data mining
+with the encyclopedia. We are still implementing, experimenting and
+collating results, but it seems that it is certainly possible to find
+previously unknown results using data mining. For example, we asked HR
+to identify any sequences for which the refactorables are a
+subsequence. It first found [<a href="http://oeis.org/A009230">A009230</a>],
+in which the <em>n</em>th term is
+lcm(<em>n</em>, <em>d</em>(<em>n</em>)), which was not too
+surprising since for every refactorable number <em>r</em>,
+lcm(<em>r</em>, <em>τ</em>(<em>r</em>)) = <em>r</em>.
+
+</p><p>
+Next, HR spotted that the refactorables are a subsequence of [<a href="http://oeis.org/A047466">A047466</a>], the integers congruent to 0, 1, 2
+or 4 (mod 8). This was an unknown result, which we subsequently
+proved:
+</p><p>
+<strong>Theorem 6. </strong> Refactorable numbers are congruent to 0, 1, 2 or 4 (mod 8).
+</p><p>
+<strong>Proof.</strong> 
+Odd refactorables are squares, and therefore congruent to 1 modulo 8.
+If a refactorable
+number were congruent to 6 mod 8 then it would be of the form 
+2(4<em>n</em>+3), and by Lemma 2, 4<em>n</em>+3 would  also be
+refactorable, a contradiction.
+<font color="red">QED</font>.
+</p><p>
+This gives us another insight into triples of refactorables:
+</p><p>
+<strong>Corollary.</strong> If (<em>a</em>-1, <em>a</em>, <em>a</em>+1) is a triple of refactorable
+numbers, then <em>a</em> = <em>b</em><sup>2</sup> for some odd number <em>b</em> and
+<em>b</em><sup>2</sup> = 16<em>c</em> + 1 for some <em>c</em>.
+</p><p>
+<strong>Proof.</strong> By Theorem 6, odd refactorables are congruent to 1
+(mod 8), hence <em>a</em>+1 = 8<em>n</em> + 2 = 2(4<em>n</em> + 1) for some <em>n</em>. Therefore,
+as <em>a</em> + 1 is refactorable and 4<em>n</em> + 1 is odd, we see by Lemma
+2 that 4<em>n</em> + 1 is an odd refactorable number. Hence, by Theorem 6
+again, 4<em>n</em> + 1 = 8<em>c</em>+1, so <em>a</em> + 1 = 2(8<em>c</em>+1) and we see that
+<em>a</em> = 16<em>c</em>+1. As <em>a</em> is an odd refactorable, by Theorem 2 we
+can write <em>a</em> = <em>b</em><sup>2</sup> for some <em>b</em>, and
+<em>a</em> = <em>b</em><sup>2</sup> = 16<em>c</em>+1. <font color="red">QED</font>.
+</p><p>
+Another data mining investigation using the encyclopedia, this time to find
+super-sequences of the perfect numbers ["even" being understood here],
+showed that perfect numbers are
+a subsequence of [<a href="http://oeis.org/A009242">A009242</a>],
+with <em>n</em>th term equal to
+lcm(<em>n</em>, <em>σ</em>(<em>n</em>)).  Therefore HR had spotted that, for all (even)
+perfect numbers <em>p</em>, there is an <em>n</em> such that
+lcm(<em>n</em>, <em>σ</em>(<em>n</em>)) = <em>p</em>. In the same session, HR also spotted that
+the even perfect numbers are a subsequence of [<a href="http://oeis.org/A007517">A007517</a>], in which the <em>n</em>th term is
+<em>φ</em>(<em>n</em>)(<em>σ</em>(<em>n</em>)-<em>n</em>).  We have subsequently proved both of these
+results:
+</p><p>
+<strong>Theorem 7. </strong> For any even perfect number <em>p</em>, there is an integer
+<em>a</em> for which lcm(<em>a</em>, <em>σ</em>(<em>a</em>)) = <em>p</em>, and an integer
+<em>b</em> for which <em>φ</em>(<em>b</em>)(<em>σ</em>(<em>b</em>)-<em>b</em>) = <em>p</em>.
+</p><p>
+<strong>Proof.</strong> From Theorem 277 of <a href="#hardy">[4]</a>, we note that
+<em>p</em> = 2<sup><em>n</em> - 1</sup> (2<sup><em>n</em></sup>-1) for some <em>n</em>, where
+2<sup><em>n</em></sup>-1 is a prime. If we take <em>a</em> = 2<sup><em>n</em>-1</sup> then
+</p><center>
+<em>σ</em>(<em>a</em>) = 1 + 2 + ... + 2<sup><em>n</em>-1</sup> = 2<sup><em>n</em></sup> - 1
+</center>
+and so lcm(<em>a</em>, <em>σ</em>(<em>a</em>)) = 2<sup><em>n</em>-1</sup> (2<sup><em>n</em></sup>-1) = <em>p</em>,
+because 2<sup><em>n</em></sup>-1 is prime. <br>
+If we take
+<em>b</em> = 2<sup><em>n</em></sup> then <em>σ</em>(<em>b</em>) = 2<sup><em>n</em> + 1</sup>-1 and only
+the odd integers less than <em>b</em> will be coprime to it, so
+<center>
+<em>φ</em>(<em>b</em>) = <em>b</em>/2 = 2<sup><em>n</em>-1</sup>
+</center>
+Therefore
+<center>
+<em>φ</em>(<em>b</em>)(<em>σ</em>(<em>b</em>) - <em>b</em>) = 2<sup><em>n</em>-1</sup> (2<sup><em>n</em> + 1</sup>
+- 1 - 2<sup><em>n</em></sup>)
+= 2<sup><em>n</em> - 1</sup> (2<sup><em>n</em></sup> - 1) = <em>p</em>.</center>
+<font color="red">QED</font>.
+<p>
+So HR has highlighted the following appealing parallel
+between the refactorable numbers and the even perfect numbers:
+</p><ul>
+<li>Refactorable numbers are of the form lcm(<em>a</em>, <em>τ</em>(<em>a</em>)) for some
+<em>a</em>.
+</li>
+<li>Perfect numbers are of the form lcm(<em>a</em>, <em>σ</em>(<em>a</em>)) for some
+<em>a</em>.
+</li>
+</ul>
+We also note that
+<ul>
+<li>Refactorable numbers are those <em>n</em> for which lcm(<em>n</em>, <em>τ</em>(<em>n</em>))  =  <em>n</em>,</li>
+<li>Perfect numbers are those <em>n</em> for which lcm(<em>n</em>, <em>σ</em>(<em>n</em>)) = 2<em>n</em>.</li>
+</ul>
+
+<h3>3.2.2 A Mathematical Cycle</h3>
+
+We have recently been able to complete a cycle of mathematical
+activities by using the automated theorem prover OTTER <a href="#Otter">[6]</a> to prove some of the conjectures that HR makes in group
+theory. HR now:
+<ul>
+<li>Invents definitions</li>
+<li>Spots conjectures involving those definitions</li>
+<li>Proves some of the conjectures using OTTER</li>
+<li>Finds counterexamples to some of the conjectures that OTTER fails to prove</li>
+</ul>
+Therefore, starting with only the axioms of group theory, HR
+constructs a theory with (i) examples of groups, (ii) definitions of
+groups and models of those definitions, (iii) proven conjectures with
+proofs supplied by OTTER, (iv) open conjectures, where OTTER has
+failed to find a proof and MACE has failed to find a counterexample.
+<p>
+<a href="#bundy">[2]</a> gives a more detailed description of the HR
+system, and the following web page is devoted to HR: 
+</p><center>
+<a href="http://dream.dai.ed.ac.uk/group/simonco/hr/">http://dream.dai.ed.ac.uk/group/simonco/hr/</a>
+</center>
+<p>
+</p><h2>
+<a name="other"></a>
+<u>
+4. Other Sequences
+</u>
+</h2>
+<p>
+<a name="re-invent"></a>
+</p><h3>4.1 Re-Invented Sequences</h3>
+<p>
+After a preliminary examination, we can claim that HR reinvented the
+following sequences:
+</p><p>
+</p><ol>
+<li> Sequences resulting from factorization:</li>
+<p>
+</p><ul>
+<li> the square numbers [<a href="http://oeis.org/A000290">A000290</a>].</li>
+<li> the non-squares [<a href="http://oeis.org/A000037">A000037</a>].
+</li>
+<li> the prime numbers [<a href="http://oeis.org/A000040">A000040</a>].</li>
+<li> the squares of primes [<a href="http://oeis.org/A001248">A001248</a>].</li>
+<li> the primes and squares of primes [<a href="http://oeis.org/A000430">A000430</a>].</li>
+<li> 1 and the odd primes [<a href="http://oeis.org/A006005">A006005</a>].</li>
+<li> 0 if prime, 1 otherwise [<a href="http://oeis.org/A005171">A005171</a>].</li>
+<li> the composite numbers [<a href="http://oeis.org/A002808">A002808</a>].</li>
+<li> the highly composite numbers [<a href="http://oeis.org/A002182">A002182</a>].</li>
+<li> <em>τ</em>(<em>n</em>), the number of divisors of <em>n</em> [<a href="http://oeis.org/A000005">A000005</a>].
+</li>
+<li> the number of proper divisors [<a href="http://oeis.org/A032741">A032741</a>].
+</li>
+<li> integers with 4 [<a href="http://oeis.org/A030513">A030513</a>],
+5 [<a href="http://oeis.org/A030514">A030514</a>], etc. divisors.
+</li>
+<li> integer square roots or zero [<a href="http://oeis.org/A037213">A037213</a>].</li>
+<li> writing out the divisors [<a href="http://oeis.org/A027750">A027750</a>].</li>
+<li> writing out the proper divisors [<a href="http://oeis.org/A027751">A027751</a>].</li>
+<li> the squarefree integers. [<a href="http://oeis.org/A005117">A005117</a>].</li>
+<li> the powers of 2 [<a href="http://oeis.org/A000079">A000079</a>].</li>
+<li> integers with at most 2 prime factors [<a href="http://oeis.org/A037143">A037143</a>].</li>
+<li> integers not divisible by 3 [<a href="http://oeis.org/A001651">A001651</a>].</li>
+</ul>
+<p>
+</p><li> Sequences resulting from addition:</li>
+<p>
+</p><ul>
+<li> the even numbers [<a href="http://oeis.org/A005843">A005843</a>].</li>
+<li> the odd numbers [<a href="http://oeis.org/A005408">A005408</a>].</li>
+<li> writing out the numbers less than n [<a href="http://oeis.org/A005408">A005408</a>].</li>
+<li> 1 together with the even numbers [<a href="http://oeis.org/A004277">A004277</a>].</li>
+<li> 2 together with the odd numbers [<a href="http://oeis.org/A004280">A004280</a>].</li>
+<li> 2,4 and the odd numbers [<a href="http://oeis.org/A004281">A004281</a>].</li>
+</ul>
+<p>
+</p><li> Sequences resulting from examination of digits:</li>
+<p>
+</p><ul>
+<li> the repunits [<a href="http://oeis.org/A000042">A000042</a>].</li>
+<li> integers with only 2's as digits [<a href="http://oeis.org/A002276">A002276</a>].</li>
+<li> integers with a 1 [<a href="http://oeis.org/A011531">A011531</a>],
+2 [<a href="http://oeis.org/A011532">A011532</a>],
+3 [<a href="http://oeis.org/A011533">A011533</a>], etc. as a digit.
+</li>
+<li> the repdigits [<a href="http://oeis.org/A010785">A010785</a>].</li>
+<li> integers divisible by each non-zero digit [<a href="http://oeis.org/A002796">A002796</a>].</li>
+<li> each digit is prime [<a href="http://oeis.org/A046034">A046034</a>].</li>
+<li> the numbers with two distinct digits [<a href="http://oeis.org/A031955">A031955</a>].</li>
+<li> the number of distinct digits in <em>n</em> [<a href="http://oeis.org/A043537">A043537</a>].</li>
+<li> number with distinct digits [<a href="http://oeis.org/A010784">A010784</a>].</li>
+<li> numbers divisible by every digit [<a href="http://oeis.org/A034838">A034838</a>].</li>
+<li> no base 2 digit is a base 10 digit [<a href="http://oeis.org/A037344">A037344</a>].</li>
+<li> the natural numbers in base 3 [<a href="http://oeis.org/A007089">A007089</a>].</li>
+</ul>
+</ol>
+<p>
+More interesting than the fact that HR reinvented these sequences are
+the ways in which HR defines them. For example, even numbers
+are defined as integers <em>n</em> for which there is a natural number
+<em>m</em> such that <em>m</em> + <em>m</em> = <em>n</em>. The natural numbers in base 3
+were defined as integers in base 10 which have no digits which can be
+written as <em>a</em> + <em>b</em> where <em>a</em> &gt; 0, <em>b</em> &gt; 0 and <em>a</em> =/=
+<em>b</em>. Powers of two were defined as those integers with no
+odd divisors.
+</p><p>
+</p><h3>4.2 <a name="newseqs">New Sequences Invented by HR</a></h3>
+<p>
+HR invented many other sequences which were not found in the
+encyclopedia.
+Most did not seem of any great interest.  However,
+we deemed the following seven of sufficient
+interest to be submitted to the encyclopedia.
+</p><ol>
+<li>1, 2, 14, 23, 29, 34, 46, 63, 68, 74, 76, 78, 88, 94, ... [<a href="http://oeis.org/A036433">A036433</a>],
+<br>
+the number of divisors is a digit in the decimal expansion of n.
+This sequence contains all primes with a 2 in them, and those primes
+starting with a 2, [<a href="http://oeis.org/A045708">A045708</a>].
+<p>
+</p></li>
+<li>1, 4, 9, 11, 14, 19, 41, 44, 49, 91, 94, 99, ... [<a href="http://oeis.org/A036435">A036435</a>],
+<br>
+those integers where all the digits are nonzero squares.
+<p>
+</p></li>
+<li>0, 1, 0, 1, 1, 0, 2, 0, 1, 1, 0, 2, 1, 1, 1, 0, 0, ... [<a href="http://oeis.org/A036431">A036431</a>],
+<br>
+<em>f</em>(<em>n</em>) = |{<em>a</em> &lt; <em>n</em> : <em>a</em> + <em>τ</em>(<em>a</em>) = <em>n</em>}|.
+<p>
+</p></li>
+<li>1, 3, 6, 8, 11, 16, 17, 20, 22, 23, 27, 29, ... [<a href="http://oeis.org/A036434">A036434</a>],
+<br>
+integers which cannot be written as <em>a</em> + <em>τ</em>(<em>a</em>) for some
+<em>a</em> (i.e. those <em>n</em> for which <em>f</em>(<em>n</em>) = 0).
+<p>
+</p></li>
+<li>1, 2, 7, 38, 122, 2766, 64686, ... [<a href="http://oeis.org/A036432">A036432</a>],
+<br>
+integers that set a record for <em>f</em>(<em>n</em>).
+<p>
+</p></li>
+<li>1, 4, 6, 10, 12, 14, 22, 24, 26, 27, ... [<a href="http://oeis.org/A036438">A036438</a>],
+<br>
+integers which can be written as <em>m</em> * <em>τ</em>(<em>m</em>) for some
+<em>m</em> (which of course include twice the primes, [<a href="http://oeis.org/A001747">A001747</a>]).
+<p>
+</p></li>
+<li>1, 6, 8, 10, 14, 15, 22, 26, 27, ... [<a href="http://oeis.org/A036436">A036436</a>],
+<br>
+integers for which <em>τ</em>(<em>n</em>) is a square. This sequence
+contains the multiplicatively perfect numbers
+[<a href="http://oeis.org/A007422">A007422</a>],
+<em>n</em> such that the product of the divisors of <em>n</em> equals <em>n</em><sup>2</sup>.
+<p>
+</p></li>
+</ol>
+<p>
+HR has also found some interesting finite sequences of integers. For example, HR
+invented those integers which have more distinct digits than any
+smaller number
+</p><p>
+1, 10, 102, 1023, 10234, 102345, 1023456, 10234567, 102345678, 1023456789
+[<a href="http://oeis.org/A038378">A038378</a>].
+</p><p>
+</p><h2>
+<a name="conclusions"></a>
+<u>5. Conclusions</u>
+</h2>
+We have shown that refactorable numbers are of some interest, and hope
+that someone will take up the challenge of proving the conjectures
+from this paper (before we do).
+<p>
+Also, we have shown that HR is capable of producing interesting concepts.
+Automated concept formation programs have some advantages over humans,
+in that they have no pride (are not ashamed to look at concepts with
+simple descriptions) and are very thorough. The use of
+computers with integer sequences has also been explored in <a href="#meredith">[7]</a>, where the Seek-Whence program was used to
+identify definitions of integer sequences. Indeed, the 
+<a href="http://oeis.org/ol.html">Superseeker</a>
+server for the Online Encyclopedia of Integer Sequences does a certain
+amount of concept formation in attempting to find a match between a given sequence
+and one in the database. A similar program to HR is Graffiti, <a href="#fajtlowicz">[3]</a>, which makes conjectures in graph
+theory.
+Another program, <a href="#bagai">[1]</a>, automatically invents
+theorems in plane geometry.
+</p><p>
+Machine discovery in mathematics and in science in general is a
+productive and interesting area which is gaining 
+recognition and attention. HR and refactorable numbers were themselves
+recently mentioned in the popular press, <a href="#newscientist">[8]</a>, which reflects the interest that machine
+discovery is attracting. As more work is done in this area, we hope to
+make discovery programs as much a part of the mathematician's tool box
+as computer algebra packages.
+
+</p><p>
+</p><h2>
+<a name="acknowledgements"></a>
+<u>6. Acknowledgements</u>
+</h2>
+This work is supported by EPSRC research grant GR/L 11724. I would
+like to thank Prof. Alan Bundy and Dr. Toby Walsh (who gave
+refactorables their name) for their valuable contributions to this
+work.
+    
+<p></p><h2><a name="references"></a><u>7. References</u></h2>
+<a name="bagai">
+[1] Bagai, R., Shanbhogue, V., Zytkow, J. M. and Chou, S. C.: Automatic theorem
+generation in plane geometry, in <em>Lecture Notes in Artificial
+Intelligence</em>, Vol. <strong>689</strong>, Springer-Verlag, 1993.
+</a>
+<p>
+<a name="bundy">
+[2] Bundy, A., Colton, S. and Walsh, T.: HR - Automated concept formation
+in finite algebras, in <em>Proceedings of the Machine Discovery Workshop</em>,
+ECAI 98, Brighton.
+Also Research Report RP920,
+Division of Informatics, University of Edinburgh.
+</a>
+</p><p>
+<a name="fajtlowicz">
+[3] Fajtlowicz, S.: On conjectures of Graffiti: <em>Discrete Mathematics</em>,
+Vol. <strong>72</strong>, pages 113-118, 1988.
+</a>
+(See also
+Fajtlowicz, S.: On conjectures of Graffiti V. In <em>Proceedings of the
+7th International Quadrennial Conference on Graph Theory, Combinatorics
+and Applications</em>, Vol. <strong>1</strong>, pages 367-376, 1995.)
+</p><p>
+<a name="hardy">
+[4] Hardy, G. H. and Wright, E. M.: <em>The Theory of Numbers</em>, Oxford Univ. Press, 1965.
+</a>
+</p><p>
+<a name="Mace">
+[5] McCune, W.: A Davis-Putnam program and its application to finite
+first order model search: Quasigroup existence problems. Technical
+Report ANL/MCS-TM-194, Argonne National Laboratory, 1994.
+</a>
+</p><p>
+<a name="Otter">
+[6] McCune, W.: <em>The Otter User's Guide</em>. Technical Report ANL/90/9,
+Argonne National Laboratory, 1994.
+</a>
+</p><p>
+<a name="meredith">
+[7] Meredith, M. J.: <em>Seek-Whence: A Model of Pattern Perception</em>, Ph.D.
+dissertation, Department of Computer Science, Indiana University, 1987.
+</a>
+</p><p>
+<a name="newscientist">
+[8] <em>New Scientist</em>, 5th Sept. 1998, p. 17, para. 3.
+</a>
+</p><p>
+<a name="sloane">
+[9] Sloane, N. J. A.: <em>The On-Line Encyclopedia of Integer Sequences</em>, 
+</a>
+published
+electronically at
+<a href="http://oeis.org/">http://oeis.org</a>.
+</p><p>
+</p><hr>
+<p>
+</p><p></p><h2><a name="add"></a><u>8. Addenda, April 19, 1999</u></h2>
+<p>
+In this paper we tried
+to make two points: (i) that the HR program we have implemented can
+invent new and interesting concepts in number theory and (ii) that one
+concept output by HR, namely the refactorable numbers, had many
+interesting properties. Because refactorables and associated sequences
+were missing from the Encyclopedia of Integer Sequences, <a href="#sloane">[9]</a>, and after a preliminary search of the relevant
+literature, we concluded that the refactorable numbers were a
+genuinely new invention.
+</p><p align="justify">
+However, on 23rd March 1999, we received notification from
+ <a href="http://www.math-cs.cmsu.edu/%7Edept/faculty/kennedy.html">Robert
+Kennedy</a> and <a href="http://www.math-cs.cmsu.edu/%7Edept/faculty/cooper.html">Curtis
+Cooper</a>, of Central Missouri State University, that they had read
+the above paper and that the concept of refactorables had been defined
+already as `τ numbers' in a 1990 paper, <a href="#kennedy">[10]</a>,
+which proved that the natural density of the τ numbers is zero.
+</p><p align="justify">
+This news detracts from our original paper in only one way, namely
+that the title is inaccurate, refactorables were a machine
+re-invention. Indeed, the news that they have been developed so
+recently adds both to the point that HR can invent and re-invent
+concepts of interest and, of course, to the point that refactorables
+are interesting.
+
+</p><p align="justify">
+To add to the argument that HR produces interesting, novel concepts in
+number theory, we present the following very simple function defined
+by HR recently:
+</p><p>
+</p><center>
+<em>f</em>(<em>n</em>) = |{(<em>a</em>,<em>b</em>) : <em>a</em> * <em>b</em> = <em>n</em> and <em>a</em> | <em>b</em>}|.
+</center>
+<p>
+This has been added to the encyclopedia:
+<br><br>
+</p><center>
+<hr>
+[<a href="http://oeis.org/A046951">A046951</a>]:
+1, 1, 1, 2, 1, 1, 1, 2, 2, 1, 1, 2, 1, 1, 1, 3, 1, 2, 1, 2, 1, 1, 1, 2, 2, 1, 2, 2, 1, 1, 1, 3, 1, 1, 1, 4, 1, ...
+<hr>
+</center>
+<p align="justify">
+This was interesting because of its similarity to the τ function,
+[<a href="http://oeis.org/A000005">A000005</a>]:
+(<em>τ(n) = </em> number of divisors of <em>n</em>). HR went on to
+define the integer sequence of numbers which set a record for <em>f</em>
+(ie. those integers, <em>a</em>, for which for all <em>b, 0 &lt; b &lt; a, f(a)
+&gt; f(b)</em>): <br><br>
+</p><center>
+<hr>
+[<a href="http://oeis.org/A046952">A046952</a>]:
+1, 4, 16, 36, 144, 576, 1296, 2304, 3600, 14400, 32400, 57600, 129600, 518400, ...
+<hr>
+<br>
+</center>
+<p align="justify">
+It was easy to spot that these are all square numbers, but a little
+investigating revealed the following result:
+</p><p align="justify">
+<strong>Theorem 1.</strong> The nth integer setting the record for <em>f</em> as
+above is the square of the nth highly composite number [<a href="http://oeis.org/A002182">A002182</a>] (the highly composite
+numbers have more divisors than any smaller integer).
+</p><p align="justify">
+To prove this, we need the following lemma:
+</p><p align="justify">
+<strong> Lemma 1.</strong> <em>f(n) = τ(square root of the largest square
+dividing n)</em>. Note that the square root of the largest square
+dividing <em>n</em>, which we write as <em>s(n)</em>, is integer sequence
+[<a href="http://oeis.org/A000188">A000188</a>].
+</p><p align="justify">
+<strong> Proof of Lemma 1.</strong>
+<br>
+Writing
+<em>n=p<sub>1</sub><sup>k<sub>1</sub></sup>...p<sub>m</sub><sup>k<sub>m</sub></sup></em>,
+the largest square dividing <em>n</em> is
+<em>p<sub>1</sub><sup>2[k<sub>1</sub>/2]</sup>...p<sub>m</sub><sup>2[k<sub>m</sub>/2]</sup></em>,
+the square root of which is:
+<em>p<sub>1</sub><sup>[k<sub>1</sub>/2]</sup>...p<sub>m</sub><sup>[k<sub>m</sub>/2]</sup></em>,
+where <em>[z]</em> denotes the integer part of fraction <em>z</em>. The
+pairs of integers dividing <em>n</em> are of the form:
+</p><p>
+</p><center>
+<em>(a,b) =
+(p<sub>1</sub><sup>x<sub>1</sub></sup>...p<sub>m</sub><sup>x<sub>m</sub></sup>,
+p<sub>1</sub><sup>k<sub>1</sub> -
+x<sub>1</sub></sup>...p<sub>m</sub><sup>k<sub>m</sub> - x<sub>m</sub></sup>)</em>
+</center>
+<p align="justify">and <em>a|b</em> if for all <em>i, x<sub>i</sub> =&lt; k<sub>i</sub> -
+x<sub>i</sub></em>, ie. <em>x<sub>i</sub> =&lt; k<sub>i</sub>/2</em>. Therefore,
+each <em>x<sub>i</sub></em> can be <em>0,1,2,...,[k<sub>i</sub>/2]</em>,
+and:
+</p><p>
+</p><center>
+<em>f(n) = ([k<sub>1</sub>/2] + 1)([k<sub>2</sub>/2] +
+1)...([k<sub>m</sub>/2] + 1) =
+τ(p<sub>1</sub><sup>[k<sub>1</sub>/2]</sup>...p<sub>m</sub><sup>[k<sub>1</sub>/2]</sup>)
+= τ(s(n)),</em>
+</center>
+<p align="justify">
+using Theorem 273 from <a href="#hardy">[4]</a>.
+<font color="red">QED</font>
+</p><p align="justify">
+<strong>Proof of Theorem 1.</strong>
+<br>
+Suppose that <em>a</em> sets a record for <em>f</em>. Therefore, <em>f(a) &gt;
+f(1), f(a) &gt; f(2), ..., f(a) &gt; f(a-1)</em>, and by lemma 1, this means
+that <em>τ(s(a)) &gt; τ(s(1)), τ(s(a)) &gt; τ(s(2)), ..., τ(s(a)) &gt;
+τ(s(a-1))</em>. Suppose now that <em>c<sup>2</sup></em> is the largest
+square less than or equal to <em>a</em>. Then we see that: </p><p></p><center>
+<em>τ(s(a)) &gt; τ(s(1)) = τ(1) <br>τ(s(a)) &gt; τ(s(4)) = τ(2)
+<br> . &nbsp; &nbsp; .<br>τ(s(a)) &gt; τ(s((c-1)<sup>2</sup>)) =
+τ(c-1) </em></center><p align="justify">If <em>a &gt; c<sup>2</sup></em>,
+the largest square dividing <em>a</em> will be less than
+<em>c<sup>2</sup></em> and <em>s(a) &lt; c</em>. But then, <em>s(a) = c -
+k</em> for some <em>k</em>, and <em>τ(s(a)) = τ(c-k)</em>, which is a
+contradiction. Hence <em>a = c<sup>2</sup>, s(a) = c,</em> and <em>τ(c)
+&gt; τ(c - i)</em> for all <em>i &lt; c</em>, which makes <em>c</em> a highly
+composite number, and <em>a</em> the square of a highly composite
+number.
+</p><p align="justify">
+Suppose now that <em>b</em> is a highly composite number, and
+<em>a=b<sup>2</sup></em>. Therefore, <em>s(a) = b</em>, and, as <em>b</em>
+is highly composite, if, for some <em>k, τ(s(a-k)) &gt;
+τ(s(a))</em>, then <em>s(a-k) &gt; s(a) = b,</em> which is
+impossible. Hence, for all <em>k &lt; a, τ(s(a)) &gt; τ(s(a - k))</em>, and by
+lemma 1, <em>f(a) &gt; f(a - k)</em>, thus <em>a</em> sets a
+record for <em>f</em>. <font color="red">QED</font>
+</p><p align="justify">
+Coincidentally, the previous time there was a similar confusion over a
+machine invented concept, Douglas Lenat, who wrote the AM program, <a href="#lenat">[11]</a>, thought for a while that what he called
+maximally divisible numbers were a machine invention. These turned out
+to be the highly composite numbers we've discussed here, which were
+originally developed by Ramanujan, <a href="#ramanujan">[12]</a>.
+</p><p align="justify">
+This time, we will only claim that it is possible that the function
+<em>f</em> above was invented by HR, and that it is possible that, while
+the concept of the squares of highly composite numbers may have been
+looked at before, HR may have been the first to define them as setting
+the record for <em>f</em>. It was fortunate that τ numbers had not
+been added to the encyclopedia, because we may have decided not to
+develop them. However, the story of refactorable/τ numbers
+emphasises the need for databases of mathematical knowledge such as
+the Encyclopedia of Integer Sequences, <a href="#sloane">[9]</a>,
+which can be used by people and computers alike to check the novelty
+of inventions.
+
+</p><p align="justify">
+
+</p><h2><u>Additional referencess</u>
+</h2>
+<a name="lenat">
+</a><p><a name="lenat">
+[10] Kennedy, R.E and Cooper, C.N.: <em>Tau Numbers, Natural Density, and
+Hardy and Wright's Theorem 437</em>, Internat. J. Math. Math. Sci. 13
+(1990), no. 2, 383-386.
+</a>
+<a name="ramanujan">
+</a></p><p><a name="ramanujan">
+[11] Lenat, D.B.: <em>An Artificial Intelligence Approach to Discovery
+in Mathematics</em>, PhD thesis, Department of Computer Science,
+Stanford University.
+</a>
+</p><p>
+<a name="kennedy">
+</a></p><p><a name="kennedy">
+[12] Ramanujan, S.: <em>Collected Papers,</em> Ed. G. H. Hardy et al.,
+Cambridge 1927; Chelsea, NY, 1962, p. 87.
+</a></p><p><a name="kennedy">
+</a></p><p><a name="kennedy">
+</a></p><hr><a name="kennedy">
+</a><p><a name="kennedy">
+<small>(Concerned with sequences
+</small></a><small><a href="http://oeis.org/A000005">A000005</a>,
+<a href="http://oeis.org/A000021">A000021</a>,
+<a href="http://oeis.org/A000188">A000188</a>
+<a href="http://oeis.org/A033950">A033950</a>,
+<a href="http://oeis.org/A036431">A036431</a>,
+<a href="http://oeis.org/A036432">A036432</a>,
+<a href="http://oeis.org/A036433">A036433</a>,
+<a href="http://oeis.org/A036435">A036435</a>,
+<a href="http://oeis.org/A036436">A036436</a>,
+<a href="http://oeis.org/A036878">A036878</a>,
+<a href="http://oeis.org/A036879">A036879</a>,
+<a href="http://oeis.org/A036896">A036896</a>,
+<a href="http://oeis.org/A036897">A036897</a>,
+<a href="http://oeis.org/A036898">A036898</a>,
+<a href="http://oeis.org/A036899">A036899</a>,
+<a href="http://oeis.org/A036907">A036907</a>,
+<a href="http://oeis.org/A038378">A038378</a>,
+<a href="http://oeis.org/A038379">A038379</a>,
+<a href="http://oeis.org/A046951">A046951</a>,
+<a href="http://oeis.org/A046952">A046952</a>,
+.)</small>
+</p><p>
+</p><p>
+</p><hr>
+<p>
+Received Dec 15, 1998; revised version received Jan 12, 1999.
+Published in Journal of Integer Sequences Feb. 13, 1999. Addendum April 19, 1999.
+</p><p>
+</p><hr>
+<p>
+Return to
+<a href="https://cs.uwaterloo.ca/journals/JIS/index.html"><strong>Journal of Integer Sequences home page</strong></a>
+</p><hr>
+
+
+
+</body></html>

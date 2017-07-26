@@ -1,0 +1,1420 @@
+	
+
+ARTIFICIAL INTELLIGENCE
+
+31
+
+Theory Formation by
+Heuristic Search
+The Nature of Heuristics II : Background
+and Examples
+Douglas B . Lena t
+Computer Science Department, Stanford University, Stanford ,
+CA 94305, U.S.A .
+
+ABSTRACT
+Machine learning can be categorized along many dimensions, an important one of which is `degree o f
+human guidance or forethought' . This continuum stretches from rote learning, through carefully guided concept-formation by observation, out toward independent theory formation . Six years ago, the
+AM program was constructed as an experiment in this latter kind of learning by discovery . Its source of
+power was a large body of heuristics, rules which guided it toward fruitful topics of investigation ,
+toward profitable experiments to perform, toward plausible hypotheses and definitions . Since that time,
+we have gained a deeper insight into the nature of heuristics and the nature of the process of formin g
+and extending theories empirically . `The Nature of Heuristics I' paper presented the theoretical basi s
+for this work, with an emphasis on how heuristics relate to each other . This paper presents ou r
+accretion model of theory formation, and gives many examples of its use in producing new discoverie s
+in various fields. These examples are drawn from runs of a program called EURISKO, the successor to
+AM, that embodies the accretion model and uses a corpus of heuristics to guide its behavior . Since our
+model demands the ability to discover new heuristics periodically, as well as new domain objects an d
+operators, some of our examples illustrate that process as well . `The Nature of Heuristics III' pape r
+describes the architecture of the EURISKO program, and conclusions we have made from its behavior .
+
+1 . The Learning Spectru m
+This paper deals with learning, by which we intend to include all processe s
+which result in accretion of knowledge . Section 1 surveys the spectrum of
+learning, from rote memorization to more complex activities . Section 2 focuse s
+on the far end of the learning spectrum, inductive inference . Section 3 propose s
+a model for the far end of that activity, empirical theory formation . That mode l
+accounts for the discovery of new heuristics as well as new task-specific object s
+and operations . Finally, Section 4 presents dozens of examples of the model i n
+action, producing discoveries in many different fields . The next paper in thi s
+Artificial Intelligence 21 (1983) 31–5 9
+
+0004-3702/83/000-0000/$03 .00 © 1983 North-Holland
+
+	
+
+32
+
+D .B . LENAT
+
+series [21] explains the design of the program that made these discoveries ,
+EURISKO, and draws new conclusions about mechanizing the process of discovery .
+Learning can assume many forms, depending on who the `teacher' is, ho w
+active a role the learner assumes, what the learner must do to acquire ,
+assimilate, and accomodate the new knowledge, etc . A large body of though t
+has been assembled on this subject, and it is not the purpose of this paper t o
+duplicate or even summarize any of that material . The reader is referred t o
+[11, 13] for the standard philosophical and psychological ideas on concep t
+formation, [10, 30] for the special cases of theory formation in mathematics an d
+natural science, [1, 4] for coverage of nonstandard ways of conceptualizing, an d
+[26] for pointers to other relevant AI work in machine learning .
+At one extreme, learning is no more than rote memorization . One migh t
+imagine simply memorizing all multiplication problems which cross one' s
+purview, but that is a decidedly unacceptable solution to learning how t o
+multiply . Far more commonly, a human teacher tells the learner specific bits o f
+information to remember (the multiplication table up to n x n, for a culture
+which works in base n), plus an equally mysterious ritual for evoking an answe r
+(the multiplication algorithm) using that table . Rote learning confers very littl e
+ability to use the memorized information in novel ways, but is of course quite
+an efficient method for transferring well-understood knowledge .
+A deeper form of learning is by observation, in which case the teacher
+provides a (probably carefully-ordered) sequence of stimuli, from which th e
+learner builds models of the concepts to be apprehended . This usually takes th e
+form of a series of graded examples, each designed to push slightly on th e
+concepts formed by its predecessors . Winston's [38] arch-finding program wa s
+such a learner, and more recently whole languages have been built aroun d
+learning from sequences of examples (e .g . RITA [36]) .
+The nemesis of this approach is inferring conditionality or disjunction . When
+you see the teacher do X, does that mean he/she chose to do X instead o f
+some alternatives, and if so what were the alternatives and how was the choic e
+made? If two disparate things are both Y's, does that mean that Y admits of a
+vast space of examples, or is there some kind of OR in the definition of Y ?
+The sensitivity of Winston's program and the RITA language to the order o f
+presentation of examples was critical . If the teacher is Nature, the learner mus t
+take a more active role, inquiring about the next examples himself, and tha t
+makes the task much more difficult . If he/she is lucky, examples will be easy t o
+find, and all that must be done is to put them in some order for consideratio n
+and incorporation .
+But in most real-life situations, much of the difficult work is in designing an d
+executing clever experiments just to obtain a few new pieces of data . This typ e
+of learning is guided by a model, by a theory based upon previously seen data .
+
+	
+
+NATURE OF HEURISTICS II
+
+33
+
+The aim of those experiments is generally to test the theory, often in the hope s
+of finding exceptions which will force the theory to develop further to in corporate them . Thus, in the case of multiplication, one might examine table s
+and algorithms in other bases, multiplication by specific numbers, multiplications which yield specific sorts of products, etc . Ultimately, one would gai n
+a deeper understanding of multiplication, and might have (i) some interestin g
+new problems to work on, such as an algebraic generalization of the process ,
+(ii) some powerful new algorithm for multiplying, (iii) some quick ways o f
+doing some multiplications, and of checking others, and perhaps mos t
+significantly (iv) a deep enough representation of what was happening that
+future phenomena (such as division), anomalies (such as ledger errors), an d
+modifications (such as getting a good algorithm given a new set of trade-off s
+on primitive operations) might be done quickly .
+The expert rules in MYCIN [34] represent knowledge at the observation level ;
+indeed, Teiresias [5] learned new MYcIN rules by observation . To learn deeper
+rules (e .g ., those involving causality), MYCIN would have to explicitly possess a
+deeper model of how diseases are caused and cured . Each rule might the n
+explain why it was usually true, in those terms .
+Just as MYcIN ' s rules represent a conceptual advance over the storage o f
+correlation coefficients (between symptoms and diseases), so a causal mode l
+would represent a further advance . In a novel situation (e .g ., a certain drug is
+invented or has just run out), the deep understanding of why each rule wa s
+usually true might enable better response .
+For instance, here are three rules from an expert system designed to manag e
+cleanups of chemical spills .
+R1:
+
+If the spill is sulphuric acid ,
+then use lime .
+
+R2:
+
+If the spill is acetic acid ,
+then use lime .
+
+R3:
+
+If the spill is hydrochloric acid ,
+then use lime .
+
+Now suppose lime runs out, and an acid has been spilled . What should w e
+use? Perhaps the most closely correlated chemical compound is lye, so lye i s
+suggested as a replacement . Can we simply go through rules R1–R3 an d
+replace lime by lye? If we do that, some of the rules still work and some o f
+them become completely useless (or even worse than useless) . What wen t
+wrong ?
+Let's take a deeper look into the rationale behind those three rules . Suppos e
+we had taken the trouble, whenever a rule is typed in, to ask the expert to als o
+specify its justification :
+
+	
+
+34
+
+D .B . LENAT
+R4:
+
+If the spill is sulphuric acid ,
+then use lime .
+Justification : lime neutralizes acid and the compound that forms is insoluble and hence wil l
+precipitate out .
+R5:
+
+If the spill is acetic acid ,
+then use lime .
+
+Justification : lime neutralizes the acid .
+If the spill is hydrochloric acid ,
+then use lime .
+Justification : lime neutralizes the acid .
+R6:
+
+What we really want to do is go through R1–R3 and substitute lye for lim e
+only in those rules which use lime solely to neutralize pH—i .e ., not in rule R1 ,
+since the compound formed by lye and sulphuric acid is soluble . The point i s
+that substitutions are more likely to work when you know why the origina l
+compound was being employed in the first place . If sulphuric acid was spilled ,
+and no lime is available, the human—or program—should search for a compound which neutralizes acid and forms a precipitate .
+Not surprisingly, the deeper the model the more costly it is to build . If yo u
+already have a list of variables to monitor, then building up the requisite set o f
+correlations is quite straight-forward (albeit timeconsuming to obtain convergence) . Surface rules, such as MYCIN ' S rules and the original versions o f
+R1–R3 above, are much more difficult to learn, due to conditionality an d
+disjunction . Deep rules, such as R4–R6 are even more difficult to learn ,
+because the justifications are rarely stated explicitly by the expert or (in the
+case of forming a theory from observed data) by the world .
+But as the problems being dealt with grow in number and complexity, th e
+flexibility of the deep knowledge eventually outweighs the need for simplicity .
+Medical students learn about disease pathways, after all, rather than jus t
+memorizing tables of numbers . Chemists need to know why variou s
+agents are effective against each type of chemical spill . Mathematicians study
+proofs and not just results .
+Learning by discovery is often referred to as inductive inference ; if th e
+model is deep enough, we call the process inductive theory formation. The next
+two sections explore this type of reasoning . Then, in Section 4, several doze n
+examples of learning by discovery are examined, spanning many task domains .
+The automation of this type of learning is described in [211 .
+Why should AI be concerned with computer programs which learn b y
+discovery? One obvious answer is AI's interest in the mechanization of an y
+human cognitive activity . There is another, more powerful reason, however .
+The standard approach to expert system-building involves extracting know ledge from human experts, and yet many of the young, explosively-growing ,
+important fields have no human experts yet, and have few rules of thumb fo r
+guiding explorations in them . In such virgin territory, discovery programs may
+
+	
+
+NATURE OF HEURISTICS II
+
+35
+
+be the fastest route to gaining a preliminary understanding, to conceptualizin g
+the useful new objects, operations, and heuristics of those fields .
+2. Inductive Inference
+Many everyday tasks which we refer to as requiring `intelligence' involve th e
+making of decisions in the absence of complete information : While driving t o
+work in the morning, what route is best at that particular hour? What did tha t
+announcer say? Is that a police car behind me ?
+In each case, how is a plausible solution obtained? Each of us has, over th e
+years, built up a large collection of more or less general rules of thumb . A
+typical rule might be "After 8 a .m . the expressway gets crowded" . One then
+applies these rules to the current situation . Although each rule is quit e
+minuscule in scope, their union suffices to cover most common situations .
+Scientists who have studied such phenomena have frequently selected quit e
+restricted inductive activities for their subjects . Perhaps the simplest inductiv e
+inference task is that of sequence extrapolation . One is given the opening few
+terms of a sequence, and asked to guess what the next term is :
+1 1 8 1 27 1 64 1 125 1 ? ?
+Notice how we assume some kind of simplicity measure on the solution space ;
+really, any answer is legally possible .
+The informal rules for this task include the concept of splitting the sequenc e
+into two or more subsequences (as in this case, every second term is `1'), th e
+notion of successive differences (thereby yielding a new sequence which may b e
+easier to extrapolate), and finally the notion of repeating and composing al l
+these preceding techniques until the sequence is reduced to one that is
+recognized by inspection (such distinguished sequences might include : constan t
+ones, the integers in order, their squares, their cubes, the prime numbers, th e
+Fibonacci sequence, etc .) .
+Using just such a simple model, it is quite easy to build a computer progra m
+that out-performs humans at this task, and this was done in the early 1950s [29] .
+Tasks which draw upon a much larger data base (e .g ., cryptograms) cannot b e
+so easily mechanized .
+A full step more sophisticated than sequence extrapolation is the task o f
+concept formation . In the psychologists' experiments, a subject learns to discriminate when a stimulus is and is not an exemplar of the concept to b e
+mastered . Again, simple models exist and lead to concise, effective computer
+programs for this kind of inductive task [6, 38] .
+This classificatory activity historically precedes a more comparative an d
+eventually a metric kind of concept formation . Ultimately, one crosses th e
+fuzzy boundary and begins to do theory formation [2, 11] . But even at thi s
+sophisticated level, we claim our same simple model suffices : one applie s
+his/her rules of thumb to the current situation .
+
+	
+
+36
+
+D .B . LENAT
+
+Artificial Intelligence work has demonstrated—often to the dismay of th e
+researcher—that many apparently deductive tasks actually demand a larg e
+amount of inductive reasoning . Thirty years ago, the automation of foreig n
+language translation by machine seemed quite within reach—until the first suc h
+programs were written . One apocryphal story has the sentence "the spirit i s
+willing but the flesh is weak" translated word by word into Russian as "th e
+vodka is fine but the meat is rotten" .
+The same need for inductive reasoning was found when AI attempted t o
+write programs for such `deductive' activities as proving a theorem an d
+identifying a molecule based on its mass spectrogram . The whole recen t
+emphasis on frames [25] and scripts [33] is merely the realization that much of
+our everyday life is spent in forming simple theories about our environment .
+Based partly on limited sense data and based heavily on past experiences, w e
+have a tentative model of the room we're in, the state of mind of ou r
+companions, the immediate future, etc. So inductive inference permeates ou r
+lives, at all levels .
+Yet nowhere is the use of inductive reasoning so explicit as in the process of
+scientific research . The scientific method reads like a recipe for induction :
+constrain attention to a manageable domain, gather data, perceive regularity i n
+it, formulate hypotheses, conduct experiments to test them, and then use thei r
+results as the new data with which to repeat this cycle again .
+The preceding discussion suggests that a good task domain in which t o
+investigate inductive thinking is science itself . Thus, one expects to fin d
+psychological studies of scientists in vivo, and AI programs which carry ou t
+simple kinds of scientific research . Both have been unduly sparse .
+The first notable AI program which attempted to mechanize a scientific method activity was DENDRAL, and there have been only a handful of attempt s
+since, most of them emerging from Stanford's Heuristic Programming Projec t
+[7] ; but see also [22, 32, 37] .
+There has been a gradual realization that the scientist's rules of thum b
+should be elicited explicitly . With this has come the discovery that one' s
+conscious rules are not sufficient to account for creative scientific behavior . B y
+various techniques, such as confronting the expert with a case in which hi s
+decision is inconsistent with his stated rule set, the knowledge engineer elicit s
+additional judgmental rules that the expert used without conscious control .
+This process—knowledge acquisition from an expert—is a bottleneck in th e
+process of building expert systems today . The neck of the bottle is narro w
+indeed for those fields in which there is as yet no human expert . Inquiries int o
+inductive reasoning, such as the projects reported in this paper, may eventuall y
+enable programs to learn some of the needed heuristics on their own .
+We can recap the central argument of Sections 1 and 2 as follows : real-worl d
+learning spans a spectrum, from rote to discovery . Surprisingly often, eve n
+when carrying out tasks we think of as deductive, we are at the inductiv e
+discovery end, because Nature provides much less help than does a human
+
+	
+
+NATURE OF HEURISTICS II
+
+37
+
+teacher . Under these conditions, effective learning requires a strong model o f
+the domain . Induction, using a deep model, is precisely what we mean b y
+theory formation, which is the subject of this paper . The world is too comple x
+to be modelled deeply in any formal way, but a dynamically-growing body o f
+heuristics might suffice . Heuristics span the sorts of guidance needed to cop e
+with the world, and they can be accreted and improved gradually . Even thi s
+sort of model is difficult to build, as heuristics are not easily elicited from
+experts (and there are many important new fields where experts hardly exis t
+yet) . The EURISKO research programme is built on the hope that heuristics ca n
+help at this meta-level as well, help in building and extending and testing ne w
+heuristics .
+3 . The Accretion Model of Theory Formatio n
+The AM program assumed a simplified model of theory formation . Based on it s
+behavior, we added Steps 5 and 6, producing the following revised model, upo n
+which the EURISKO program is based . In the next section, we carry throug h
+about forty examples, from five of EURISKO ' S domains, to illustrate this model .
+Accretion model of theory formatio n
+Step 1. Given some new (not fully explored) definitions, objects, operations ,
+rules, etc ., immediately gather empirical data about them : find examples of
+them, try to apply them, etc .
+Step 2. As this progresses, try to notice regularities, patterns, and exception s
+to patterns, in the data .
+Step 3. From these observations, form new hypotheses and modify old ones .
+In a world over which you have some control, design and carry out experiment s
+to test these hypotheses .
+Step 4 . As a body of conjectures develops, economize by making ne w
+definitions that shorten the statement of the most useful conjectures . Th e
+entire cyclic process now typically begins anew at Step 1, given these ne w
+definitions as grist .
+Step 5. As the above loop (Steps 1–4) proceeds, it will become necessary
+from time to time to abstract some new specific heuristics, by compiling th e
+learner's hindsight .
+Step 6. On even more rare occasions, it will become necessary to augment o r
+shift the representation in which the domain knowledge is encoded .
+Step 7. For all steps in this model, even Steps 5, 6, and 7, it suffices to collect
+and use a body of heuristics, informal judgmental rules which guide th e
+explorer toward the most plausible alternatives and away from the mos t
+implausible ones .
+There are several assumptions in this model, most of which are easy t o
+satisfy for human learners and not so trivial for machine learners . Step 1
+
+	
+
+38
+
+D .B . LENA T
+
+assumes the ability to gather data oneself . In most fields, this means employin g
+some instruments to sense or record phenomena, and despite the micro computer revolution most instruments are still designed to present their result s
+to human eyes and ears, and to accept their inputs and instructions fro m
+human hands and feet . Conceptualizing in the world of recombinant DNA i s
+fine, but a program which proposed an experiment or a new lab procedur e
+would have to pause while a human expert carried it out and reported th e
+results . The only fields where a kind of direct sensing of and experimentin g
+with the environment is possible today is the category of fields which ar e
+internally formalizable, that is, for which machine-manipulable simulations o r
+axiomatizations exist . This includes the various fields of mathematics, games ,
+programming, and precious few others . Certainly simulators can be found i n
+other areas, but the program would be trapped in whatever world the simulation defined . For instance, suppose a program is supposed to form theorie s
+about physics, and we supply a (Newtonian) simulator . It may carry out an y
+number of experiments, but it will never achieve more than a rediscovery o f
+Newtonian mechanics (perhaps a reformulation such as Lagrange's), for it s
+world genuinely is nonrelativistic . Most of the fields which AM and EURISK0
+explore are internally formalizable, or are carefully-selected subfields of othe r
+disciplines, subfields which do admit an adequate machine formalization .
+Step 2 in the model innocuously requests the learner to be observant fo r
+recognizable patterns . That assumes that he/she/it has a large store of know n
+patterns to recognize, or is working in a world where an adequate set can b e
+learned very quickly . Langley [14] presented a comprehensive listing of ver y
+general low-level pattern-noticing rules, and an appendix to [5] presented man y
+higher-level ones found in M . Both BACON and AM assumed that the noticing
+`demons' could be largely domain-independent, and, while that has worked s o
+far, it bears repeating that it is only an assumption . Human beings, of course ,
+already possess a rich store of facts and images to match against ; the process of
+`recognizing' blends continuously into `analogizing' .
+The activity in Step 3 is largely one of generalization (of regularities noticed )
+followed by specialization (into new specific questions and cases whic h
+experiments can test) . The latter activity once again presumes access to the
+world—either through direct sensors and effectors, or via a simulation (o r
+formalization) good enough to provide answers to previously unasked questions . Deeply embedded into this point is a set of metaphysical assumption s
+about the world : most phenomena should be be explainable by a small set of
+simple laws or regularities, knowledge comes from rational inquiry, causality is
+inviolable, coincidences have meaning, etc .
+The fourth step in the model appears simple enough, but a subtle differenc e
+crops up in the results obtained mechanically and by people . Even though tw o
+bodies of (new) definitions may be isomorphic, there is great psychological
+import attached to appropriate naming of the new concepts . Humans can dra w
+upon their rich reserve of metaphor and imagery once again ; programs must
+
+	
+
+NATURE OF HEURISTICS II
+
+39
+
+work hard to do much better than names like G000sl . Large blocks of code i n
+both AM and EURISKO deal with choosing names for newly-defined concepts, bu t
+even so most of these are noncreative mergings of old names, and a human i s
+often consulted for more evocative concept names . Step 4 also assumes tha t
+new terms are introduced to shorten hypotheses and conjectures and th e
+statements of other terms' definitions ; while that is true, humans may hav e
+other reasons for introducing new terms : completeness (e .g ., extending a
+metaphor in which several other terms already have meanings), symmetry (e .g . ,
+defining the complement of a useful subset), etc .
+Step 5 assumes that heuristics can be synthesized, kept track of, evaluated ,
+modified, etc ., just as any domain object or operation could be . This was no t
+part of AM's model, and it limited AM's behavior as a result . This point glibly
+requires that, as new knowledge is gleaned, new heuristics somehow come int o
+being, rules which can guide the explorer using the new concepts . While thi s
+does happen `somehow' for human beings, any program which explores ne w
+territory must possess a concrete method for acquiring the needed ne w
+heuristics .
+Step 6 makes the analogous assumption for representation of knowledge :
+that the program can reason about, produce, and modify new pieces of its ow n
+representation language . A simple case of this is when EURISKO defines a new
+kind of slot for its frame-like language . The synthesis and modification o f
+heuristics is potentially explosive, so must be a rare activity ; the synthesis an d
+modification of the learner's (program's) representation for knowledge must b e
+an even rarer event .
+Step 7 assumes that a large body of heuristics is available, can be efficientl y
+accessed, provides the requisite guidance, etc . The italicised clause in Step 7
+indicates that it applies to every one of the steps in the model, even to Steps 5 ,
+6 and 7 . That means that a body of heuristics can guide the discovery ,
+evaluation, and modification of heuristics ; a body of heuristics can guide th e
+evolution of the representation being employed ; and, finally, a body of heuristics can guide the application of heuristics in each situation .
+The model has many shortcomings and poor reflections of reality built int o
+it . Obviously one does not follow Steps 1–6 in a precise loop, ad infinitum, bu t
+rather carries out many of the activities in parallel . Occasionally a kind o f
+back-up is called for, when a result is found to be in error . Uncertainty in data
+and reported results is inevitable, and this makes it cost-effective to doubl e
+check earlier results whenever possible . The model of course says nothin g
+about a field developing abnormally due to funding, emergence or death o f
+individual practitioners, mores and taboos, results in other fields (often apparently unrelated nontechnical fields like politics, economics, or religion), an d
+so forth .
+We add to the model our conviction that each step involves inductiv e
+reasoning, that each step can be adequately modelled as a search . These
+searches take place in immense search spaces (e .g ., the space of all possible
+
+	
+
+40
+
+D .B . LENAT
+
+regularities to look for, the space of all possible new definitions to make), an d
+the heuristics serve to constrain the generation of, and the exploration of thos e
+spaces .
+By and large, most technical fields appear today to follow this Baconia n
+development, perhaps with occasional upheavals as described in [12] . Bear i n
+mind that from now on this model will be assumed to be adequate ; neither th e
+examples presented subsequently in this section nor the programs described i n
+later sections are designed to test that model, but rather merely to operationalize, illustrate, and employ the model to good effect . Only the long-rang e
+success or failure of this research programme has anything to say about th e
+adequacy of the model, and even that is weakly suggestive evidence at best .
+4 . Examples of Using Heuristics to Guide Theory Formatio n
+Our purpose here is to illustrate the basic model of learning by discovery ,
+specifically Step 7 : the use of heuristic rules to guide a researcher . To do that ,
+we provide dozens of examples drawn from disparate domains, including finit e
+set theory, elementary number theory, naval fleet design, VLSI device physics ,
+and Lisp programming . In each case, the examples we provide are taken fro m
+the actual behaviors of the AM and EURISKO programs . Occasionally, a non technical example from `everyday life' is provided, and those were no t
+generated by the programs .
+Rather than organizing these examples by task domain, we have chosen t o
+highlight Step 7 by organizing them by heuristic . Thus, we will state a heuristi c
+or two, and give examples of its use in several fields . Some of these example s
+result in new heuristics being synthesized and added to the set guidin g
+EuRIsxo's behavior, and some result in new types of slots being defined an d
+added to EURISKO ' S representation language . The key idea is that the sam e
+heuristics can be used for all three `levels' of activity (inducing domain
+concepts, heuristics, and representations) .
+It is worth noting that these heuristics are far more specific than the genera l
+`weak methods' [27] such as hill-climbing, generate and test, and means–end s
+analysis . They are also much more general than the domain-specific rule s
+usually incorporated into expert systems [7], such as those mentioning term s
+like king-side, ketones, or carcinoma . Consider, as our first example heuristi c
+R7 .
+4.1 . Making parts coincide
+R7 :
+
+if f is an interesting function which takes a pair of A's as inputs,
+then define and study the coalesced function g(a) = di f(a, a) .
+
+Let us examine some applications of R7 in the domain of elementary finit e
+set theory . If f is `Set Intersection', then R7 applies, because f takes a pair o f
+sets as its arguments . R7 suggests studying the function Intersect(s, s) . The AM
+
+	
+
+NATURE OF HEURISTICS II
+
+41
+
+program carried through this line of reasoning, and (following Step 3 in ou r
+accretion model of theory formation) began choosing random examples of set s
+to run the Self-Intersect function on . But every time it was run, that function
+returned its original argument . Thus, R7 led AM to the conjecture that—
+empirically at least—a set intersected with itself is unchanged . If f is `Set Union', again the coalesced function is the same as the identity function, an d
+R7 thus leads to the realization that unioning a set with itself leaves i t
+unchanged . If f is `Set-Difference', g(s) = s –s = 0 : i .e ., a set minus itself is
+always (again, at least empirically on a few hundred cases examined) the empty
+set . The same result occurs when f is `Symmetric-Difference' . If f is `Member of', then the coalesced function computes Member(s, s), which is never True ,
+thus leading to the conjecture that a set is never an element of itself and, les s
+directly, the concept of infinity . If f is `Set-Equality', then the coalesce d
+function is computing Equal(s, s), which is always True . This leads to th e
+result that a set is always equal to itself . Given some simple generalizatio n
+abilities, those last two experiences led the program to define two extreme type s
+of relations (binary predicates), those for which P(x, x) always holds (reflexiv e
+relations) and those for which P(x, x) never holds (antireflexive relations) .
+But R7's usefulness is not limited to set theory . Analogues to the abov e
+results accrue when R7 is applied to various logical functions, such as XOR ,
+OR, AND, IMPLIES, etc . In elementary number theory, one function which
+satisfies the condition of R7 is addition . R7 suggests defining Plus(x, x) ; i .e ., th e
+doubling function . When f is multiplication, R7 produces a new function g
+which is squaring . When f is subtraction, g is always 0, leading to the resul t
+that x – x = 0 . When f is division, g is always 1, leading to yet another usefu l
+regularity . When f is `divides-into', R7 leads to the conjecture that x alway s
+divides x . Similar minor results are obtained when f is gcd, 1cm, rem, >, an d
+mod .
+Turning to computer science, one can consider what happens when f is
+`Compile' . The resultant function g computes Compile(c, c), which takes a n
+optimizing compiler c, hopefully written in the same language L which i t
+compiles, and runs c on c, thereby turning out a (probably) faster compiler fo r
+L . Focusing on a specific language such as Lis p , R7 suggested NCONC(l, 1 )
+which makes a list 1 circular, and INTERSECT(l, 1) which eliminates multiples
+copies of elements from 1. CONS(l, 1) and APPEND(l, 1) are useful for building
+arbitrarily large list structures . PROGN(l, 1) led to the notion of side effect s
+(when comparing its behavior to simply evaluating 1) .
+Turning to less technical domains, R7 can help in both understanding an d
+generating plot twists in stories ; that is, view them as scripts [33] with a larg e
+number of slots which are the arguments to the script . R7 then says to watc h
+for—or consider—what happens when a pair of the slots are filled in with th e
+same value . In the Theft script, for example, three of the slots are `thief' ,
+`victim', and `investigator' . Many dramas have been based on all three of th e
+possible cases of co-occurrence . Most languages have prefixes, such as our
+
+	
+
+42
+
+D .B . LENAT
+
+`Auto-' and `Self-', which effectively perform the kind of coalescing called fo r
+by R7 .
+One of the tasks which we examine in more detail in [21] is the design of
+naval fleets, specifically an annual competition based on a large collection o f
+published constraints and a simulator capable of resolving battles between a
+pair of fleets . For example, if hull armor is increased on a ship, then formula e
+allow one to calculate the additional cost, weight, loss in agility, gain in
+protection against various types of damage, additional engine capacity and fue l
+required, etc . One type of craft which is commonly included is a fighter, which
+is carried into the area by a carrier . Following R7, the possibility was considered of building fighters that could transport themselves into the battle area ;
+due to the way the constraints were set up, this turned out to be a ver y
+powerful—if bizarre—design tactic . Essentially, each fighter was equipped with
+just enough `sailing' and `launching' equipment for it not to need a carrier .
+Once airborne, this excess equipment was jettisoned . EURISKO originally uncovered this tactic more or less accidentally, but did not properly appreciate it s
+significance ; EURISKO now has heuristics which we believe would have success fully rated it highly . This design tactic caused the rules publishers to modif y
+the constraints, so that in 1982 one could not legally build such a thing .
+A second use of R7 in the naval design task, one which also inspired a rule s
+change, was in regard to the fuel tenders for the fleet . The constraints specified
+a minimum fractional tonnage which had to be held back, away from battle, i n
+ships serving as fuel tenders . R7 caused us to consider using warships for tha t
+purpose, and indeed that proved a useful decision : whenever some front-line
+
+NOT(A )
+
+A side-view diagram of a single (leftmost) piece of metal controlling two gates . The region s
+labelled `channel' are intrinsic channel, coated with a thin oxide layer on both their top and botto m
+surfaces. If the input A is 1, a connection exists across the bottom channel, and the rightmost n-dope d
+region is brought to 0, therefore the output (rightmost metal tile) is O . If the input A is 0, a connectio n
+exists across the top channel, and the rightmost p-doped region is brought to 1, therefore the output i s
+I . Note that the two metal regions are not touching .
+FIG . 1 .
+
+	
+
+NATURE OF HEURISTICS II
+
+43
+
+ships were moderately (but not totally) damaged, they traded places with th e
+tenders in the rear lines . This maneuver was explicitly permitted in the rules ,
+but no one had ever employed it except in desparation near the end of a
+nearly-stalemated battle, when little besides tenders were left intact . Due to th e
+unintuitive and undesirable power of this design, the tournament director s
+altered the rules so that in 1982 and succeeding years the act of `trading places '
+is not so instantaneous . The rules modifications introduced more new synergies
+(loopholes) than they eliminated, and one of those involved having a shi p
+which, when damaged, fired on (and sunk) itself so as not to reduce the overal l
+fleet agility .
+We give one final example of the application of R7, this time in the domai n
+of designing three-dimensional VLSI devices [20] . Each gate consists of a piece o f
+metal (actually any conductor, e .g ., polysilicon) either above or below a n
+oxide-coated piece of intrinsic channel material . Flanking the channel are tw o
+regions of doped semiconductor material . One application of R7 which is i n
+standard practice is to make a doped region from one gate and a doped regio n
+from an adjacent gate coincide (i .e ., be the same physical region) . A new ,
+three-dimensional application of R7 was to allow the piece of metal to serv e
+simultaneously as the control for a gate above it and below it . See Fig . 1 . On e
+specific use for this was in the design of the single-gate inverter, shown in Fig .
+1 . This was the first high-rise VLSI chip successfully fabricated [8] .
+4.2 . Generalizing rare predicates
+For our next series of examples, consider the following heuristic .
+R8 :
+
+If a predicate P rarely returns True ,
+then define a new one which is similar to, but more general than, P .
+
+By a predicate we mean simply a function whose range is the set {True ,
+False} . By negating the predicate, R8 also can be written : if a predicate rarel y
+returns False, then define new specializations of it . When R8 is relevant, its
+then-part places a new task on the agenda, namely that of generalizing P.
+When attended to, other heuristics must decide on plausible ways to generat e
+such new predicates . We give examples of this process below .
+In the domain of elementary set theory, one predicate rarely satisfie d
+(empirically, on randomly chosen sets from a fixed universe) is Set Equality(sl, s2) . One algorithm for computing this is :
+Step 1 . If sl and s2 are both empty, return True .
+Step 2. Choose an element of s 1 (if s 1 is empty, return False) .
+Step 3 . Verify that it is in s2 (else return False) .
+Step 4 . Remove it from both s 1 and s2 .
+Step 5. Recur ; i .e ., go to Step 1 .
+One way to generalize this predicate is to modify its algorithm, say by
+
+	
+
+44
+
+D.B . LENAT
+
+eliminating Step 3, the verification of the chosen element being in s2 . What
+happens in Step 4, then? One possible interpretation is that the item is re moved from s 1 and (if it is present in s2) from s2 as well ; that makes the predicate
+computed by the algorithm `Superset-of' . A second version of Step 4 (that AM
+discovered) removed some item from sl and some item from s2 . The algorith m
+now takes a pair of sets, strips elements from each of them, and repeats this ove r
+and over again . If one becomes empty before the other, it returns False, but if the y
+both become empty simultaneously, it returns True . Thus, the new algorithm test s
+whether or not the two sets have the same number of elements . This new
+predicate, Same-Length, is of course an extraordinarily useful test and led AM t o
+the concept of Cardinality .
+A different generalization of Set-Equality occurs if we modify Step 2 in th e
+above algorithm so that if s1 empty, it returns True instead of False . The ne w
+predicate being computed is now Subset-of .
+Turning from sets to numbers, one important predicate is Divides . Here is an
+algorithm for computing whether n divides evenly into m :
+Step 1 . Factor n into a bag (multiset) of primes .
+Step 2 . Factor m into a bag of primes .
+Step 3 . Call SUBBAG (similar to SUBSET) on the two previous results .
+As before, heuristic R8 may apply, say in a situation where large numbers
+are involved and very few of them divide evenly into each other . One way to
+generalize the Divides predicate is to modify the above algorithm, say b y
+replacing SUBBAG by a call on one of its generalizations : DOES-INTERSECT, SHORTER-THAN, SUBSET, etc . These yield, respectively, three
+new predicates on numbers : NOT-RELATIVELY-PRIME, FEWER-FACTORS, and an interesting predicate that has no concise English name . Indeed ,
+all three of these are generalizations of DIVIDES ; i .e ., wheneve r
+DIVIDES(n, m) returns True, so do the three new predicates . The last tw o
+predicates may or may not lead to a dead-end, but the first one led into a n
+exploration of relative primeness, which is known to be a fruitful area .
+R8 is useful in geometry, where rigid predicates such as Equal-Polygons wer e
+relaxed by AM into fruitful tests such as Congruent, and interesting (if not to o
+useful) ones such as Equi-side-lengths and Sharing-a-common-angle .
+4 .3 . Inverting extrem a
+A very different, but equally potent heuristic is the one which counsel s
+examining extreme cases of known relations .
+R9 :
+
+If f is a known, interesting function, and b is a known, interesting, extreme subset of it s
+range ,
+then define and study f - '(b) .
+
+In the realm of finite sets, one interesting function is Intersection . Its range i s
+Sets, and an extreme kind of set might be an extremely small set, say the empty
+
+	
+
+NATURE OF HEURISTICS 11
+
+45
+
+set . Thus R9 recommends defining pairs of sets whose intersection is empty :
+but this is just the powerful and useful concept of disjointness . A related use o f
+R9, with f = Intersection and b = Singletons, defines the relation that hold s
+between pairs of sets when they have precisely one element in common ; chain s
+of such sets are useful in more advanced mathematical constructions .
+R9 is more powerful in number theory than in set theory, however . On e
+application was made by AM, with f = Divisors-of and b = Doubletons . That
+defined the set of numbers with precisely two divisors—namely, prime numbers . Actually, R9 also caused the definition of the set of numbers with thre e
+divisors, the set of numbers with one divisor, etc ., as well . A related us e
+occurred when R9 caused the definition of numbers with an extremely larg e
+number of divisors . Some unusual relations were noticed about such numbers .
+Later, once primes had been shown to be a useful albeit extreme kind o f
+number, R9 applied again, with f = Divisors-of and b = Primes . That is, R 9
+defined the set of numbers having a prime number of divisors . Whether or not
+anything was ever proved about that concept, it is intuitively pleasing as th e
+right sort of new definition to make and investigate . It turned out, incidentally ,
+that the only such numbers are all primes to some power, indeed they are o f
+the form p q- ', for some primes p and q .
+In the naval fleet design task, R9 was used quite heavily . The functions f i n
+that simulated world apply to the design and behavior of fleets and o f
+individual ships : FleetComposition, Agility, Armor, WeaponVariety ,
+TimeToEngage, etc . R9 caused the early consideration of ships (and fleets )
+with extreme values for these functions . This proved fortuitous, as the ultimate
+design did settle on a fleet containing almost all identical ships, each wit h
+nearly minimal agility, maximal armor, maximal weapon variety, almost all o f
+which engaged with the enemy immediately, etc . One extremal ship employe d
+in the 1981 tournament was a tiny but incredibly agile ship, with no offens e
+whatsoever, that simply could not be hit . Although this was no longer legal i n
+1982, a ship with massive offensive capability and no defense was instrumenta l
+in that new fleet .
+In the VLSI design task, R9 was used to focus attention on various kinds o f
+goals : designing a circuit with minimal power usage, maximal speed, minima l
+volume, minimal number of separate masks required, and so on . R9 encouraged
+focusing on one such extreme at a time, and often these partial results could b e
+melded together into solutions satisfying several of the constraints at once . Fo r
+instance, reducing volume, power, and cycle time all reinforce each other ,
+encouraging more cubical chip designs, more foldings .
+In the programming domain, R9 was applied to good effect with f = Time .
+This focused attention on applications of functions that took abnormally lon g
+or short times to compute . Strange results were obtained, such as a functio n
+which determines if two equal list structures are EQ to each other by measuring the time it takes EQUAL to return a value! (In that case, f was actuall y
+Time-of-Equal, and b was the set of abnormally fast times, relative to the mean
+
+	
+
+46
+
+D .B . LENAT
+
+time for computing EQUAL .) This line of inquiry eventually led to th e
+definition of List, objects which could never be EQUAL-but-not-EQ—namel y
+atoms . Another use of R9 in the Lisp programming world was with f = NCON C
+and b = Circular-lists . This yielded a quite atypical algorithm for computin g
+whether one list structure is a subtree of another (namely, perform NCON C
+and then test to see if the result is circular) .
+Nontechnical uses of R9 abound ; we present here only two related ones . I f
+f = Employed-As, the function that maps a person to the set of jobs he/sh e
+holds, then some extreme kinds of values might be abnormally large sets (> 1
+member) or extremely small sets (< 1 member), since almost everyone ha s
+exactly one job . These two derived concepts correspond to moonlighters an d
+the unemployed . If f is Income, which maps a person to his annual gros s
+earnings, then R9 would cause the definition of Lowlncome and HighIncom e
+categories of people . Notice how this sets the stage for noticing, say, tha t
+moonlighters, as a group, do not have significantly higher incomes than thos e
+who hold down just one job .
+4.4 . Noticing fortuitous bargains
+So far we have looked at three heuristics for generating plausible new concept s
+and conjectures . The next heuristic we consider is concerned with evaluatin g
+such new discoveries for interestingness .
+RIO :
+
+If some normally-inefficient operation can be done quickly on X's ,
+then X is a more interesting concept than previously thought.
+
+After working with sets for a long time, suppose one introduces the notion o f
+a list . Many of the operations which were slow on sets, can now be speeded up .
+For instance, Insert need no longer check that the item it is inserting is no t
+there already ; thus it takes constant time instead of linear time to perform . The
+predicate Equal can simply march down the two lists in order, haltin g
+whenever there is a discrepancy, so it now runs faster too . These make Lists a
+more attractive concept, and worth exploring further ; heuristic RIO is the rule
+that makes this judgement .
+In number theory, representing numbers as bags of primes (their prim e
+factors) makes multiplication very speedy, though it does make addition an d
+subtraction crawl . But because it does speed up some operations, it was judge d
+(by RIO) interesting enough to remember it, and indeed that representatio n
+does turn out to be useful, e .g ., in some proofs in number theory .
+We shall illustrate R10 in a nontechnical setting : consider the various
+representations one might employ to convey the instructions for assembling a
+bicycle . There could be an exploded-view diagram of the bike, a linea r
+sequence of verbal commands, a predicate-calculus axiomatization of some o f
+the pieces (their structure, function, and assembly), a set of production rule s
+which embody the expertise to assemble it, etc . Each representation is parti-
+
+		
+
+NATURE OF HEURISTICS II
+
+47
+
+cularly good at some types of inference, and bad at others . The exploded vie w
+is great for telling which pieces touch which others, or where a specific piec e
+goes . The linguistic instructions are good for step-by-step assembly, but may b e
+quite frustrating when problems develop which are not covered in the instructions . The predicate calculus may be good at answering derived questions ,
+such as : what set of tools should I prepare ahead of time ; what might b e
+causing the rear axle bearing to wear out so often? The production rules migh t
+be best at responding to whatever situation the assembler was in, but might b e
+nearly impossible to `look ahead' at in a browsing, planning, or doublecheckin g
+mode . Each of these representations is worth studying and having, because i t
+makes some operations very quick, operations which are very costly in other
+representations . This illustrates R10, but is also the basic reason for having an d
+using multiple representations of knowledge .
+4.5 . Gathering empirical data
+One of the most important types of tasks the theorizer performs is that of dat a
+gathering . Our next heuristics, R11, R12, and R13, are three techniques fo r
+finding instances of a concept about which we wish to know more .
+R11:
+
+If you want to find examples of some concept C with a recursive Defn ,
+then from the `base step' of the recursion, read off a trivial example .
+
+R12 :
+
+If you want to find examples of some concept C with a recursive Defn, and you kno w
+some examples of C already ,
+then plug the examples into the recursive step of the definition and unwind that step t o
+produce a new, longer example .
+
+R13 :
+
+If you want to find examples of some concept C, and you know some function F whos e
+range is C,
+then find some instances of F in action ; the values returned are C's .
+
+Suppose we have defined `Sets', but have not looked at any examples o f
+them so far . How might we find some? R11 says to look at the definition o f
+Sets, which might say that s is a set if it is empty, or if its first element i s
+nowhere else inside the set, and, when you strip off that first element, what yo u
+have left satisfies the same definition of set :
+IsSet(s) =
+
+df
+
+s
+
+= { } or AND(Notlnside(CAR(s),CDR(s)),IsSet(CDR(s))) .
+
+Here we assume that CDR is any repeatable function which strips off a n
+element of a set, and CAR is a function that yields the value of tha t
+stripped-off element . Sets are represented as Lis p lists with no repeated elements permitted, hence CAR and CDR can have their usual Lisp definitions .
+RI I applies to the task of generating examples of sets and says to locate th e
+base step of the definition, which is 's = { }' . This does indeed supply a trivia l
+example of a set, namely the empty set .
+
+	
+
+48
+
+D .B . LENAT
+
+R12 says to plug a known example of a set into the recursive step of th e
+definition and `unwind' it . So we find the recursive step . IsSet(CDR(s)), set u p
+an equation of the form CDR(s) = (known example), and plug the empty set
+(written NIL in Lisp ) in as the known example : CDR(s) = NIL . This sets up a
+small, well-defined problem : create a Lisp list structure whose CDR is NIL . A
+hit of Lis p knowledge about CONS suffices, namely that CONS(x, x) has a CD R
+which is x. (Incidentally, this piece of knowledge was generated by R7' s
+defining of SelfCONS(x) = CONS(x, x), and subsequent exploration of Self CONS .) Thus a new example of a set should be CONS(NIL,NIL), which i s
+{{ }}, which is indeed a valid new example . R12 can apply again, with th e
+known example being If }} this time, further unwinding the definition t o
+produce a longer example .
+R13 also applies to the task of finding examples of Sets . It says to look fo r
+functions whose range is `Sets' ; this might include Intersect, Union, PowerSet ,
+Symmetric-Difference, etc . Now that a few examples of Sets exist, R13 sugges t
+plugging them in as inputs to these various functions, and often a new set i s
+generated as the output . For instance, the PowerSet of {{ }} is {{ }, {{ }}} .
+The instance-finding heuristics can be used to find examples of functions a s
+well as objects, and numeric concepts as well as set-theoretic concepts . Consider the arithmetic function for multiplication ; here is a definition for it :
+Times(x, y)
+
+= df
+
+if x = 0 then 0
+else Plus(y, Times(x — 1, y)) .
+
+R11 finds the base step and immediately generates a few examples of th e
+form Times(0, 9) = 0, Times(0, 0) = 0, Times(0, 1) = 0, etc . R12 locates th e
+recursive call on Times, and notes that when x 1 = 0 . Times(x 1, 9) = O .
+Unwinding this produces the example : Times(1, 9) = Plus(9, 0) = 9 . The thir d
+heuristic, R13, also can be employed to find instances of Times . In thi s
+application of R13, the function F found is Apply (i .e ., FunCall), and R1 3
+causes the definition of Times to be applied to randomly chosen examples o f
+Domain(Times), i .e ., to pairs of natural numbers . A pair of numbers is chose n
+randomly, the Lisp code which defines Times executed, and the record o f
+(inputs, output) is recorded as a new example of Times in action .
+In the device physics world, a `Device' is defined as a structure built out o f
+primitive regions and smaller devices . When trying to find new devices, Rll is
+relevant, and draws our attention to the simplest types of devices, namely thos e
+that consist of a single region of some type of material . R12 is then useful for
+causing us to put these simple devices together into bigger and bigge r
+configurations . Once we have several devices, R13 is useful, since there are
+several operations that take a device or two and yield a new one : Reflect Device . OverlayDevices, Abut, Optimize, FoldDevice, etc .
+
+		
+
+NATURE OF HEURISTICS II
+
+49
+
+4.6 . Overlapping concepts
+The next heuristic, R14, says it is worthwhile to focus attention on the overla p
+of two promising concepts, when such an overlap is known to exist .
+R14 :
+
+If some (but not most) examples of X are also examples of Y, and some (but not most)
+examples of Y are also examples of X,
+then define and study the intersection of X and Y ; this new concept is a specialization
+of both X and Y, and defined by conjoining their definitions .
+
+In number theory, AM used R14 heavily, intersecting classes of interestin g
+numbers . E .g ., which primes are also palindromes ?
+R14 was used in set theory in an analogous manner, especially a varian t
+which could be applied to operations as well as objects . For example, it
+sometimes happens that two set-theoretic functions yield the same answer ; e .g . ,
+the PowerSet of set sl sometimes equals the UIClosure of another set s2 (i .e . ,
+the closure of s2 under all possible intersections and unions) . One example i s
+s 1 = {a, b, c}, s2 = {{a, b}, {a, c}, {b, c}}. A heuristic related to R14 (and to R7
+as well) caused the definition of a new binary predicate (a relation), which take s
+two sets and returns True iff the second's UIClosure equals the first's powe r
+set . Analogues of this `basis' concept are quite useful in topology .
+The converse of R14 is also useful .
+R15:
+
+If a concept already has a conjunction in its definition ,
+then define and study the concepts one gets by separating the conjuncts .
+
+In the fleet design problem, for example, each ship was presumed to hav e
+some military capabilities . Looking at the definition of such capabilities, they
+fall into two groups, which we might call offensive and defensive . Separatin g
+those two notions is quite useful . Often, R15 generates what turn out to b e
+extreme concepts .
+The major bug in using R15 is that `(AND x y)' can mean two quite differen t
+things in Lisp :
+(i) x and y are simultaneous conditions to be checked ;
+(ii) if x is verified to be true, then it makes sense to check y .
+In (ii), if x is false, then trying to check y might or might not lead to a Els e
+error . By splitting the conjunction, the new concept whose definition check s
+only y may well cause an error when it is evaluated . These bugs can sometime s
+lead to serendipitous discoveries . One fortuitous accident occurred in the VLS I
+design task, where AND was serving in role (ii) . The final test involve d
+checking neighbors of a region on a rectangular grid, and the precedin g
+conjuncts tested the array subscripts . When all but the final conjunct wer e
+eliminated, the array automatically `wrapped around', in the sense that a cell
+
+	
+
+50
+
+D .B . LENAT
+
+on the rightmost boundary thought its right neighbor was a cell on the leftmos t
+boundary of the array (and vice versa) . This led to a remarkably small desig n
+for a flip-flop, and when it was scrutinized the `bug' was revealed . Nevertheless
+that memory cell design can be realized in three dimensions, on the surface of a
+Mobius strip . See Fig . 2.
+
+0
+
+0
+
+0
+
+Substrate Laye r
+
+Metal Laye r
+
+Substrate Laye r
+
+1
+
+0
+
+Conventional circuit diagram for a flip-flop, and a side-view of the tiny design EURISKO
+produced due to a programming bug which it itself introduced . If that configuration of regions i s
+produced in three dimensions, given a half-twist, and the ends joined, then that Mobius strip device wil l
+indeed duplicate the functionality of the full flip-flop .
+FIG . 2 .
+
+	
+
+NATURE OF HEURISTICS II
+
+51
+
+4 .7 . Making conjecture s
+One important activity in theory formation is the synthesis of hypotheses an d
+conjectures . How are these done? Earlier, when stating our accretion model o f
+theory formation, we claimed that heuristics could guide those processes . Her e
+is one such heuristic :
+R16 :
+
+If the first few examples of a concept C have just been found ,
+then examine a typical one, and see what properties it satisfies ; then see if any of those
+properties is satisfied by all examples of C.
+
+For example, heuristic R9 above caused AM to consider the set of number s
+with exactly three divisors . It found a few examples of that set, and looked at a
+typical one, 9 (the divisors of 9 are 1, 3, and 9) . What properties does 9
+satisfy? It is odd, it is a perfect square, it is one larger than a power of 2, etc .
+Now look at the other few examples we found : 4, 25, 49 . The only property
+that holds for all of them is the one about being a perfect square, so that i s
+formed into a conjecture .
+In point set topology, R16 helps us find most of the theorems of the for m
+"The (product, intersection, . . .) of two (Closed, Finite, . . .) (Hausdorff ,
+Regular, Compact, . . .) spaces is (Closed, Finite, Normal, T1, . . .) ." In set
+theory, R16 leads to de Morgan's laws and many other common results .
+In the VLSI design world, after the first device was designed using the JMO S
+cross device EURISKO found [20], it was observed that it was difficult to produc e
+masks for and difficult to fabricate, but extremely small and fast . Several othe r
+properties were noted, but the ones just mentioned seemed to hold across al l
+subsequent devices using the cross device .
+In the fleet design world, once a new design was tested in simulated combat ,
+several characteristics of the conflict were noted (speed of victory, final state o f
+the victor, amount of tactical decision-making required, etc .) . These were
+formed into proto-conjectures, which were then tested by subsequent moc k
+battles, and any which held over most of the simulations were believed a s
+empirically valid . Thus R16 was a chief `workhorse' in finding conjectures i n
+several domains .
+4.8 . Multiple paths to the same discover y
+Heuristics often lead to the same concept or conjecture in several ways, alon g
+quite distinct paths . In one run of AM, the same body of heuristics ended u p
+defining multiplication in four different ways : as repeated addition, as the size
+of the Cartesian product of two sets, as repeated unioning, and finally b y
+unioning the powersets of two sets . The concept of prime numbers was als o
+derived in more than one way . Consider :
+
+		
+
+D .B . LENAT
+R17 :
+
+If an analogy is strong between A and B, but there is a conjecture (For all b in B . . . )
+whose analog is false ,
+then define the subset of A for which the analogous conjecture holds .
+
+R18:
+
+If a concept has a complement (negation) which is much smaller (rarer) ,
+then explicitly define and name that complement .
+
+One of the earliest and strongest number theory analogies is between
+addition and multiplication . They have identities (0 and 1, respectively), the y
+are commutative, they each take a pair of numbers and produce a new number ,
+etc . But one property that each natural number (bigger than 1) has is that it ca n
+be expressed as the sum of two smaller natural numbers . The analogou s
+conjecture would say that all natural numbers (bigger than, say, 2) can b e
+expressed as the product of two smaller natural numbers . Of course that's false ,
+but R17 causes us to define the set of numbers for which it's true—namely th e
+composite numbers . R18 has us also define the numbers for which the conjecture fails—namely the prime numbers . This is a second way in which prim e
+numbers are defined, quite different from the scenario using R9 we presented
+earlier .
+4 .9 . Anticipating bugs and special cases
+Sometimes a heuristic is an expert at anticipating a bug that may arise .
+R19:
+
+If you've just generalized C into a new concept G,
+then beware that G isn't really just the same as C . To doublecheck : are there any other
+specializations of G, and if so, have you looked for examples of them yet? If it turn s
+out to be true, at least you have a conjecture about C .
+
+In the set theory domain, Sets was generalized into UnorderedStructures . A t
+that time, only examples of Sets were known, so R19 almost forgot abou t
+UnorderedStructures . But in doublechecking, it found some examples of Bags ,
+thereby preserving the existence of all three concepts .
+In the number theory world, we generalized Numbers-which-equal-theirnumber-of-divisors—which was simply {1, 2}—into Numbers-which-are-no-larger-than-their-number-of-divisors . Unfortunately, this, too, seemed to includ e
+only the numbers 1 and 2 as examples ; R19 was the heuristic that had us chec k
+that . After extensive doublechecking, we gave up and discarded Numberswhich-are-no-larger-than-their-number-of-divisors . However, we were left wit h
+a new, tiny conjecture .
+In programming, this `false generalization' trap is even more prevalent . Sinc e
+programs are carefully engineered artifacts, they are often quite optimized .
+Thus, replacing EQ by EQUAL, say, in most places (in a piece of code whic h
+defines a concept) serves only to slow it down slightly, not truly generalize it .
+Some code mutation operations, such as adding unused extra arguments to a
+concept's Lis p definition, are almost guaranteed to be No-Ops . Indeed, most
+
+		
+
+NATURE OF HEURISTICS II
+
+53
+
+small changes to a program are either of no effect or of immense (usuall y
+catastrophic) effect . The analogy to biological mutation is clear ; see [19] .
+4.10 . Broadening a concept
+One kind of activity the theory builder engages in sounds quite risky but i s
+surprisingly often fruitful :
+R20 :
+
+If an operation C is useful, and is to be generalized somehow ,
+then consider just widening the domain of C ; that is, try to apply C to more inputs, an d
+see which can be accepted .
+
+In finding the values for infinite series, for instance, mathematicians per formed operations on them that they knew were unjustifiable and might lead t o
+errors (such as systematically rearranging the terms, or pretending the serie s
+were differentiable) . These methods often came up with the right answer, fro m
+which it was easier to go back and prove that that was the right answer .
+Differentiation and rearrangement can sometimes be fruitfully applied outsid e
+their 'legal' domains .
+Many times we write programs that can be run on slightly illegal arguments ;
+for instance, a numerically-oriented Lisp predicate that is based aroun d
+EQUAL and SORT may very well be runnable (meaningfully) on lists .
+In VLSI design, many of the 'lambda rules' in [23] are constraints which ca n
+be violated with impunity . The constraints are set up to guarantee the circui t
+will work, and are stricter than they have to be to permit a configuration tha t
+will probably work . Almost all of EuRtsxo's VLSI designs, not surprisingly it s
+best ones, simultaneously violate many of these constraints . In these cases ,
+components are not placed at random ; rather, we follow useful (though no t
+guaranteeable) placement strategies .
+4 .11 . Evaluating new concepts
+Many criteria for judging interestingness are domain-specific, but some of th e
+most important ones are quite general . R10 was such a heuristic ; here i s
+another :
+R21 :
+
+If exactly 1 element of a class satisfies an interesting property ,
+then that class becomes more intersting . This is especially true of a function that alway s
+produces an output satisfying this property .
+
+In set theory, when computing power sets, it was noticed that exactly on e
+element of the power set is empty, and that the largest element is equal to th e
+original set itself . The power of R21 is blunted in many set-theory instances ,
+however, as, when the output of a function is a set, it is always certain that n o
+two elements will be identical . Thus 'exactly one' is often no more rigorou s
+than 'at least one' .
+
+	
+
+54
+
+D .B . LENA T
+
+In the the number theory world, when examining the function that maps a
+number onto all its possible factorizations, it was noticed that precisely on e
+such factorization (for each number) consisted of a bag of all prime numbers .
+R21 was relevant, and it greatly increased the expected worth and interestingness of factorization . R21 also noticed that each number had exactly on e
+factorization into a bag containing 1 (namely, the number itself and 1) . Tha t
+proved less significant ultimately, but also served to boost interest in factorization .
+In VLSI design, one of the first devices produced (due to heuristic R7) was a
+piece of metal that was gating p-doped regions above it and n-doped region s
+below it . This device has the nice property that exactly one of the two possibl e
+channels will be on at all times (the upper channel if the metal is low, and th e
+lower if the metal is high) . Here was a device which takes in three inputs an d
+produces two outputs, and one of those outputs is always going to be `on', R2 1
+thus caused us to focus more attention on this device .
+4 .12 . Synthesizing new heuristic s
+The preceding eleven subsections exemplified the use of heuristics to synthesize, modify, and evaluate concepts in specific application areas, but w e
+have omitted discussion of heuristics operating on heuristics . Often, a new
+heuristic arises by applying (executing) an existing one which is capable o f
+generating new heuristics . Consider, for example ,
+R22 :
+
+If 2 slots (call them s1 and s2) of frame F can have the same type ,
+then define a new heuristic, attached to F, that says :
+"If f is an interesting F, and its s1 and s2 are of the same type ,
+then define and study the situation in which f's Si and s2 values are equal . "
+
+This is the most general rule that EURISKO contains about co-identification . I t
+has led to many powerful heuristics being synthesized . When F is taken to b e
+the frame for Functions, some of the slots that may have the same type ar e
+Argl, Arg2, and Value . Applying R22 to the slots Argl and Arg2 yields a new
+heuristic that says : "If f is an interesting function, and both its arguments ar e
+of the same type, then define and study situations in which the two argument s
+are equal ." This is just heuristic R7, which has already been shown to be mos t
+useful . Applying R22 to the slots Argl and Value yields another new heuristic ,
+one which says it's interesting to find the fixed points of a function . Applyin g
+R22 to the slots Domain and Range, the new heuristic says it's interesting if a
+function's domain and range coincide . All three of these heuristics wer e
+produced from the Function frame by R22 ; R22 can be applied to many othe r
+general frames with equally powerful results .
+Since R22 blatantly deals with the production of new heuristics, it is clearl y
+labelable as a meta-heuristic . The preceding paragraph shows that one need not
+
+	
+
+NATURE OF HEURISTICS II
+
+55
+
+represent or treat R22 in any special way, and indeed R19, discussed earlier ,
+can be used to detect poor new heuristics as well as poor new domain concepts .
+For example, generalizing a noncriterial slot of a heuristic (e .g ., the English
+text describing it) will not affect its behavior, and R19 would be on the lookou t
+for just such a mistaken `generalization' ; indeed a surprising fraction o f
+attempts to generalize heuristics led EURISKO to new ones which are not
+perceptibly different from the originals, and R19 is even more useful whe n
+working at the meta-level than it is at the domain-level .
+New heuristics arise frequently (both in real life and in runs of the EURISK O
+program) by specializing some existing, very general heuristic . Since man y
+specializations are possible, it is worth remembering (caching) any that turn ou t
+to be particularly useful . Consider, for example :
+R23:
+
+If f is interesting and can be computed ,
+then f(x) often shares many of the attributes of x.
+
+This is often incorrect, of course, so it doesn't pay to apply it too often . On e
+useful specialization of it is R9, in which case the `attribute' being preserved i s
+Interestingness . A similar specialization of R23 says it's interesting computin g
+the values of f on any of its interesting arguments . Yet another specializatio n
+says it may use a lot of resources (time and space) to compute and store th e
+value of f any domain elements which themselves take up a lot of space .
+R24:
+
+If A is similar to B in a key way, and uses less resources ,
+then A is interesting and worth preserving .
+
+This heuristic can apply to functions, and indeed one specialization of it i s
+R10 . It applies just as clearly to other heuristics, of course . In [181 we gav e
+more examples of heuristics which could apply even to themselves (If f is
+timeconsuming and not productive, then forget it ; If f is sometimes useful bu t
+always costly, then specialize f and hope for the best) . EURISKO did apply th e
+latter of these to itself, producing some more efficient, more useful specia l
+cases of it . Here is another heuristic, which applied to heuristics and to domai n
+concepts .
+R25:
+
+If f(Exs(A), Exs(B)) is nearly extreme ,
+Then combine Defn(A) and Defn(B) to yield a new concept's Defn . Prefer combinin g
+functions which are analogous to f.
+
+One use of R25 was when f = Symmetric-Difference, extreme = small, and
+combine = conjoin . That yielded heuristic R14, discussed earlier . Another use
+was f = Set-Difference, extreme = small, and combine = AndNot (i .e ., A(x, y )
+(AND X (Nor y))) . That produces a heuristic that says "If only a few example s
+of A are not examples of B, then define and study the concept `A's which ar e
+not 'B's . " Another heuristic which applies to meta- and domain-levels alike is :
+
+	
+
+56
+
+D .B . LENA T
+R26 :
+
+If s1 and s2 are slots filled by the same type of values, and s1(A) is more interestin g
+than s2(A), and usually s1's values are less interesting than s2's ,
+then define and study a new concept A', similar to A, by the constraint that s2(A') b e
+precisely s 1(A) .
+
+One specialization of R26 occurred with sI = NonExamples, s2 = Examples ;
+the resulting heuristic says "If the nonexamples of A are more interesting tha n
+its examples, then define and study that concept whose examples are precisel y
+A's nonexamples ; i .e ., the complement of A ." But this is just R18, which w e
+saw used earlier, so we've already seen (a special case of) R26 used at th e
+domain level, in particular defining prime numbers . R26 can also apply at th e
+level of generating new heuristics . Once, e .g ., EURISKO applied it with s1 =
+IfEnoughTime, s2 = IfPotentiallyRelevant, A = R26, and decided to produce a
+new heuristic R26' which was similar to R26 but explicitly added a clause to th e
+IfPotentiallyRelevant slot, saying "and there is plenty of CPU time availabl e
+before going on to the next task" . This turned out to be more useful than R2 6
+as it was stated above, because it tends to be such an explosive, time consuming rule to fire . Although worries about CPU time are usually les s
+interesting, less criterial, in this particular rule's case it was worth noticing th e
+exception, and rephrasing the rule accordingly . Eventually, the original R2 6
+lost more and more in Worth, as R26' increased, and R26 was finally archived
+by EURISKO . Although this was a case of a heuristic applying to itself, R26 (an d
+R26') can and did apply to other heuristics as well .
+5 . Conclusion s
+Our first attempts at programs that reasoned inductively were small system s
+which tried to induce Lisp programs from collections of input/output pairs [9 ,
+15] . These experiences led us to conclude that we might learn more abou t
+induction if the program's task were more open-ended, closer to full theor y
+formation rather than problem solving . This led to the design and constructio n
+of AM [16], which explored elementary mathematics concepts . AM was guide d
+by a body of informal heuristic rules, which helped it define useful new object s
+and operations, gather data, notice patterns, form conjectures, and evaluate th e
+interestingness of its discoveries . More recent work, on EURISKO, deals wit h
+several disparate domains, including elementary mathematics, VLSI device an d
+circuit design, fleet and ship design, and Lisp programming . The examples fro m
+Section 4 conveyed the flavor of EURISKO's processing . Section 4 was anecdotal, rather than theoretical ; we believe the time is not yet to attempt a forma l
+analysis . Section 4 .12 accounted for the discovery of several of the earlie r
+heuristics presented in Sections 4 .1–4 .11, and, finally, even for some heuristics
+which can apply to other heuristics .
+It is important to be skeptical of the generality of learning programs, as wit h
+any AI program ; is the knowledge base `just right' (i .e . finely tuned to elicit its
+
+	
+
+NATURE OF HEURISTICS II
+
+57
+
+one chain of behaviors)? The answer in earlier induction-program cases was a
+clear Yes [9,15], but in the case of AM, the answer is just as clearly No . The whol e
+point of the project was to show that a relatively small set of general heuristic s
+can guide a nontrivial discovery process down paths not preconceived . Eac h
+activity, each task on AM'S agenda, was proposed by some heuristic rule (lik e
+those illustrated in Section 4), which was used time and time again, in man y
+situations . It was not considered fair to insert heuristic guidance which coul d
+only `guide' in a single situation . In fact, all but a few heuristics were writte n
+down ahead of time, before a single line had been coded, before we had muc h
+idea what directions AM would, or even could take ; we expected it woul d
+always be working only on set theoretic concepts . EURISKO drives this clai m
+forward, by demonstrating that heuristics previously entered in one domain ca n
+successfully guide the exploration of new, quite different domains .
+As AM ran longer and longer, the concepts it defined were further an d
+further from the primitives it began with, and its performance slowed down .
+For instance, while it discovered them both, it had no way of telling a prior i
+that the UFT (all numbers have one unique factorization into primes) would b e
+more important than Goldbach's conjecture (all even numbers can be
+represented as the sum of two primes) . What a human learns, after working i n
+a new field for a while, is more than the terms, objects, operations, results, etc . ;
+he/she learns the necessary domain-specific heuristics for operating efficientl y
+with those concepts . AM'S key deficiency appeared to be the absence o f
+heuristics which cause the creation and modification of new heuristics .
+To remedy this situation, we conceived the EURISKO project . Its fundamenta l
+assumption was that the task of `discovering and modifying useful new heuristics '
+is qualitatively similar to the task that AM already worked on, namely 'discovering and modifying useful new math concepts' . Therefore, we assumed, th e
+heuristic synthesis can be performed by a program just like AM, but in additio n
+to having frames for objects like Sets and Truth-Values, the initial frame s
+now include heuristic rules . AM had primitive operators like Coalesce, Compose ,
+and Intersect, to which EURISKO added new operators that can work o n
+heuristics : generate, evaluate, and modify them . Just as AM only `worked '
+because it had a large corpus of heuristics to guide it, the EURISKO progra m
+works only thanks to the body of heuristics that guide it. These heuristics ,
+which one is tempted to call meta-heuristics or meta-rules [5], serve to propos e
+plausible syntheses and modifications to perform, experiments to try, etc ; they
+also warn when they detect implausible constructs and actions which th e
+program is spending time on .
+The careful reader will perceive that these activities are more or less th e
+same as the ones which AM'S heuristics were guiding it to do (albeit i n
+mathematics rather than in the domain of heuristic-finding) . That similarity led
+us to the most important decision in designing EuRisKO ; to not distinguish
+meta-heuristics from heuristics . The same rule might—and did—operate on
+
+	
+
+58
+
+D .B . LENAT
+
+mathematical objects, on VLSI circuits, on Traveller fleets, and on othe r
+heuristics .
+The revised model of theory formation was presented in Section 3 ; unlik e
+the original one on which AM was based, two important new steps were adde d
+(5 and 6), to the effect that heuristics could deal with other heuristics and eve n
+with representation of knowledge . The EIJRISKO program was built embodyin g
+this expanded model, and the reader is referred to [21] for details of it s
+architecture, results, and our conclusions from ten thousand hours' experienc e
+running that program .
+ACKNOWLEDGMEN T
+Productive discussions with John Seely Brown, Bruce Buchanan, Bill Clancey, Randy Davis, Ed
+Feigenbaum, Johan deKleer, George Polya, Herb Simon, Mark Stefik, and Mike Williams hav e
+heavily influenced this work . EURtsKO is written in RLL [17], a self-describing and self-modifyin g
+representation language constructed by Russ Greiner, Greg Harris, and the author . The threedimensional VLSI design work was pursued in collaboration with Bert Sutherland and Jim Gibbons .
+Saul Amarel, Judea Pearl and Elaine Rich provided many useful comments on drafts of this article .
+XEROX PARC's CIS and Stanford University's HPP provided superb environments (intellectual ,
+physical, and computational) in which to work . Financial support was provided by ONR (N00014-80 C-0609), ARPA, and XEROX .
+
+REFERENCE S
+1. Adams . J .L ., Conceptual Blockbusting (Freeman, San Francisco, CA, 1974).
+2. Amarel, S ., On the automatic formation of a computer program which represents a theory, in :
+M .C . Yovits, G .T . Jacobi and G.D . Goldstein (Eds .), Self Organizing Systems (Spartan Books ,
+Washington, DC, 1962).
+3. Amarel, S ., Representations and modelling in problems of program formation, in : B . Meltzer
+and D . Michie (Eds .) Machine Intelligence 6 (Edinburgh University Press, Edinburgh, 1971) .
+4. Seely Brown, J . and VanLehn, K ., Repair theory : a generative theory of bugs in procedura l
+skills, J. Cognitive Sci . 4(4) (1980) .
+5. Davis, R . and Lenat, D., Knowledge Based Systems in Artificial Intelligence (McGraw-Hill ,
+New York, 1981) .
+6. Evans, T .G ., A program for the solution of geometric-analogy intelligence test questions, in : M.
+Minsky (Ed .), Semantic Information Processing (MIT Press, Cambridge, MA 1968) 271-353 .
+7. Feigenbaum, E .A ., Knowledge engineering : the practical side of artificial intelligence, HP P
+Memo, Stanford University, Stanford, CA 1980 .
+8. Gibbons, J . and Lee, K .F ., One-gate-wide CMOS inverter on laser-recrystalized polysilicon ,
+IEEE Electron Device Letters 1(6) (1980).
+9. Green, C .R ., Waldinger, R ., Barstow, D ., Elschlager, R ., Lenat, D ., McCune, B ., Shaw, D . and
+Steinberg, L ., Progress report on program understanding systems, A1M-240, STAN-CS-74-444 ,
+AI Lab ., Stanford, CA, 1974 .
+10. Hadamard, J ., The Psychology of Invention in the Mathematical Field (Dover, New York ,
+1945) .
+11. Hempel, C .G ., Fundamentals of Concept Formation in Empirical Science (University of
+Chicago Press, Chicago, IL, 1952).
+12. Kuhn, T ., The Structure of the Scientific Revolutions (University, of Chicago Press . Chicago, IL,
+1976) .
+
+	
+
+NATURE OF HEURISTICS II
+
+59
+
+13. Lefrancois, G .R ., Psychological Theories and Human Learning (Wadsworth, Belmont, CA ,
+1972) .
+14. Langley, P., Bradshaw, G . and Simon, H ., Bacon, 5 : the discovery of conservation laws, Proc.
+7th Internat. Joint Conf. Artificial Intelligence, Vancouver, 1981 .
+15. Lenat, D .B ., Synthesis of large programs from specific dialogues, Proc. Internat . Symp . Provin g
+and Improving Programs, Le Chesnay, France, 1975 .
+16. Lenat, D .B ., On automated scientific theory formation : a case study using the AM program . in :
+J . Hayes, D . Michie and L .l . Mikulich (eds .), Machine Intelligence 9 (Halstead, New York ,
+1979) 251-283 .
+17. Lenat, D .B . and Greiner, R .D ., RLL : a representation language language, Proc. First Annua l
+Meeting of the American Association for Artificial Intelligence (AAAI), Stanford, CA, 1980 .
+18. Lenat, D .B ., The nature of heuristics, Artificial Intelligence 19(2) (1982) 189-249 .
+19. Lenat, D .B ., Learning by discovery : three case studies in natural and artificial learning systems ,
+in : R .S . Michalski, T . Mitchell and J . Carbonell (Eds .), Machine Learning (Tioga Press, Palo
+Alto, CA, 1982) .
+20. Lenat, D .B ., Sutherland W .R . and Gibbons, J . . Heuristic search for new microcircuit structures . AI Magazine 3 (1982) 17-33 .
+21. Lenat, D .B ., EuRisxo : a program that learns new heuristics and domain concepts : the nature o f
+heuristics 111 : program design and results, Artificial Intelligence 21(1, 2) (1983) 61-98 .
+22. McDermott, J ., R1, Proc . First Annual Meeting of the American Association for Artificia l
+Intelligence (AAAI), Stanford, CA (1980) 269-271 .
+23. Mead, C. and Conway, L ., Introduction to VLSI System (Addison-Wesley, Reading, MA, 1980) .
+24. Minsky, M . . Steps toward artificial intelligence, in : E.A. Feigenbaum and J . Feldman (Eds .) ,
+Computers and Thought (McGraw-Hill, New York . 1963) .
+25. Minsky, M., Frames, in : P . Winston (Ed .), The Psychology of Computer Vision (McGraw-Hill ,
+New York, 1975) .
+26. Mitchell, T., Utgoff, P ., Nudel, B . and Banerji, R ., Learning problem-solving heuristics throug h
+practice, Proc . 7th Internat. Joint Conj.. Artificial Intelligence, Vancouver, 1981 .
+27. Newell, A . and Simon, H ., Human Problem Solving (Prentice-Hall, Englewood Cliffs, NJ ,
+1972) .
+28. Newell, A . and Simon, H ., Computer science as empirical inquiry : symbols and search, Comm .
+ACM 19(3) (1976).
+29. Pivar and Finkelstein, Automation, using LISP, of inductive inference on sequences, in : E.C.
+Berkeley and D .G . Bobrow (Eds .), The Programming Language LISP : Its Operation an d
+Applications (Information International, Cambridge, MA, 1954) 125-136 .
+30. Poincare, H ., The Foundations of Science (The Science Press, New York, reprinted, 1929) .
+31. Polya, G., How to Solve It (Princeton University Press, Princeton, NJ, 1945) .
+32. Reboh . R ., Knowledge engineering techniques and tools in the PROSPECTOR environment, Rep t
+No . 243, AI Center, SRI International, Menlo Park, CA, 1981 .
+33. Schank, R . and Abelson, R .P ., Scripts, Plans, Goals and Understanding (Erlbaum, Hillsdale,
+NJ, 1977) .
+34. Shortliffe, E .H ., Computer-Based Medical Consultations : ATYcmt (Elsevier, New York, 1976) .
+35. Simon, H.A ., The Science of the Artificial (MIT Press, Cambridge, MA, 1969) .
+36. Waterman, D ., Exemplary programming in RITA, in : F . Hayes-Roth and D . Waterman (Eds .) ,
+Pattern Directed Inference System (Academic Press, New York, 1978) .
+37. Weiss, S . and Kulikowski, C . and Safir, A., Glaucoma consultation by computer, Computers in
+Biology and Medicine 8 (1978) 25-40 .
+38. Winston, P .H ., Learning structural descriptions from examples, Project MAC TR-231, MIT A I
+Lab ., Cambridge, MA, 1970 .
+
+Received August 1982 ; revised version received October 1982
+
+

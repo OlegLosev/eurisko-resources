@@ -1,0 +1,717 @@
+WoD 2004 Preliminary Version
+
+The TM System for Repairing Non-Theorems
+
+Simon Colton
+Department of Computing
+Imperial College, London
+United Kingdom
+sgdo.i.a.uk
+
+Alison Pease
+Shool of Informatis
+University of Edinburgh
+United Kingdom
+
+alisonpdai.ed.a.uk
+
+Abstrat
+
+We desribe a exible approah to automated reasoning, where non-theorems an
+be automatially altered to produe proved results whih are related to the original. This is ahieved in the TM system through an interation of the HR mahine
+learning program, the Otter theorem prover and the Mae model generator. Given
+a non-theorem, Mae is used to generate examples whih support the non-theorem,
+and examples whih falsify it. HR then invents onepts whih ategorise these
+examples and TM uses these onepts to modify the original non-theorem into speialised theorems whih Otter an prove. The methods employed by TM are inspired
+by the pieemeal exlusion, strategi withdrawal and ounterexample barring methods desribed in Lakatos's philosophy of mathematis. In addition, TM an also
+determine whih modied theorems are likely to be interesting and whih are not.
+We demonstrate the eetiveness of this approah by modifying non-theorems taken
+from the TPTP library of rst order theorems. We show that, for 98 non-theorems,
+TM produed meaningful modiations for 81 of them. This work forms part of
+two larger projets. Firstly, we are working towards a full implementation both of
+the reasoning and the soial interation notions desribed by Lakatos. Seondly, we
+are aiming to show that the ombination of reasoning systems suh as those used
+in TM will lead to a new generation of more powerful AI systems.
+Key words: Automated theorem modiation, automated
+reasoning, model generation, mahine learning, automated theory
+formation, philosophy of mathematis.
+
+This is a preliminary version. The nal version will be published in
+Eletroni Notes in Theoretial Computer Siene
+URL: www.elsevier.nl/loate/ents
+
+Colton and Pease
+
+1 Introdution
+Mathematis has developed in a muh more organi way than its rigid textbook presentation of denition-theorem-proof would suggest. Automated theorem proving systems more losely reet the textbook notion of mathematis
+than a developmental approah. In partiular, most dedution systems are
+designed either to prove results if they are true, or nd ounterexamples if
+they are false, but not both. System designers also assume that the onepts
+mentioned in the onjeture are orretly dened and atually relate to the
+mathematial notions the user is interested in. Clearly, the adoption of these
+assumptions is not onduive to the kind of exploration more ommon in researh mathematis, in whih onept denitions hange and beome more
+sophistiated, and awed onjetures and proofs are gradually rened. Hene,
+it is time to inrease the exibility of reasoning systems to better handle illspeied problems.
+We desribe here the development of the Theorem Modier (TM) system.
+This takes a set of axioms and a onjeture in rst order logi and tries to
+prove it. If this fails, TM attempts to modify the onjeture into a set of
+theorems whih it an prove. To ahieve this exibility, TM ombines the
+power of three automated reasoning systems, namely the HR mahine learning program [1℄, the Otter theorem prover [11℄ and the Mae model generator
+[12℄. As desribed in x3, TM uses these systems in ways presribed in the
+philosophy of mathematis developed by Lakatos [9℄. In partiular, TM performs ounterexample-barring, pieemeal exlusion and strategi withdrawal.
+These tehniques are further explained in x2. As a simple example of TM
+working, given the non-theorem that all groups are Abelian, it states that it
+annot prove the original result, but it has disovered that self-inverse groups
+are Abelian. To evaluate this approah, in x4, we desribe how TM suessfully found meaningful modiations to 81 of 98 non-theorems derived from
+the TPTP library of rst order theorems [16℄.
+The development of the TM system forms part of two larger projets.
+Firstly, we are working towards a full implementation both of the reasoning
+and the soial interation notions desribed by Lakatos in [9℄. Seondly, we
+are aiming to show that the ombination of reasoning systems suh as those
+used in TM will lead to a new generation of AI systems whih are able to solve
+problems whih individual tehniques annot.
+
+2 Bakground
+The way in whih TM forms modied theorems is inspired by the notions
+expressed in the philosophy of mathematis presented by Imre Lakatos [9℄,
+as desribed in x2.1 below. The implementation of these ideas is heavily
+dependent on third party software, in partiular the Otter, Mae and HR
+programs. Of these, HR is the least well known, so we desribe this in x2.2.
+2
+
+Colton and Pease
+2.1 Lakatos's Philosophy of Mathematis
+
+Our inspiration for TM omes from Lakatos, who presented a fallibilist approah to mathematis, in whih proofs, onjetures and onepts are uid and
+open to negotiation [9℄. Lakatos strongly ritiised the dedutivist approah
+in mathematis, whih presents denitions, axioms and theorem statements
+as immutable ideas whih ome from nowhere into a mathematiian's empty
+mind. Rather than a mysterious and ever-inreasing set of truths, Lakatos
+saw mathematis as an adventure in whih { via patterns of analysis whih
+he ategorised into various methods { onjetures and proofs are gradually
+rened but never ertain. He rejeted the view that disovery in mathematis
+is essentially irrational and should be left to the psyhologial arena, as hampioned by, for instane, Popper [15℄. Instead, he outlined a heuristi approah
+whih holds that mathematis progresses by a series of primitive onjetures,
+proofs, ounterexamples, proof-generated onepts, modied onjetures and
+modied proofs. Lakatos demonstrated his argument using ase studies inluding the development of Euler's onjeture that for any polyhedron, the
+number of verties (V) minus the number of edges (E) plus the number of
+faes (F) equals two.
+Lakatos's treatment of exeptions is noteworthy for two reasons. Firstly,
+he highlights their existene in mathematis { traditionally thought of as an
+exat subjet. Seondly, he shows how exeptions, rather than simply being annoying problem ases whih would fore a mathematiian to abandon
+a onjeture, an be used to further knowledge. He does this via two methods; pieemeal exlusion and strategi withdrawal. Pieemeal exlusion works
+by generalising from a ounterexample to a lass of ounterexamples and
+then exluding this lass from the faulty onjeture. For instane, Lakatos
+showed how, by examining the hollow ube whih is a ounterexample to
+Euler's onjeture, mathematiians modied the onjeture to `for any polyhedron without avities, V E + F = 2' [9℄. Put formally, suppose that
+we have the onjeture 8 x (A(x) ) B (x)), a set of ounterexamples N suh
+that 8 x 2 N; A(x) ^ :B (x), and a set of positive examples P suh that
+8 x 2 P; A(x) ^ B (x). To perform pieemeal exlusion, nd a onept C suh
+that 8 x 2 N; C (x), and 8 x 2 P; :C (x), then modify the onjeture to:
+8 x (:C (x) ^ A(x)) ) B (x). When there is only one ounterexample and
+no simply expressed onept whih overs it, pieemeal exlusion extends to
+ounterexample-barring, in whih the ounterexample is expliitly forbidden in
+a modied onjeture, i.e., given a single ounterexample x1 2 N , one modies
+the onjeture to: 8 x 6= x1 (A(x) ) B (x)).
+Strategi withdrawal works by onsidering the examples supporting a onjeture, nding a onept whih overs a subset of these, and limiting the domain of the onjeture to that of the onept. For instane, by examining the
+supporting examples of Euler's onjeture, suh as the ube, tetrahedron and
+otahedron, mathematiians retreated to the `safe' domain of onvex polyhedra (i.e. polyhedra whose surfae is topologially equivalent to the surfae of a
+3
+
+Colton and Pease
+sphere). Put formally, given the above onjeture, set of supporting examples
+P and ounterexamples N , rst nd a onept C suh that 8 x 2 P; C (x), and
+8 x 2 N; :C (x), then modify the onjeture to: 8 x (C (x) ^ A(x)) ) B (x).
+Clearly, an implementation of a theorem modiation system along the
+lines suggested by Lakatos requires three ore funtionalities. Firstly, an ability to prove theorems is required. We ahieved this by inorporating the Otter
+program [11℄ into the system. Otter is a powerful rst order resolution theorem
+prover whih has been used for many disovery tasks in algebrai domains,
+e.g., [13℄. Seondly, an ability to generate ounterexamples to non-theorems
+is required. We ahieved this by inorporating the Mae program [12℄ into the
+system. Mae is a powerful model generator whih employs the Davis-Putnam
+method for generating models to rst order sentenes. Thirdly, an ability to
+suggest modiations to non-theorems in the light of ounterexamples is required. We ahieved this by inorporating the HR program into the system.
+HR is desribed below.
+2.2 The HR System
+
+HR is named after the mathematiians Hardy and Ramanujan, and the ore
+funtionality of this system is desribed in [1℄. HR performs desriptive indution to form a theory about a set of objets of interest whih are desribed
+by a set of bakground onepts, as detailed further in [3℄. This is in ontrast
+to preditive learning systems whih are used to solve the partiular problem
+of nding a denition for a target onept. The theories HR produes ontain onepts whih relate the objets of interest; onjetures whih relate the
+onepts; and proofs whih explain the onjetures. Theories are onstruted
+via theory formation steps whih attempt to onstrut a new onept. HR
+builds new onepts from old ones using a set of 15 generi prodution rules
+[4℄ whih inlude:
+ The exists rule: this adds existential quantiation to the new onept's
+denition
+ The negate rule: this negates prediates in the new denition
+ The math rule: this unies variables in the new denition
+ The ompose rule: this takes two old onepts and ombines prediates from
+their denitions in the new onept's denition
+For a more formal desription of these prodution rules, and the others that
+HR uses, see [3℄ or [4℄.
+For eah onept, HR alulates the set of examples whih have the property desribed by the onept denition. Using these examples, the denition,
+and information about how the onept was onstruted and how it ompares
+to other onepts, HR estimates how interesting the onept is [6℄, and this
+drives a heuristi searh. As it onstruts onepts, it looks for empirial
+4
+
+Colton and Pease
+relationships between them, and formulates onjetures whenever suh a relationship is found. In partiular, HR forms equivalene onjetures whenever
+it nds two onepts with exatly the same examples, impliation onjetures
+whenever it nds a onept with a proper subset of the examples of another,
+and non-existene onjetures whenever a new onept has an empty set of
+examples. HR is also able to make near-onjetures whenever the relationship
+has only a few ounterexamples. To attempt to determine the truth of eah
+onjeture, they are passed to a third party theorem prover and a third party
+ounterexample nder (usually Otter and Mae, but there are interfaes to
+other reasoning systems [17℄). HR also works hard to break the onjetures
+into lemmas whih are easier to prove, and it will also extrat prime impliates
+whih may be more interesting to the user [2℄.
+HR has been used for a variety of disovery projets in mathematis. It has
+been partiularly suessful in number theory [5℄ and algebrai domains [14℄.
+Moreover, we have used HR to improve the abilities of Artiial Intelligene
+systems, most notably onstraint solvers [7℄, and we are urrently extending
+HR to perform disovery tasks in other sienti domains, in partiular bioinformatis. While we have used HR to generate rst order onjetures [8℄, the
+appliation desribed in this paper is the rst one in whih we have applied
+HR to the problem of proving, rather than generating, theorems.
+
+3 Automated Theorem Modiation
+Users supply TM with a onjeture of the form: )
+
+where A is a onjoined
+set of axioms whih desribe the domain they are working in, and C is the
+statement of the onjeture they wish to prove/modify/disprove. The theorem
+is supplied in Otter rst-order syntax, whih means that C must be negated,
+as Otter will derive a ontradition using resolution. TM assumes that C is
+plaed in the last line of input, preeded by a line per axiom. We hope to
+relax suh restritions in future versions of the program. For the purposes
+of this paper, we also assume that we are working in an algebrai domain,
+where algebrai objets omprise a set of elements and a set of operators
+relating those elements whih are onstrained as presribed by the axioms.
+An example algebra is group theory, where there is a single operator whih
+satises the assoiativity, identity and inverse axioms.
+A
+
+C
+
+3.1 Forming Modied Theorems
+
+How the TM program operates an be haraterised by how and when it alls
+the Otter, Mae and HR programs, and how it implements the pieemeal exlusion, strategi withdrawal and ounterexample-barring methods desribed
+in x2. To begin with, TM heks whether the onjeture is true, i.e., A ) C .
+It does this by invoking Otter for a period of time speied by the user, and if
+Otter is suessful, this is reported to the user and TM stops. If the theorem
+5
+
+Colton and Pease
+annot be proved by Otter in the time given, TM then uses Otter to attempt
+to prove that the negation of C follows from A. For reasons we shall see later,
+if the negation of the theorem is true, then TM will not be able to modify this
+onjeture using its urrent tehniques.
+Next, TM heks whether the onjeture is true if and only if the objets in
+the domain (whih are all algebrai objets) are trivial { in the sense that they
+have only one element { and whether the onjeture is true if and only if the
+objets are non-trivial. To do this, Otter is asked to prove: A ) ((8 a; b (a =
+b)) , C ) and A ) ((9 a; b (a 6= b)) , C ) respetively. If either an be
+proved, then TM returns the modied theorem that the onjeture is true
+for trivial/non-trivial algebras only. These are speial ases, and heking
+for them is in line with Lakatos's ounterexample-barring. If TM were to
+follow Lakatos's advie diretly, then it would rst nd ounterexamples to
+the theorem and try to prove that if they are exluded from the onjeture,
+it is true. However, in all but a few ases, we have found that Otter is not
+good at proving suh results, as desribing the models to be exluded leads
+to a great number of rst order sentenes being added to the input le for
+Otter. The exeption, of ourse, is when the algebra to be exluded is trivial,
+as we have seen above that this an be simply stated. However, in algebrai
+domains, theorems whih are true for all but the trivial algebra are quite
+rare. In fat, the opposite is often true: the theorem is true only for the
+trivial algebra. For these reasons, we deided that having TM hek initially
+for these two simple modiations was a better idea than implementing full
+ounter-example barring tehniques.
+If none of these preliminary heks have been suessful, then the onjeture is either a non-theorem, or is too diÆult for Otter to prove in the time
+available. In either ase, this presents an opportunity to modify the theorem
+in order to enable Otter to prove it. We have so far onentrated on modifying a onjeture by speialising it, i.e., adding in extra onditions whih
+enable Otter to prove the modied theorem. To do this, TM rst nds some
+example algebras whih support the onjeture, by using Mae to generate
+models whih satisfy A and for whih C holds. Mae is then used to generate
+some examples whih ontradit the onjeture, i.e., models whih satisfy A
+but whih break the onjeture C . Mae is given a limit for both time and
+size. Normally, we ask Mae to nd an example of size 1, an example of size
+2, et., up to size 8, and that it an spend 10 seonds on eah searh. For
+instane, when we give TM the false onjeture that all groups are Abelian,
+it uses Mae to nd an example Abelian group for eah size 1 to 8, whih
+support the onjeture. However, it also nds a non-Abelian group of size 6
+and a non-Abelian group of size 8, whih falsify the onjeture.
+The supporting and falsifying examples generated by Mae are given as
+the objets of interest to a session using HR. HR is also supplied with the
+le ontaining the statement of the onjeture in Otter format. From this,
+it extrats the bakground onepts in the domain, e.g., in group theory, HR
+6
+
+Colton and Pease
+would extrat the onept of groups, elements, multipliation, identity and
+inverse. These form the basis of the theory HR forms, i.e., all onepts it
+produes will be derived from these. TM then uses HR to form a theory for a
+user-set number of theory formation steps, usually taken to be between 1000
+and 5000. In this time, HR generates many onepts whih an be interpreted
+as speialisations of the algebra, suh as Abelian groups, self-inverse groups,
+et. For instane, in group theory, given the groups up to size 8 as input, in
+5000 steps, HR generates 37 speialisations of the onept of group.
+From the theory produed by HR, TM identies all the speialisation onepts and extrats those whih desribe only algebras that support the onjeture. For example, in the session assoiated with the non-theorem that all
+groups are Abelian, amongst others, HR invents the onept of groups whih
+are self inverse, i.e., 8 a (a = a 1 ). It turns out that these form a subset of the
+examples whih supported the onjeture, and hene TM extrats this from
+HR's theory. For eah extrated speialisation, M , TM forms the modied
+onjeture: (A ^ M ) ) C by adding M to the axioms. Otter is invoked to
+see whih of these modiations an be proved, and any whih are proved
+are presented to the user. Note that, in addition to the speialisations that
+HR produes, TM also extrats any onepts whih have been onjetured to
+be logially equivalent to a speialisation { these onepts are not normally
+allowed into the theory as distint items, but HR reords the onjetured
+equivalene of the denitions. This funtionality is turned on by default, but
+the user an set a ag to stop it happening, whih will produe faster results
+(as fewer alls to Otter will be made), but has the potential to miss interesting
+modifying speialisations.
+3.2 Identifying Uninteresting Modiations
+
+Unfortunately, there are a number of reasons why the modiations generated
+by this proess an be uninteresting for the user. TM takes are to disard
+any it an prove to be uninteresting, and highlights any whih have a greater
+hane than normal of being uninteresting. In partiular, some speialisations
+that HR produes are true only of the trivial algebra. As most onjetures
+are also true of the trivial algebra, the modiations usually hold, but are
+uninteresting. For instane, the modied onjeture: \all groups whih are
+the trivial group are Abelian" holds very little interest. Hene, whenever a
+modiation has been proved, and the examples satisfying the denition of
+the speialisation M in the modiation amount to just the trivial algebra,
+TM invokes Otter to hek whether: A ) (M , (8 a; b (a = b))) It is
+unlikely, but not impossible that suh re-denitions of the trivial algebra will
+be interesting to the user (for instane, the re-denition might ontain an
+unusual ombination of bakground onepts). Hene, in TM's output, the
+modiation is set-aside from the others, but it is not disarded.
+Another problem arises when HR derives onepts whih are re-denitions
+of the onjeture statement. Obviously, adding this to the axioms would make
+7
+
+Colton and Pease
+the onjeture trivially true, e.g., all Abelian groups are Abelian. Hene, for
+every speialisation, M , where every supporting example has the property
+presribed by M , TM uses Otter to try to prove: (i) M , C (ii) A ) (M ,
+C ) and (iii) M ) C . Often M is just a simple restatement of C , and of no
+interest, but it sometimes happens that the equivalene of C and M is quite
+surprising and non-trivial to prove, hene the modiation is valid. Hene, if
+TM proves any of the three results above, it presents the modiation to the
+user separately, and provides the result as a possible indiation of why the
+modiation is true and a aution that it may be uninteresting beause the
+speialisation trivially proves the onjeture.
+This proess of modifying onjetures by speialising them is an implementation of Lakatos's strategi withdrawal method, whereby a onept whih
+exludes all of the ounterexamples is disovered and the onjeture is speialised to only apply to examples satisfying that onept. Note also that
+when HR uses the negate rule, whih TM instruts it to, for every speialisation M , the negation :M will also be produed. Hene, if the examples of
+M ontained all the falsifying examples for the onjeture, then :M would
+desribe a subset of the supporting examples, and hene would be used in a
+modiation attempt. Realling that the pieemeal exlusion strategy involves
+nding a onept whih overs all the ounterexamples (and possibly more),
+then exluding the onept from the onjeture, we see that TM is also using
+pieemeal exlusion to form the modiations.
+3.3 Summary of Theorem Modiation
+
+To summarise, in our running example that all groups are Abelian, TM undertakes the following proess. Firstly, it tries and fails to prove that the
+onjeture is true already, and similarly fails to prove that the negation of
+the onjeture follows from the axioms (i.e., it fails to prove that all groups
+are non-Abelian). If the latter were true, then no amount of speialisation
+would improve matters. TM also fails to prove that a group is Abelian if and
+only if it is trivial, and that a group is Abelian if and only if it is non-trivial.
+It then employs Mae to generate some Abelian groups whih support the
+onjeture and some non-Abelian groups whih falsify the onjeture. Both
+sets of examples are given, along with the onjeture statement as input to
+HR, whih forms a theory of groups ontaining many speialisations of the
+notion of group. From this theory, TM extrats all those speialisations whih
+desribe only groups whih support the onjeture. When using one of these,
+namely self-inverse groups, in a modied onjeture, Otter proves the theorem
+and TM reports that it an prove that self-inverse groups are Abelian, even
+though the original onjeture is false. In ontrast to the usual proof-or-fail
+output from a theorem prover, TM outputs 5 dierent types of result:
+ The original onjeture is true: A ) C
+ The negation of the onjeture is true: A ) :C
+8
+
+Colton and Pease
+
+ The onjeture is true only for trivial algebras ( ) ) ,
+ It is true only for non-trivial algebras ( ) ) , :
+ The original onjeture is false, but various modiations of it are
+( ^ ))
+A
+
+A
+
+A
+
+M
+
+C
+
+C
+
+T riv
+
+T riv
+
+true,
+
+C
+
+In the latter ase, when appropriate, TM an also warn the user that the
+modiation may be trivially true beause either M is only true of the trivial
+algebra, or beause one of the following lemmas holds: M , C , A ) (M ,
+C ) or M ) C .
+
+4 Testing and Evaluation
+We used the TPTP library [16℄ to supply a set of non-theorems for experiments designed to test the hypothesis that TM an nd meaningful modiations to non-theorems. We looked at four ategories within TPTP, namely
+GRP (groups), FLD (elds), RNG (rings) and COL (ombinatory logi). Unfortunately, we found only 9 non-theorems whih were suitable, beause (a)
+there aren't many non-theorems (b) many were atually just statements of
+axioms for whih models an be found and () many were not in the form of
+axioms followed by onjeture, e.g., there are many non-theorems stating that
+one set of axioms is not equivalent to another set.
+In order to provide a more substantial test set, we took theorems from
+the above TPTP ategories and altered them to beome non-theorems. The
+alterations inluded (i) removing axioms (ii) hanging/removing quantiers
+(iii) altering variables and onstants and (iv) altering braketing. In this
+fashion, we produed 158 altered theorems, whih we used alongside the 9
+proper non-theorems. We found that 30 of our altered TPTP theorems were
+still theorems (TM told us this). Mae produed the same examples to both
+support and falsify the onjeture, for 39 of the remaining 137 non-theorems.
+This was due to onstants suh as an identity element being used in the
+onjeture statement without referene in the axioms, or to variables being
+instantiated dierently. We removed these non-theorems from the test set,
+leaving us with a ore of 98 non-theorems.
+In addition to testing the eetiveness of TM, we also wanted to determine
+whether any alterations to the setup would improve the performane. It was
+lear from an early stage that giving Mae extra time and range did not
+improve matters, as it only found a few more examples whih did not aet the
+speialising onepts that HR found. Also, we experimented by giving Otter
+more time, but we have not seen any evidene that this improves performane
+of TM { it is often the ase that if a prover is going to solve a problem,
+it will do so quikly, and giving a little extra time will not help for more
+diÆult problems. Hene, we onentrated on altering the way in whih we
+ran HR. We ran three sessions using TM to attempt to modify eah of the 98
+non-theorems. Otter and Mae were given 10 seonds, with Mae looking for
+examples up to size 8, and HR was allowed 1000 theory formation steps in
+9
+
+Colton and Pease
+Session
+
+1
+
+2
+
+3
+
+Equivalent to trivial algebra
+
+24
+
+24
+
+24
+
+No valid modiations
+
+11
+
+10
+
+9
+
+Only redenition modiations
+
+8
+
+8
+
+8
+
+Valid modiations with aution
+
+18
+
+18
+
+18
+
+Valid modiations no aution
+
+37
+
+38
+
+39
+
+Total valid modiations
+
+79
+
+80
+
+81
+
+Average number of modiations per non-theorem
+
+0.8
+
+1.3
+
+3.1
+
+Average time to generate modiations (s)
+
+73
+
+120 253
+
+Table 1
+Results from modiation attempts on 98 non-theorems
+
+the rst two sessions, and 3000 steps in the third session. In the rst session,
+however, the ability to use equivalene onjetures to harvest speialisations
+was turned o. The results are presented in table 1.
+In the sessions, we found that in many ases, the only modiations ame
+with a aution that the speialisation may trivially make the theorem true.
+However, in around two thirds of these ases, upon looking at the modiation,
+it was found to be valid, i.e., not obviously just a restatement of the onjeture.
+Taking these into aount, in addition to the modiations stating that the
+onjeture is true if and only if the algebra is trivial (a valid modiation),
+TM produed proper modiations for 79, 80 and 81 of the 98 of the nontheorems respetively, i.e., 81%, 82% and 83%. We believe that suh a suess
+rate is very enouraging. These gures don't appear to provide muh evidene
+of improvement by running HR for longer and allowing it to use information
+from equivalene onjetures. However, if we look at the average number of
+modiations produed in the three sessions, we see that using the setup as in
+the rst session, on average TM will nd 0.8 proved modiations, but using
+the setup as in the third session, TM will nd 3.1 modiations per theorem.
+However, the time taken to produe these modiations triples.
+To illustrate why TM highlights theorems for whih M ) C , we an look
+at the non-theorem we generated from TPTP theorem GRP001. This states
+that, if all elements in the group square to give the identity, then the group
+must be Abelian, i.e., (8 a (a  a = id)) ) (8 a; b (a  b = b  a)). We removed
+the inverse and assoiativity axioms to make this into a non-theorem. TM
+found only two speialisations to perform the modiation, both of whih
+were autioned. The rst was:  b; ; d (b   = d ^   b 6= d). This is obviously
+the speialisation into Abelian groups, hene, inluding this speialisation into
+a modied theorem produed: \in Abelian groups, if all elements square to
+give the identity, then the group is Abelian", whih is trivially true. Hene
+10
+
+Colton and Pease
+TM was right in this ase to aution us about this theorem.
+In ontrast, however, when we gave TM the non-theorem whih we generated from TPTP theorem GRP011-4, it produed speialisations whih were
+not at all obvious, and hene made interesting modiations. GRP011-4 is
+the left anellation law, i.e., 8 a; b;  ((a  b = a  ) ) b = )). We took
+out the identity and inverse axioms to generate a non-theorem, and one of the
+ve (autioned) speialisations was:  b; ; d (b   = d ^ b  d 6= ) Hene the
+modied theorem states that, in algebras for whih 8 x; y (x  (x  y ) = y )),
+the left anellation law holds (with no mention of assoiativity).
+TM managed to nd valid modiations for 7 out of the 9 non-theorems
+that we took diretly from the TPTP library, and these provide interesting
+illustrative examples of TM working as it should do. Firstly, TM suessfully
+modied 3 out of 5 non-theorems in ombinatory logi { a new domain for
+HR. For example, non-theorem COL073-1 states that, given ertain axioms:
+8 y ((apply(y; f (y))) = (apply(f (y); apply(y; f (y))))): TM found a single speialisation from the 7 supporting examples Mae provided:
+ b; ; d (apply (b; ) = d ^ apply (b; d) 6= ). However, this was only true of the
+trivial algebra, and while Otter ouldn't prove an equivalene between this
+speialisation and the trivial algebra, we annot rule it out.
+In group theory, the rst non-theorem in the library is GRP024-4, whih
+states that, given the denition of the ommutator operator on two elements
+1
+x and y being omm(x; y ) = x  y  x
+ y 1, then this operator is assoiative if and only if the produt of the ommutator is always in the entre of the group (dened to be the set of elements whih ommute with all
+others). Hene this theorem states that: 8 x; y; z (omm(omm(x; y )); z ) =
+omm(x; omm(y; x)) , 8 u; v; w (omm(u; v )  w = w  omm(u; v ))). Mae
+ould not nd any ounterexamples to this, but it did nd four groups for
+whih the onjeture is true. As strategi withdrawal doesn't need any ounterexamples, TM ould ontinue. It found that, with the extra axiom that the
+groups are self inverse (i.e., 8 x (x = x 1 )), the onjeture atually holds.
+The rst of two ring theory non-theorems taken diretly from the TPTP
+library was RNG007-5, whih states that, given a ring for whih 8 x (xx = x),
+then 8 x (x  x = id). Given the rst property as an axiom, TM proved that
+the seond property is equivalent to being the trivial algebra, whih gives good
+justiation for implementing this funtionality. The seond ring theory nontheorem was RNG031-6, whih states that the following property, P , holds
+for all rings: 8 w; x ((((w  w)  x)  (w  w)) = id) where id is the additive
+identity element. Mae found 7 supporting examples for this, and 6 falsifying
+examples. HR produed a single speialisation onept whih was true of
+3 supporting examples:  b;  (b  b =  ^ b + b 6= ). Otter then proved
+that P holds in rings for whih HR's invented property holds. Hene, while
+TM ouldn't prove the original theorem, it did prove that, in rings for whih
+8 x (x  x = x + x), property P holds. The speialisation here has an appealing
+symmetry. A proof of the modied theorem is given in the appendix.
+11
+
+Colton and Pease
+
+5 Conlusions and Further Work
+We have desribed and demonstrated the eetiveness of the TM automated
+theorem modiation system. This is based on an implementation of methods
+presribed in Lakatos's philosophy of mathematis, and relies on the interation of the HR, Otter and Mae programs. In tests, TM modied 7 out of 9
+non-theorems from the TPTP library into interesting, proved alternatives, and
+on an artiial set of 98 non-theorems, it produed meaningful modiations
+80% of the time, whih we believe is highly enouraging given that this is only
+the rst version of the software. We intend to improve the implementation in
+at least the following ways:
+
+ enabling it to strengthen modiations after it has weakened the original
+onjeture. For instane, if it has proved ) ( , ), try ) ( ^ ).
+A
+
+P
+
+We expet this to result in more interesting theorems;
+
+Q
+
+A
+
+P
+
+Q
+
+ extending the domains on whih it works, to seurity protools, hemistry
+and bioinformatis as well as other mathematial domains;
+
+ automatially evaluating the modiations further, to enable TM to reognise interesting modiations from all those produed. For instane it might
+onsider aspets of the proof, suh as its length;
+ using a failed proof attempt to suggest modiations to a onjeture C . This
+is Lakatos's method of lemma inorporation: given a ounterexample to a onjeture, nd whih step of the proof it violates and then modify the onjeture
+by making that step a ondition. The modied onjeture therefore beomes:
+8 x whih satisfy proof step i, C holds. We are urrently implementing this
+method;
+ exploring the possibilities of using TM to suggest ase splits for diÆult but
+true theorems. For instane, given a theorem: 8
+( ) ) ( ), and a onx P x
+
+Q x
+
+ept C (x) whih overs all the supporting examples and no ounterexamples,
+then TM would form and attempt to prove (i) 8 x (C (x) ^ P (x)) ) Q(x)
+and (ii) 8 x (:C (x) ^ P (x)) ) Q(x). This suggests ways of automatially
+rephrasing a onjeture statement into one whih an be proved.
+TM is part of a larger projet, in whih we are implementing all of the
+methods presribed by Lakatos in [9℄. The aim of this projet is to (a) provide a
+omputational model for the use of Lakatos's ideas and (b) enhane the model
+and implementation of automated theory formation (ATF) as desribed in [1℄.
+Our model of Lakatos-enhaned theory formation has developed along two
+axes: the sophistiation of the onjeture-orreting methods whih Lakatos
+proposed, and the soial nature of the disourse he desribed.
+There are various reasons to automate theories of sienti disovery, inluding developing new tehniques whih aid sientists in their work [10℄. We
+have demonstrated a new tehnique, namely automated theorem modiation,
+12
+
+Colton and Pease
+whih has the potential to aid mathematiians, by adding more robustness and
+exibility to automated theorem proving. We believe that suh robustness {
+in the ase of TM, gained by the integration of dedutive, indutive and model
+based tehniques { will play an important part in the next generation of automated theorem provers.
+
+Aknowledgements
+We would like to thank Alan Smaill and John Lee for their ontinued input to
+this projet. Speial thanks to Bill MCune and Geo Sutlie for supplying
+data and for their input to this work, and to Roy MCasland for providing the
+proof found in the appendix. We are grateful to the anonymous referees for
+their useful omments on an earlier draft of this doument, and to the organisers of the IJCAR workshop on disproving. This work has been supported by
+EPSRC platform grant GR/S01771/01.
+
+Referenes
+[1℄ S Colton. Automated Theory Formation in Pure Mathematis. Springer-Verlag,
+2002.
+[2℄ S Colton. The HR program for theorem generation. In Proeedings of CADE,
+2002.
+[3℄ S Colton and S Muggleton. ILP for mathematial disovery. In Proeedings of
+the 13th International Conferene on Indutive Logi Programming, 2003.
+[4℄ S Colton, A Bundy, and T Walsh. Automati identiation of mathematial
+onepts. In Mahine Learning: Proeedings of the 17th International
+Conferene, 2000.
+[5℄ S Colton, A Bundy, and T Walsh. Automati invention of integer sequenes. In
+Proeedings of the Seventeenth National Conferene on Artiial Intelligene,
+2000.
+[6℄ S Colton, A Bundy, and T Walsh. On the notion of interestingness in automated
+mathematial disovery. International Journal of Human Computer Studies,
+53(3):351{375, 2000.
+[7℄ S Colton and I Miguel. Constraint generation via automated theory formation.
+In Proeedings of CP-01, 2001.
+[8℄ S Colton and G Sutlie. Automati generation of benhmark problems for
+automated theorem proving systems. In Proeedings of the Seventh AI and
+Maths Symposium, 2002.
+[9℄ I Lakatos. Proofs and Refutations: The logi of mathematial disovery.
+Cambridge University Press, 1976.
+
+13
+
+Colton and Pease
+[10℄ P. Langley. Lessons for the omputational disovery of sienti knowledge. In
+Proeedings of First International Workshop on Data Mining Lessons Learned,
+2002.
+[11℄ W MCune. The OTTER user's guide. Tehnial Report ANL/90/9, Argonne
+National Labs, 1990.
+[12℄ W MCune. A Davis-Putnam program and its appliation to nite rstorder model searh. Tehnial Report ANL/MCS-TM-194, Argonne National
+Laboratories, 1994.
+[13℄ W MCune and R Padmanabhan. Automated Dedution in Equational Logi
+and Cubi Curves, LNAI 1095. Springer-Verlag, 1996.
+[14℄ A Meier, V Sorge, and S. Colton. Employing theory formation to guide proof
+planning. In Proeedings of the Tenth Symposium on the Integration of Symboli
+Computation and Mehanized Reasoning, LNAI 2385. Springer, 2002.
+[15℄ K Popper. The Logi of Sienti Disovery. Basi Books, 1959.
+[16℄ G. Sutlie and C.B. Suttner. The TPTP Problem Library: CNF Release
+v1.2.1. Journal of Automated Reasoning, 21(2):177{203, 1998.
+[17℄ J Zimmer, A Franke, S Colton, and G Sutlie. Integrating HR and tptp2x
+into MathWeb to ompare automated theorem provers. In Proeedings of the
+CADE'02 Workshop on Problems and Problem sets, 2002.
+
+Appendix
+Theorem:
+Let R be a ring suh that 8 x 2 R; x + x = x  x. Then 8 x; y 2 R; x2 yx2 = id:
+Proof:
+Let r be an arbitrary element in R. Then
+
+(r2 ) = (r  r) = (r + r) = (
+
+r
+
+)+(
+
+r
+
+)=(
+
+r
+
+)(
+
+r
+
+)=(
+
+Hene (r2 ) = r2 , so r2 + r2 = id.
+Now let x and y be arbitrary elements in R. Then:
+2
+
+x yx
+
+2
+
+= (x2 y )(x2 ) = ((x + x)y )(x2 )
+= (xy + xy )(x + x) = (xyx + xyx) + (xyx + xyx)
+= (xyx  xyx) + (xyx  xyx) = (xyx)2 + (xyx)2
+=
+
+id
+
+[by above result℄
+
+QED.
+14
+
+r
+
+)2 = r 2
+
+

@@ -1,0 +1,210 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+<script type="text/javascript" src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics9_files/analytics.js"></script>
+<script type="text/javascript">archive_analytics.values.server_name="wwwb-app16.us.archive.org";archive_analytics.values.server_ms=172;</script>
+<link type="text/css" rel="stylesheet" href="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics9_files/banner-styles.css">
+
+
+</head><body alink="blue" text="blue" vlink="blue" background="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics9_files/chalk.jpg"><a name="top"></a>
+<title> HR - Automatic Theory Formation In Pure Mathematics </title>
+
+
+
+<a name="using_hr"></a>
+<h2>9. USING HR - A BRIEF GUIDE</h2>
+<font color="red">Subsections:</font>&nbsp;&nbsp;
+<a href="#hr_input">Input to HR</a>&nbsp;&nbsp;
+<a href="#running_hr">Running HR</a>&nbsp;&nbsp;
+<a href="#hr_output">Output from HR</a>
+<p align="justify">
+We are working on a java version of HR which will be much easier to
+use, and before that, a java front end which will enable the user to
+specify parameters, run sessions, etc., more easily. At present, HR is
+a prolog program written in sicstus objects, and to use it properly,
+the Otter, MACE, LaTeX, Dot and xgraph programs are also needed.
+
+<a name="hr_input"></a>
+</p><h2>Giving Input to HR</h2>
+
+<p align="justify">
+The more initial information about a theory the user can give, the
+more HR can do. Here are some of the things a user can specify:
+</p><ul>
+<li><font color="green">Axioms.</font>&nbsp;&nbsp;These are necessary if
+any theorem proving is to be done.</li>
+<li><font color="green">How to Generate Models.</font>&nbsp;&nbsp;This
+will enable HR to perform its own counterexample finding.</li>
+<li><font color="green">Initial Concepts.</font>&nbsp;&nbsp;If the user
+is interested in any particular concepts, they can provide them in
+advance.</li>
+<li><font color="green">Search Strategy Parameters.</font>&nbsp;&nbsp;See below</li>
+<li><font color="green">Tasks to Achieve.</font>&nbsp;&nbsp;For example,
+if the user is looking for a concept which provides a particular
+categorisation, then the categorisation must be given.</li>
+<li><font color="green">Output Choices</font>&nbsp;&nbsp;ie. how to
+present the output.</li>
+</ul>
+<p align="justify">
+There are many ways to influence the search HR performs. Some of the
+many parameters that the user can set are:
+</p><ul>
+<li>Which production rules to use.</li>
+<li>A complexity cap (usually less than 10).</li>
+<li>When to sort the concepts and conjectures (usually after every
+10th new concept).</li>
+<li>When to attempt to settle conjectures (usually when first
+seen).</li>
+<li>How to sort the concepts and conjectures, ie. how to weight the
+measures.</li>
+<li>How to approach theorem proving (usually: HR first, Otter
+second).</li>
+<li>How long to spend finding proofs and counterexamples.</li>
+<li>How many counterexamples to find for each conjecture (usually just 
+one).</li>
+</ul>
+<p align="justify">
+At present, setting parameters has to be done on the command line,
+with commands such as: <tt>?- cycle::set(sort_when(30)).</tt> which
+tells HR to start sorting its concepts after the 30th has been
+introduced. Some more complicated sets of commands can be put into a 
+`modes' file which HR can read.
+
+<a name="running_hr"></a>
+</p><h2>Running HR</h2>
+
+<p align="justify">
+Once the user has set all the necessary parameters, usually HR is run
+completely autonomously. Users can, if they wish, interrupt the
+process and re-set the parameters, but this is not usual. To run HR,
+it needs to be given a target, something to achieve. For example, it
+could be asked to produce 100 conjectures, or 200 concepts. The list
+of things to ask for includes:
+
+</p><ul>
+<li>Time, eg. to construct a theory for a given number of
+minutes.</li>
+<li>Concepts</li>
+<li>Conjectures</li>
+<li>Theorems</li>
+<li>Models</li>
+<li>Categorisations</li>
+<li>Classifications (ie. the gold standard, given by the user).</li>
+<li>Prime implicants</li>
+</ul>
+
+<p align="justify">
+To start HR running, the user simply types
+<tt>construct(30,minutes).</tt>, etc. (if they want HR to work for
+half an hour). It is sometimes a good idea to change strategies half
+way through a session, and I often find myself asking HR to run for a
+certain time in one mode and then to complete the session in another
+mode. For example, if looking for a concept which classifies up to
+order 6, the classifying mode often specialises too early. Therefore,
+I usually run HR for 10 minutes in exhaustive mode (to cover the
+basics), then 10 minutes in novelty mode (to produce many different
+categorisations), then I finally change to classifying mode. In this
+case, the commands to run HR would be:
+</p><p align="center">
+</p><pre>?- set_mode(exhaustive), construct(10,minutes),
+   set_mode(novelty), construct(10,minutes),
+   set_mode(classifying), construct(1,classification).
+</pre>
+
+
+<a name="hr_output"></a>
+<h2>Understanding HR's Output</h2>
+<p align="justify">
+Once HR has finished forming a theory, the user can employ some tools
+to understand and choose between the concepts that HR has come up
+with. Firstly, the user can look for concepts of a particular
+type. For example, in number theory, they may want to look for
+concepts which are number types. These will have tables with only one
+column, so the user looks for concepts with arity 1. They can use this
+in conjunction with one of many print commands, which will print to
+screen. Eg.
+
+</p><pre><font color="green">
+?- concept(A)::arity(1), A&gt;20, print::fol(A).
+[I] s.t. 2 = |{(a) : a|I}|
+A = 21 ? ;
+[I] s.t. 3 = |{(a) : a|I}|
+A = 22 ? ;
+.
+.
+.
+[I] s.t. 2 = |{(a) : a|I}| &amp; -(I = |{(b) : b|I}|)
+A = 43 ?
+
+yes
+?- print::table(43).
+
+| 3  || 5  || 7  || 11 || 13 || 17 || 19 |
+yes
+</font></pre>
+<p align="justify">
+There are also some other, more graphical, ways to explore HR's
+concepts. For example, if the user were interested in how the average
+complexity of the concepts had changed over the course of the theory,
+they could type:
+</p><p>
+<tt>?- view::concept_statistics(average,complexity).</tt>
+</p><p>
+and they would be presented with this graph:
+</p><p>
+<img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics9_files/100_complex.html" width="100%">
+</p><p align="justify">
+which shows how the given concepts have complexity 1, but as the
+theory progresses, the average complexity increases to nearly
+5.5. Note that graphs of this type are produced using the xgraph
+package. 
+
+</p><p align="justify">
+There are other graphs which HR can draw, using the DOT package from
+AT&amp;T. If the user is interested in the construction history of a
+concept or concepts, they can ask for a graphical representation of
+how the concepts were constructed. For example, if interested in
+concepts 77,88 and 99, the user could type:
+</p><p>
+<tt>?- view::graph([77,88,99]).</tt>
+</p><p>
+and they would be presented with this graph:
+</p><p>
+<img src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics9_files/778899.html">
+</p><p align="justify">
+Finally, the user can ask HR to write and mark up a LaTeX script in a
+human-readable format. This aspect of HR's functionality is in need of
+an overhaul, and at present doesn't work correctly. Here are some
+examples from around September 1998, of HR's LaTeX output. Note that
+the HR project has moved on considerably since these were produced.
+
+</p><center>
+<p>
+<a href="https://web.archive.org/web/20010722201903/http://www.dai.ed.ac.uk/homes/simonco/research/hr/postscript/number_theory50.ps">50 Concepts in Number
+Theory</a>
+</p><p>
+<a href="https://web.archive.org/web/20010722201903/http://www.dai.ed.ac.uk/homes/simonco/research/hr/postscript/5_classifiers.ps">5 Classification concepts in
+Group Theory</a>
+</p><p>
+<a href="https://web.archive.org/web/20010722201903/http://www.dai.ed.ac.uk/homes/simonco/research/hr/postscript/latex2.ps">101 Concepts in Group Theory</a>
+</p></center>
+<hr>
+©&nbsp;Simon Colton 1999.
+
+
+
+
+
+
+
+
+</body></html>
+<!--
+     FILE ARCHIVED ON 20:19:03 Jul 22, 2001 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 10:44:22 May 16, 2016.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->

@@ -1,0 +1,1865 @@
+Reprinted from
+
+AN INTERNATIONAL JOURNA L
+
+A Program That Learns New
+Heuristics and Domain Concepts .
+URISKo :
+
+The Nature of Heuristics III : Program
+Design and Results
+
+Douglas B . Lena t
+Computer Science Denartinent. Stanford University . Stanford _
+CA 94305. U.S.A .
+
+Compan y
+North-Hollansh)n
+kw
+Amsterdam
+
+	
+
+ARTIFICIAL INTELLIGENCE
+
+61
+
+A Program That Learns Ne w
+Heuristics and Domain Concept s
+EURISKO :
+
+The Nature of Heuristics III : Program
+Design and Result s
+
+Douglas B. Lenat
+Computer Science Department, Stanford University, Stanford ,
+CA 94305. U .S .A .
+ABSTRACT
+The AM program, an early attempt to mechanize learning by discovery . has recently been expande d
+and extended to several other task domains. ,amt's ultimate failure apparently was due to its inability t o
+discover new, powerful. domain-specific heuristics for the various new fields it uncovered . At tha t
+time, it seemed straight-forward to simply add 'Heuristics' as one more field in which to let AM
+explore, observe, define, and develop . That task—learning new heuristics by discovery—turned out to
+be much more difficult than was realized initially, and we have just now achieved some successes a t
+it. Along the way, it became clearer why Am had succeeded in the first place . and why it was so
+difficult to use the same paradigm to discover new heuristics . In essence. AM was an automatic
+programming system . whose primitive actions were modifications to pieces of LISP code, code whic h
+represented the characteristic functions of various math concepts . It was only because of the dee p
+relationship between LISP and Mathematics that these operations (loop unwinding, recursion elimination, composition, argument elimination, function substitution, etc .) which were basic LISP mutators
+also turned out to yield a high 'hit rate' of viable, useful new math concepts when applied to
+previously-known, useful math concepts . But no such deep relationship existed between LISP an d
+Heuristics, and when the basic automatic programming operators were applied to viable, usefu l
+heuristics, they almost always produced useless (often worse than useless) new rules . Our work on th e
+nature of heuristics has enabled the construction of a new language in which the statement of heuristic s
+is more natural and compact . Briefly, the vocabulary includes many types of conditions, actions, an d
+descriptive properties that a heuristic might possess ; instead of writing a large lump of LISP code to
+represent the heuristic, one spreads the same information out across dozens of 'slots' . By employing
+this new language. the old property that AM satisfied fortuitously is once again satisfied : the primitiv e
+syntactic operators usually now produce meaningful semantic variants of what they operate on . Th e
+ties to the foundations of Heuretics have been engineered into the syntax and vocabulary of the ne w
+language, partly by design and partly by evolution, much as John McCarthy engineered ties to th e
+foundations of Mathematics into LISP . The EURISKO program embodies this language, and it is
+described in this paper. along with its results in eight task domains : design of naval fleets, elementary
+set theory and number theory . LISP programming, biological evolution, games in general, the design of
+Artificial Intelligence 21 (1983) 61–98
+
+0004-3702/83/0000-0000/803 .00 © 1983 North-Holland
+
+	
+
+62
+
+D .B . LENA T
+
+three-dimensional VLSI devices, the discovery of heuristics which help the system discover heuristics ,
+and the discovery of appropriate new types of 'slots' in each domain . Along the way, some very
+powerful new concepts, designs, and heuristics were indeed discovered mechanically . Characteristics
+that make a domain ripe for AM-like exploration for new concepts and conjectures are explicated, plu s
+features that make a domain especially suitable for EURISKO-level exploration for new heuristics .
+
+1 . Design Decisions in Constructing the
+
+EERISKO
+
+Progra m
+
+Our earlier papers in this `Nature of Heuristics' series [9 . 12] have motivate d
+the task of the EURISKO program : learning by discovery, in particular learnin g
+new heuristics as well as new domain-specific definitions of concepts . The y
+have given little attention to the architecture of that program, to its results . o r
+to what—in hindsight—they reflect on our earlier experiences with AM [3] . Th e
+EuRISKO project was first conceived in 1976 . During the past six years, there has
+been an accumulation of `design ideas' which have been tested . Some of thes e
+have been built into the representation language underlying EURISKO (i .e ., RLL
+[8]) . Other ideas have found their way into the EURISKO knowledge base itself ,
+as explicitly represented (and malleable) concepts . This section presents thes e
+ideas and design decisions, and in Sections 2 and 3 we discuss the performanc e
+of the EURISKO program . The design ideas fall naturally into three categories :
+those dealing with representation, with control, and with the user interface .
+1 .1 . Ideas about representing concept s
+(1) Rules need not distinguish 'slots' from 'functions' . As in AM . EURISKO' S
+basic representation employs frames (units) with slots . Each slot can be viewe d
+as a unary function which is handed a unit-name and returns a value . E .g . ,
+Worth and IsA are slotnames : they are the names of properties a unit migh t
+possess . But they can also be considered unary functions : Worth(SetUnion) =
+650 ; IsA(SetUnion) = {SetOp . BinaryOp, Dom = RanOp} . Other unary functions exist, of course, and can be defined in terms of these more primitive slots .
+For instance, suppose we define AlllsAs as a function which returns the Is A
+value for a concept . plus all their Generalizations, plus all their Generalizations, etc . So AllIsAs(SetUnion) first accesses the IsA slot of SetUnion, an d
+finds {SetOp . BinaryOp . Dom = RanOp} . It next looks on the Generalization s
+slot of those three units, and finds (coincidentally) that they all say {Operation} .
+so it adds that value to the growing list . Continuing, it finds that the Generalizations slot of Operation contains {Active}, and finally the Generalizations o f
+Active is {Anything} . The final value returned is therefore the set {SetOp ,
+BinaryOp . Dom = RanOp, Operation . Active. Anything} . The point here i s
+that the system's heuristic rules can refer to Isa(SetUnion) . and they can refe r
+to AllIsAs(SetUnion), and they need never know nor care whether one or bot h
+of them are primitive slots, or in fact whether they are both computed via som e
+more complex algorithm . The decision about which functions are implemented
+
+	
+
+NATURE OF HEURISTICS III
+
+63
+
+as primitives (slots), and which are computed dynamically from others, i s
+invisible to the rules, and may change from time to time (e .g ., after a grea t
+amount of experience is accumulated in some domain, it may be apparent tha t
+AllIsAs is requested so often that it should be stored primitively) . The rules
+represent guidance knowledge which is, after all, independent of the specifi c
+representation being employed ; this 'slots = functions' scheme adequatel y
+decouples the two . From the point of view of the rules, all a 'concept' is is a lega l
+argument for a list of functions (mostly unary ones) .
+(2) 'GET' knows why it's being called, 'PUT' knows how the value is
+justified. As in most frame-based systems, the most fundamental access functions are GET and PUT, rather than, e .g ., ASSERT and MATCH . The abov e
+paragraph shows that instead of writing (GET Cf), which would mean "get th e
+value stored in slot f of concept C"), we shall write simply f(C) . It becam e
+painfully obvious during the building of AM that GET was being called fo r
+several different reasons in different places . Sometimes, all that was wante d
+was to know if any values at all were known yet for f(C) : sometimes an A M
+rule wanted to know the length of the set of values ; sometimes it wanted t o
+know some values, but it didn't matter how up-to-date the answer was : ofte n
+the major constraint was a limitation on the amount of resources to expen d
+(time or space or number of queries to the human user) : and occasionally 'th e
+complete answer' was required, regardless of how difficult it was to obtain . I n
+EURISKO we have begun to accomodate these different reasons and constraint s
+on each call on GET, by providing extra arguments which specify which reaso n
+is behind this call (Existence, Length, Some, Up-to-date) and how muc h
+resources can be spent (Time, Cells . Queries) . Calls on PUT are more standard ; they may trigger some flurry of re-writing, but the only extra argumen t
+one wishes to supply is an indication of the justification of the value bein g
+changed . For example, was this value computed by using values obtained b y
+GET? The answer is almost always affirmative, so one then asks just ho w
+precise those values were ; e .g ., if they were all obtained under severe tim e
+limits, the value we're about to PUT will be of dubious accuracy .
+(3) 'The size of ships' can mean different things, and there should be a plac e
+for each . Consider what it means to say that the Size(Ships) = Large . We can
+find many separate interpretations : here are half a dozen :
+(i) Each ship is large (this is guaranteed) .
+(ii) The default answer, when asked how big a ship is, is 'Large' (but n o
+guarantee) .
+(iii) The EURISKO units representing ships take up a lot of memory .
+(iv) There are many elements in the set of all ships .
+(v) Looking over the unit representing the set of all ships, we see it is ver y
+big .
+
+	
+
+64
+
+D .B . LENA T
+
+(vi) Viewing Ships as the name of a kind of slot (e .g ., a unit representing a
+fleet might have a slot called Ships, which was filled with a list of ship-names) ,
+we note a very large number of entries on such slots (for those units which ca n
+have a Ships slot) .
+Our aim here is not to argue for a preferred meaning, but rather to point ou t
+that each meaning should be unambiguously representable . Having ambiguity
+in English adds flair to the language, and makes conversation exciting ; but i t
+makes computation much more costly . We opt to eliminate ambiguity at th e
+time knowledge is entered into the system, so that, e .g ., the way tha t
+Size(Ships) = Large gets entered is guaranteed to disambiguate among the si x
+meanings listed above . In brief, we (a) replace a unit for X with separate unit s
+for AllXs, TypicalX, and XquaSlot, and (b) have meta-knowledge recorded i n
+slots that are prefaced `My' . Eliminating redundancy internally reduces processing time required, at a small increase in space required . Preserving metaknowledge uses quite a bit of extra space, but enables heuristics to late r
+perform inductions that would otherwise be impossible (e .g ., noticing regularities in all units entered by a certain person, or all attempts to synthesiz e
+examples by a certain new heuristic) .
+(4) Each kind of slot has a unit describing it . In building a knowledge base ,
+the need arises to be able to say things about each kind of slot . We give three
+examples .
+(a) What does it mean when a value is stored in slot s of unit U? Is tha t
+value guaranteed to be a legal entry, or is it just probable that it belongs there ?
+Is it going to always be valid, or is it merely currently a valid entry? These an d
+other questions about the epistemological status of entries on a slot will chang e
+from one task domain to another, from one program to another, from one slot t o
+another . Each kind of slot should `know' what it means to have a value stored o n
+itself .
+(b) Another question whose answer will vary is : Should we redundantl y
+cache (store) this value, or just assume we'll recompute it whenever we need it ?
+Some languages, such as the MOLGEN units package, force the answer to alway s
+be 'redundantly store' ; most languages force the answer to be `redundantl y
+compute' . But the optimal answer will depend on how the knowledge bas e
+grows, changes, and is used (e .g ., how often are the values accessed, compared
+to how often they're changed? How much space do they take up? )
+(c) When an entry is added or removed from an IsA slot, we expect th e
+'inverse link' to be likewise added or removed . This could be built in for eac h
+type of slot, but that makes defining new slots hard for the user .
+These examples illustrate the utility of representing each kind of slot as a
+unit . Thus there are units called CompiledCode, Generalizations, IsA, etc . Fo r
+instance :
+
+	
+
+NATURE OF HEURISTICS III
+
+65
+
+NAME : IsA, isa, Is-a, ISA, IS-A
+Informally : is, element-of, is-i n
+DOMAIN/RANGE : (Units — SetOf Units)
+IS-A : Sot
+FilledWithA : Set
+EachEntryMustBeA : Unit representing a set
+Inverse : Example s
+UsedBylnheritanceModes : I nheritAlong IsA s
+MakesSenseFor : Anythin g
+MylsA : Eurisko uni t
+MySize : 500 word s
+MyCreator : D . Lena t
+MyTi meOfCreati on : 4/4/79 12 :0 1
+Generalizations : AKindOf
+Specializations : MemberOf, ExtremumOf
+Worth : 600
+Cache : Alway s
+English : The slot which tells which classes a unit belongs to .
+ALGORITHMS :
+Nonrecursive Slow PossiblyLooping : A (u) {c E Concepts 1 c.Defn(u)}
+DEFINITIONS :
+Nonrecursive Fast PossiblyLooping : A (u,c) c.Defn(u )
+
+Most of the slots present for IsA were also meaningful for, e .g ., SetUnion [3] ,
+but a few are new and worth commenting upon . The Inverse slot is filled wit h
+Examples ; whenever x is added to (removed from) the IsA slot of y, y will b e
+added to (removed from) the Examples slot of x . The MakesSenseFor slot i s
+filled with Anything . This slot describes the class of concepts that can legall y
+have an IsA slot—in this case any concept at all .
+MakesSenseFor(Domain/Range) = Active, since only active concepts (thos e
+with algorithms) can have domains and ranges . Naturall y
+MakesSenseFor(MakesSenseFor) = Slot, since no other type of unit can legall y
+have a MakesSenseFor slot . The Cache slot of IsA says Always ; it might hav e
+said Never (which would save some space and squander much time) or som e
+more dynamic predicate instead .
+1 .2 . Ideas about control (agendae, reasons, and heuristic rules )
+(1) The control structure of the system is represented as part of the knowledg e
+base. While an AM-like agenda mechanism has been retained, the precise contro l
+algorithm is represented within EURISKO as a set of concepts, so the system ca n
+modify it itself . Basically, there is Select-Execute-PostMortem loop represente d
+as a unit . Specializations of this unit form the three nested loops that characterize the EURISKO program : select and work on a topic ; given a topic, select an d
+work on a promising task ; given a task, select and obey a relevant individua l
+heuristic rule . Each topic is a major category of investigation for the program
+
+	
+
+66
+
+D .B . LENA T
+
+Number Theory, Device Physics, Games, Evolution, Oil Spills) ; each tas k
+is an order of magnitude more specific and minuscule (e .g ., "Find som e
+examples of prime palindromes", "identify the functionality of a newly-designed VLSI device"), and the execution of individual heuristics are yet anothe r
+order of magnitude smaller ("if trying to find extreme examples of C, the n
+extract the base step from a recursive definition of C as one such example" :
+and see the dozens of heuristics R1–R26 discussed in [12]) .
+Representing the control structure explicitly has had three benefits so far .
+First, it facilitates explanation ; EURISKO can more coherently explain what it i s
+doing at any given moment, when asked by the user . Given that it's running i n
+a particular function, the user can ask what the purpose of the function is, ho w
+long it usually takes to run, why it was called, etc . Second, it allows enforced
+semantics [8] . Given that individual rules are supposed to take about a minut e
+to run, that an IfPotentiallyRelevant test is supposed to be much faster than a n
+IfTrulyRelevant test for each rule, and other assumptions upon which th e
+system has been built and optimized, it now has a way to enforce thos e
+constraints . If, for instance, a rule is created whose IfPotentiallyRelevant i s
+taking longer than its IfTrulyRelevant, explicit representation and record keeping of the control structure will let this be noticed and corrected . Thi s
+situation has happened many times, for rules synthesized by other heuristics ; i t
+might well happen in the future when new human users begin adding rules t o
+the system with only a partial view of what the various slot names are suppose d
+to mean . Third, and finally, since the average time and space for each functio n
+(and the variances of time and space) are built up over a reliable sample o f
+cases, it is possible for EURISKO to notice when it's in danger of being in a n
+infinite loop, even a subtle one in which there is no obvious infinite recursion o r
+circular list structure involved . The original motivation for explicitly representin g
+control was to enable the program to meaningfully modify its own control code ,
+but this has always resulted in bugs (due to an inadequate mastery of programming, of models of learning, and so on) .
+(e .g .,
+
+(2) Multiple agendae. The human researcher sticks with a topic for a n
+extended period of time . Partly this is due to the difficulty of `swapping in' a
+whole new set of concepts, heuristics, etc . Yet part of the reason for this
+behavior is more rational, and worth duplicating in our mechanical researchers :
+a developing field will often bog down and appear to stagnate, and this gradua l
+winding down of interestingness is punctuated by occasional bursts of (ofte n
+serendipitous) discovery, which lead to many promising things to do, which
+gradually wind down, etc . If the human—or the machine—abandons a topic a s
+soon as it begins to level out, he/she/it will forever be limited to making ver y
+superficial discoveries in many fields . How, then, does EURISKO stay focused o n
+a single topic for a nontrivial period of time ?
+Some (initially eight) of EURISKO's concepts (e .g ., Games, DevicePhysics,
+
+	
+
+NATURE OF HEURISTICS III
+
+67
+
+NumberTheory) represent `topics' . Each topic has a slot called Agenda, whic h
+contains its own agenda of tasks dealing with that topic (concept) and/or wit h
+one or more of its specializations . There no longer is one central agenda ;
+rather, there is a 'current topic', and its agenda is the one being used for a
+while .
+When a task is proposed which deals with a concept C, EURISKO ripples u p
+from C along the Generalizations links looking for topics, halting as soon as i t
+finds one . Since a concept may have several immediate Generalizations, ther e
+may be several upward ripplings going on at once ; each one terminates as soo n
+as it finds a topic . For instance, suppose some rule proposes a new tas k
+involving Palindromes . Their immediate generalizations are Numbers an d
+SymmetricConstructs . These eventually lead to the topics of NumberTheory
+and Aesthetics . A pointer to the task is put on the agenda of each topi c
+encountered . There can be several pointers to the same task simultaneousl y
+existing on different agendae .
+Below we examine the mid-level loop (choosing tasks and working on them )
+and low-level loop (choosing heuristics and obeying them) . Here we are
+considering the top-level loop, which involves choosing a topic, working on i t
+for a while (minutes to—rarely—days of CPU time), and then performing a
+post-mortem (after which the loop repeats) . Once a topic is chosen, the next lowe r
+level of loop is entered : choose a task, work on it, and analyze what happened .
+Note that a user's interests (as defined by the concepts that model individuals an d
+groups of individuals) may affect which topics EURISKO expects the user to b e
+interested in, which tasks he would most like to see worked on, etc .
+(3) Dynamic creation and elimination of agendae (topics) . On rare occasions ,
+a heuristic rule will advise that an agenda be split into pieces . E .g ., here ar e
+two rules which make such recommendations :
+If agenda A contains more than four times as many tasks as the average agenda ,
+then (try to) split A into about three pieces .
+If the number of units called on per task, when working on tasks of agenda A, is more than te n
+times the rate at which other agendae inspect units ,
+then (try to) split A into two pieces .
+
+Once the recommendation is made, other rules have some ability to meaningfully effect such schisms . One easy way to do this is by creating a ne w
+agenda for each specialization of the concept (=topic) of the original bi g
+agenda A . If there are no known specializations of that concept, other rule s
+may still apply . One rule looks for groups of concepts mentioned in som e
+fraction (ideally :i) of the tasks on A . but on very few (ideally less than ) of
+tasks on other agendae, and then uses these groupings to delineate the few ne w
+topics . Each new topic is explicitly defined and marked as being a ne w
+specialization of A . and the tasks from A are parcelled out onto the new ,
+specialized, smaller agendae .
+
+	
+
+68
+
+D .B . LENA T
+
+When an agenda shrinks too small, rules cause it to be merged into al l
+appropriate immediate generalizations' agendae . In such cases, the genera l
+agendae should adopt (a little of) the small agenda's aesthetics, values, heuristics, reasons, goals . open problems . proints of view . . . In practice, so far, th e
+only things inherited are the tasks themselves . This raises a possible researc h
+question, but is not currently an area we are investigating .
+In one run . EURISKO Split the Games agenda into two pieces : one dealing with
+the Traveller fleet design game . and one dealing with all other games . As it ra n
+out of things to try in the Traveller domain, that agenda grew shorter and finall y
+(days later) was automatically reincorporated into the Games agenda .
+(4) Selecting a task : the half-frame problem . Let's look in more detail at th e
+three phases for the middle level : selecting a task, finding rules which hel p
+satisfy it, and doing a post-mortem on the aftermath on the task's execution .
+Selecting a task is done as follows . The top task's reasons are evaluate d
+carefully, and its rating is updated . Reasons often become stale, but rarel y
+(during this phase) does a new reason suddenly spring to mind ; therefore, a
+task's rating will almost never increase, but may decline quite a bit by the tim e
+we get around to it . We term this the 'half-frame problem' because it remind s
+us of McCarthy and Hayes' [13] frame problem, but in a world where change s
+go only in one direction . That constraint lets us efficiently 'solve' the problem :
+If, after reevaluation, the top task's rating falls below that of task number 2, w e
+merge it back into the agenda . and repeat this step . Finally . some task will sta y
+at the top of the agenda (or we'll be down to re-re-evaluating some task whic h
+was higher initially—hence we know it won't be lowered any further) . One wa y
+or another, then, this phase terminates by selecting a task from the agenda . No t
+all the lower-rated tasks have been reevaluated at this time, but that doesn' t
+matter because reevaluating them would only have lowered their rating s
+anyway, so they almost certainly aren't the top task to work on now .
+(5) Executing a task : dynamically assembling a rule interpreter. The secon d
+phase then begins . The first activity is to locate a set of potentially relevan t
+heuristic rules, rules whose execution may (help to) satisfy the chosen task .
+Space and time bounds are computed (and may be updated as the rules fire) .
+Executing a rule is not so straightforward as it was in AM or most othe r
+rule-based systems . There are several ways that the pieces of the relevant rule s
+can be run as executable code—i .e., several possible rule interpreters . Variou s
+parameters of the current situation determine which rule interpreter is used .
+Here are nine examples .
+If resources are quite limited, the conditions If-Enough-Time ,
+If-Enough-Space, If-Enough-UserAccess, etc . will be checked
+quite early on .
+
+	
+
+NATURE OF HEURISTICS III
+
+69
+
+If the current task is vitally important, those slots may never eve n
+be considered .
+If very few rules are potentially relevant, then there's little need
+to spend time ordering them .
+If very many rules are potentially relevant, it may be better t o
+evaluate some If slot of all of them, and then place them in som e
+order for further, detailed consideration of relevance .
+In some particularly tricky situations, the rule interpreter mus t
+know that it is only a provisional choice, and that it must look fo r
+features of the environment (as it runs) that cause it to suspend ,
+and initiate a quest for a better interpreter.
+A more common, and less drastic, situation occurs when a rul e
+interpreter knows it must occasionally check for some new rule s
+which might have become relevant since the start of the rule executions .
+All other consideration being equal, prefer a specific rule to an y
+of its generalizations, prefer a rule with shorter running time ,
+with (average) fewer number of user interactions initiated, wit h
+higher Worth, with more ancient TimeOfCreation, etc .
+If the user is impatient (according to the user model, which, e .g . ,
+might have noticed a flurry of ' T's being typed), then execut e
+the ThenPrint actions of the relevant rules before actually working on the other Then slots of any of them .
+If the user likes conjectures, then execute all the ThenConjectur e
+slots first .
+These and other judgmental rules guide EURISKO in choosing and changing—
+or on some occasions synthesizing a new—rule interpreter for the current task .
+Once assembled, it is handed control and it runs the potentially relevant rules .
+This is itself usually a select-execute-analyze loop, which proceeds until th e
+resource bounds have been exceeded, or the rules have all quit .
+(6) Post-mortem of a task : non-blind `suspend and resume' . After the secon d
+phase ends, a careful analysis is performed upon that activity . What happened ?
+How many rules succeeded? How long did the task take? How much space? I s
+the user (as represented by units modelling him and the groups he belongs to )
+still interested in this topic, or is it time to (possibly) switch to a new one? Th e
+task is re-examined in light of its reasons : is it now worth putting back on th e
+agenda? With what reasons?
+
+	
+
+70
+
+D .B . LENA T
+
+If a task failed, it will usually be placed back on the agenda along with som e
+new tasks which (if they succeed) might enable this one to run successfully .
+This task's failure serves as one reason for those new tasks, and when the y
+succeed their post-mortem should boost the priority of this task . In trivial case s
+(where no heuristics know why the task failed, what could have helped it), th e
+task is simply put back on the agenda, and this mechanism resembles th e
+familiar blind suspension and resumption of processes . What Eurisko's contro l
+structure allows here is a sort of best-first knowledge-guided generalization of that
+mechanism .
+(7) Each heuristic rule is itself a concept ; we do not distinguish metarules fro m
+rules. Each heuristic rule examines some concepts . modifies them, create s
+similarly typed ones, etc . It just may so happen that some of those concept s
+examined and synthesized will be heuristic rules (will themselves be capable o f
+operating upon other concepts) . For that matter, they might even be concept s
+that are heuristics which work on heuristics ; this was illustrated toward the en d
+of Section 4 .12 of [12] . There is no need to distinguish metarules from rules, as w e
+can now simply apply a body of heuristics to itself as well as to concepts fro m
+some technical task domain . After all, categories should be drawn when an d
+only when the distinctions lead to some advantage, some new ability or clarit y
+or power.
+Unfortunately for my philosophy . EURISKO recently chose to define an d
+separate out the set of rules that can operate sometimes on other rules—i .e . ,
+the metarules . It did this mainly for aesthetic reasons (co-identification), an d
+decided to keep the distinction around because it noticed a powerful regularit y
+involving metarules : running one on rules usually takes much longer tha n
+running it on domain-level concepts . In hindsight it's clear that testing a rul e
+will take an order of magnitude more effort than testing an object-leve l
+construct, because testing a rule might require synthesizing and testing a doze n
+domain concepts along the way . Nevertheless, each metarule can and does stil l
+run at both levels .
+As part of what we get from representing each rule as a full-fledged unit, th e
+rules are automatically now organized into an enormous generalization/specialization hierarchy . The so-called Weak Methods (generate and test . hil l
+climbing, etc .) lie at the top (most general), and there are many hundreds o f
+entries near the bottom (specific judgmental rules which mentioned particula r
+terms like 'n-doped, 'nuclear dampers, and 'perfect numbers') . But what o f
+the structure in between? In particular, what are the next hundred or so node s
+below the five weak methods? What is the average depth of the tree, th e
+average branching factor, and so on? One aim of this research is to get a bette r
+grasp of what this 'space of heuristics' looks like, what its structure is . Ou r
+results to date were recently presented in [9] . Even though the weak methods
+are encoded as rules in EURISKO, and can be run . few of them have ever
+
+	
+
+NATURE OF HEURISTICS III
+
+71
+
+succeeded in producing a useful result, and as a result their Worths are fairl y
+low . It is usually more efficient to devise for the program a specific heuristic fo r
+some new situation, rather than spending the extra time following a very genera l
+heuristic .
+Once a task is chosen, say working on concept C, a rule interpreter is chosen
+or synthesized . This is run on the set of potentially relevant rules, namely th e
+rules pointed to by C or by one of its generalizations . The organization of rule s
+into a tree enables this set to be small (on the order of the log of the tota l
+number of rules in the system) . The interpreter will evaluate If parts of rule s
+and execute Then parts in some fashion (perhaps dealing with rules one at a
+time, perhaps running all their If's and then picking a rule at a time to carry ou t
+its Then's, perhaps running all the Then-Conjecture slots of all truly relevan t
+rules immediately, etc .) The post-mortem of an individual rule is necessarily
+simple : bookkeeping information about time and space used, new units created ,
+etc . are recorded .
+1 .3 . Ideas about communicatio n
+(1) As EURISKO matures, it interacts less as a pupil, more as a co-researcher .
+As with all expert systems, much system-user interaction has been require d
+initially, at system-startup time . These dialogues have been primarily tutorial ,
+as we put in one concept after another by hand . Later interactions were les s
+frequent, less tutorial in character, more frequently involving outside expert s
+watching and interacting with the program as a performer . Besides models o f
+users and user-groups, EURISK0 should have models of dialogue-modes (tutoring the system, solving problem, being taught by the system, etc .) We did, an d
+still do, believe this to be important, but little work has been done on it as yet .
+(2) EURISKO must quickly notice when new concepts are related to existing ones .
+EURISKO generates new concepts frequently . One result we've noted is the hig h
+
+frequency with which these `new' concepts are in fact equivalent to an already existing one . So EURISKO should have a fast way of checking each new concept ,
+to see if its genuinely new or not . We call this the recognition problem' . I t
+arises both when the user defines some new concept, and when EURISKO itsel f
+does .
+EuRISKO currently employs the following strategy to deal with this
+problem . Each unit knows which slots are criterial, i .e ., define it . Each suc h
+criterial slot s knows the way in which it makes sense to do matching . Th e
+existing concepts caught by this simple mechanism can then be examined i n
+detail at leisure . For instance, a concept may have Defn as a criterial slot, an d
+the Defn may be a conjunction of tests . Consulting AND, the matcher find s
+that it is supposed to be insensitive to the order of the conjuncts, and that i t
+should recur on their structure to determine if they match . Another concep t
+has a criterial slot which is Alg (a procedure for computing some function) . The
+
+	
+
+72
+
+D .B . LENA T
+
+Alg slot is filled with a Lis p PROGN, and the matcher consults PROGN an d
+finds that EVAL-ing the program on test arguments to see if gives the sam e
+answers is one way of testing a match . This does not provide a theoretical
+solution to the general problem of finding potentially-related concepts, but it i s
+working satisfactorily, empirically .
+(3) EURISKO always has the initiative ; the user can request but never demand .
+When the user types in some message indicating that he wishes to define o r
+modify a concept, that request is placed as a very (but not infinitely-) hig h
+priority task on the agenda . Note that EURISKO does not relinquish control a t
+any time ; it keeps the initiative . When the user types in `interrupts', EURISK O
+does minimize the amount of time until his/her interrupts are handled, but that
+is only due to courtesy (as defined by rules), not built in to the system in an y
+way .
+When the user selects a topic, that topic is given much greater weight tha n
+any others ; yet there may well still be some task on some agenda which has s o
+high a rating that its done anyway . The model of the user (based on him/her a s
+an individual and also based on groups the user belongs to) determines how to
+treat his/her requests and interrupts . Some categories (such as AI researchers )
+enjoy seeing a program retaining full control ; for other groups (such a s
+mathematicians), EURISKO knows it must (and does) simulate being a quit e
+subservient program .
+
+(4) Modelling the user enables the creation of a good first impression . Creatin g
+a good `first impression' is important . Psychologically, it will overshadow th e
+user's attitude toward using the system for a long time to come . Pragmatically ,
+EURISKO is dependent upon outside experts for testing, use, and knowledge bas e
+building ; it is important to keep them interested in interacting with the program .
+Telling a user something he/she already knows about, or omitting an explanatio n
+in an area he/she is unfamiliar with, are equally serious turn-offs .
+EURISKO solves this problem by building up and using models of its users .
+When a new user logs in, the program attempts to quickly guess as much a s
+possible his profession, his interests, his notations . Many of these features are
+co-occuring (e .g ., if he writes `j' to indicate the square-root of -1, then he' s
+probably an engineer, and he'd feel at ease being shown huge equations an d
+formulae) . Thus, when a few things are observed . EURISKO can tentativel y
+assign (as defaults, as it were) all the other known co-occuring `symptoms' . Thi s
+kind of expectation-filtering inference forms the common source of power
+for many current AI methodologies (frames, scripts, beings, stereotypes, units ,
+schemata) .
+To support expectation-filtering by user models, a massive data base mus t
+exist, dealing with people in general, broken into groups, and even some dat a
+about specific known individual users . As one might expect from the EURISK O
+philosophy, each person, each group, and the set AllPeople, get their own
+
+	
+
+NATURE OF HEURISTICS III
+
+73
+
+separate full-fledged concept frames . A genl/spec hierarchy exists, with th e
+most common knowledge at the top node (`AllPeople' in general), and th e
+most specific knowledge at the bottom nodes ('Polya', `Feigenbaum') . A t
+present there is not much in this knowledge base, but the results it affects ar e
+often the most noticeable ones by outsiders . For instance, when a new user
+types '(' T as EURISKO is starting up, EURISKO concludes that he/she is familia r
+with other computer systems, is impatient, is probably scientifically-oriented ,
+etc . EURISKO does learn simple models of each new user, but there are a t
+present very few psychological and societal heuristics for building up (an d
+testing!) such models . Based on our model of theory formation (presented i n
+[12]), we are not surprised that only minimal sorts of learning were achieve d
+without a deep model of the domain (in this case, the domain of `th e
+psychology of using computer programs') .
+2. Results of
+
+EURISKO
+
+Applied to Naval Fleet Design
+
+New concepts lie `near the surface' of all fields, though of course some field s
+have been picked cleaner than others (e .g ., contrast number theory to AI) .
+Mathematics was a poor choice of domain for AM from this point of view, since
+it has been so well explored throughout the millenia . It is rare that interestin g
+new results arise near the surface of old disciplines ; one exception is Conway' s
+numbers [7] . In fact, in our first graph theory protocol, such a concept wa s
+discovered (the category of graphs now known as uniquely geodesic : if a pat h
+exists between two vertices, then a unique shortest path exists) . In AM, there
+was always the possibility that while each heuristic seemed intuitively obviou s
+and general, its true nature was merely an encoding of some of know n
+mathematics, and that that was in fact why it appealed to our intuition (that ou r
+intuition has been shaped to reflect a rough image of mathematics that exist s
+already) . We strongly believed this not to be the case, however . EURISKO has
+been a good test of the hypothesis that a large but general set of judgmental rule s
+for manipulating concepts (and for discovering new rules) can be found an d
+operationalized .
+To demonstrate the efficicacy of its methods to practitioners of the fields i t
+works in (e .g ., mathematicians) and to practitioners of Al, any progra m
+claiming to be a `discovery program' should aspire to two goals : (i) use th e
+same methods to discover concepts, conjectures, and heuristics in severa l
+domains, and (ii) make at least a few genuinely new (to mankind) usefu l
+discoveries . Ana did not meet these criteria well, but EURISKO does . Sections 2
+and 3 of this paper discuss the various tasks EURISKO has worked on, and the result s
+it has achieved . Other articles focus on applications to VLSI design [11] ,
+elementary mathematics [3], and biological evolution [10] ; therefore we shal l
+concentrate upon a different task, that of designing a futuristic fleet to compete i n
+the Traveller Trillion Credit Squadron (TCS) wargame [14] .
+EURISKO designed a fleet of ships suitable for entry in the 1981 and 1982
+
+	
+
+74
+
+D .B . LENAT
+
+national Origins tournaments for TCS . These tournaments are held on July 4
+weekends, and run by Game Designers Workshop, which is based in Normal ,
+Illinois . The 1981 tournament was held in San Mateo, CA, and the 198 2
+tournament was held on the campus of the University of Maryland, in Baltimore .
+Each tournament was single elimination, six rounds . EURISKO'S fleet won the firs t
+tournament, thereby becoming the ranking player in the United States (and als o
+an honorary Admiral in the Traveller navy) . This win is made more significant b y
+the fact that no one connected with the program had ever played this game befor e
+the tournament, nor seen it played, and there were no practice rounds .
+Subsequent to that event, changes were made in the tournament rules, changes
+which nullified most of the unusual features of the submitted fleet . A differen t
+collection of rule synergies were opened up by the new rules, however, an d
+EURISKO'S new fleet won the 1982 tournament as well .
+Each participant has a budget of a trillion `credits' (roughly equal to dollars )
+to spend in designing and building a fleet of futuristic ships . There are over on e
+hundred pages of rules which detail various costs, constraints, and tradeoffs ,
+but basically there are two levels of variability in the design process :
+(1) Design an individual ship : worry about tradeoffs between types o f
+weapons carried, amount of armor on the hull, agility of the vessel, grouping s
+of weapons into batteries, amount of fuel carried, which systems will hav e
+backups, etc .
+(2) After designing many distinct kinds of individual ships, group the m
+together into a fleet . The fleet must meet several design constraints (e .g ., som e
+ships in the fleet, having a total fuel tonnage of at least 10% of the total flee t
+fuel tonnage, must be capable of refueling and processing fuel), and in additio n
+must function as a coherent unit .
+To handle this task, 146 units were added, by hand, to EURISKO . We list thei r
+names below, illustrate a couple in detail, and then discuss what EURISKO did .
+Accel AccelAttacklnfo AcceIUSP Agility Alg Armor Attacklnfo AttacklnfoO f
+BeamDefense BeamLaser BeamLaserAttacklnfo BigAccel BigAccelDamage
+BigAccelUSP Bridge DestroyedDamage Computer ComputerDestroyedDamag e
+ComputerFib ComputerinternalDamage ComputerRadiationDamage Confi g
+Configuration ConfigurationDefense CrewDamage CriticalHitDamag e
+CriticalTypeOfDamage Damage Damagelnfo DamagelnfoOf DamageTableO f
+DefendsAs DefendsUsing DefensiveWeaponType EnergyGu n
+EnergyGunAttacklnfo EnergyGunUSP Fleet FleetBattle FrozenWatc h
+FrozenWatch/TroopsDeadDamage FuelDamage Game GameConcept GameOb j
+GamePlaying Games H61 H62 H63 HEMissile HandleComputerinternalDamag e
+HandleComputerRadiationDamage HandleCrewDamag e
+HandleCriticalHitDamage HandleDamage HandleFuelDamag e
+HandleJumpDamage HandleManeuverDamage HandlePowerDamag e
+HandleScreenDamage HandleWeaponDamage Hangar/BoatDestroyedDamag e
+IfDecidingTermination IfSimulating Juggernaut JumpDamag e
+JumpDestroyedDamage LaserUSP ManeuverDamag e
+ManeuverDestroyedDamage Manu MesonGun MesonGunAttacklnfo
+
+	
+
+NATURE OF HEURISTICS III
+
+75
+
+MesonGunDamage MesonGunUSP MesonScreen MesonScreenDefens e
+MesonScreenUSP Missile MissileAttackInfo MissileUSP Missler NAccel s
+NBigAccels NEnergyGuns NLasers NMesonGuns NMesonScreens NMissile s
+NNucMissiles NNuclearDampers NNumber NRepulsors NSandCaster s
+NSmallAccels NucMissile NucMissileDamage NuclearDampe r
+NuclearDamperDefense NuclearDamperUSP OffensiveWeaponTyp e
+PhysGameObj PlayTravellerFleetBattle RangeDesired Repulsor RepulsorDefens e
+RepulsorUSP SandCaster SandCasterUSP SandDefense Scooter Scree n
+ScreenDamage ScreenDestroyedDamage Ship ShipVaporizedDamage Ship s
+SimulationHeurs SizeMod SizeUSP SmallAccel SmallAccelDamag e
+SmallAccelUSP SmallWeaponDamage Spine/FireControlDestroyedDamag e
+TerminationHeurs ToHit ToHitLongRange ToHitShortRange ToPlay ToPlayO f
+Tonnage TravellerFleet TravellerFleetBattle TwoPersonGame TypeOfDamag e
+USPNucMissile UnFairGame UsedlnSimulating UsedlnTerminating UspPresen t
+WarGame Weapon WeaponAttacklnfo WeaponDamage WeaponTyp e
+
+Each concept is represented by a unit that takes about half a page of text t o
+describe . Here are two of these units, shown the way they exist in EURISKO . Th e
+first describes a type of weapon available to ships ; its offensive power i s
+described in more detail by the second unit .
+Name . EnergyGun
+Generalizations : (Anything Weapon )
+AIIIsA : (GameConcept GameObj Anything Category WeaponType
+DefensiveWeaponType OffensiveWeaponType Ob i
+AbstractObj PhysGameObj PhysObj )
+IsA : (DefensiveWeaponType OffensiveWeaponType PhysGameObj)
+MyWorth : 400
+MylnitialWorth : 500
+Worth : 100
+InitialWorth : 500
+Damagelnfo : (SmallWeaponDamage )
+Attacklnfo : (EnergyGunAttacklnfo)
+NumPresent : NEnergyGuns
+UspPresent : EnergyGunUSP
+DefendsAs : (BeamDefense)
+Rarity : (0 .11 1 9)
+FocusTask : (FocusOnEnergyGun)
+MylsA : (EuriskoUnit)
+MyCreator : DLenat
+MyTimeOfCreation : "4-JUN-81 16 :19 :46"
+MyModeOfCreation : (EDIT NucMissile)
+Name : EnergyGunAttacklnf o
+MyWorth : 400
+Worth : 500
+All IsA : (Anything GameConcept )
+IsA : (GameConcept)
+Generalizations : (Anything WeaponAttacklnfo)
+AttacklnfoOf : (EnergyGun)
+ToHitShortRange : (8 7 7 6 6 5 5 4 4)
+
+see Note
+1, 3
+
+1
+2
+2
+2
+2
+8
+3
+4
+4
+5
+6
+7
+7
+7
+
+8
+
+	
+
+D .B . LENAT
+
+76
+
+ToHitLong Range : Impossibl e
+SandDefense : ((4 3 2 1 0 0 0 00 )
+(543210000 )
+(654321000 )
+(765432100 )
+(876543210)
+(987654321 )
+(1098765432 )
+(11109876543)
+(121110987654) )
+
+FocusTask : (FocusOnEnergyGunAttacklnfo )
+MylsA : (EuriskoUnit ValueOfASlot )
+MyCreator : DLenat
+MyTimeOfCreation : "4-JUN-81 16 :33 :18"
+MyModeOfCreation : (EDIT MissileAttacklnfo)
+Note 1 . The ` IsA ' slot holds the immediate (most specific) sets to whic h
+EnergyGun belongs ; the slot `AIIIsA' holds those same entries, plus all thei r
+Generalizations, plus all their Generalizations, etc . The `MyIsA' slot indicate s
+what this data structure is, namely a unit in an AI program .
+Note 2. The slot `MyInitialWorth' records the value of the MyWorth slot of th e
+unit at the time it was created . If the value of MyWorth has never changed ,
+then there is no MyInitialWorth slot needed—such units only have a MyWort h
+Slot ; EnergyGunAttacklnfo is such a unit . These values reflect how useful th e
+unit has been to EURISKO—i .e ., how compact it's been, how little CPU time it' s
+wasted, how many interesting analogies were built using it, how many of th e
+structural modifications done to it were fruitful, etc . This is to be contraste d
+with the Worth slot of, e .g ., EnergyGun, which specifies how useful energ y
+guns are to have on ships . All values are in the 0—1000 range . What happene d
+to lower the MyWorth of EnergyGun? At one time, it was selected as a
+candidate for modification ; EURISKO spent some time trying to analogiz e
+between it and other types of weapons, and nothing much came out of that . A s
+a result, its MyWorth was dropped from 500 to 400 . Why was the Worth o f
+EnergyGun lowered? Through many tens of simulations, it became clear tha t
+one could buy enough armor plating to make a ship invulnerable to attacks b y
+these types of weapons, and from then on almost all ships were so armored .
+Thus, any ships having energy weapons were at a serious disadvantage, an d
+gradually—as they lost—the Worth of EnergyGun declined . Incidentally, thi s
+mistakenly led to a correct heuristic : "If a weapon cannot hit at all at one rang e
+(e .g ., Long Range in this case), then it's probably not worth having too many o f
+them ." That was not the major problem with energy guns, but the heuristic is a
+good one anyway .
+Note 3 . Most of the slots are filled in with names of other units ; for example
+the AllIsA slot of the EnergyGun unit points to the unit called WeaponType . If
+
+	
+
+77
+
+NATURE OF HEURISTICS III
+
+new facts should emerge about weapontypes (e .g ., a heuristic that the bigge r
+the better, or a new regulation affecting the grouping of weapons into bat teries), the unit WeaponType would be edited and modified, but there woul d
+be no need to try to figure out all the effects on other units in the system . Th e
+changes would be inherited by EnergyGun and only noticed when they wer e
+needed, when some use was about to be made of them . This is a major sourc e
+of power in most frame-based systems . Some of these pointers are actuall y
+indirect SeeUnit ; references [8] . For instance, the NumPresent slot of EnergyGu n
+should be filled simply with a range limit ; instead, it contains the lis t
+(*SeeUnit :* NEnergyGuns) . There is a unit called NEnergyGuns, with a Valu e
+slot that does provide the desired range [anywhere from 0 to Tonnage/100], bu t
+NEnergyGuns contains other information about the number of energy guns o n
+a ship, such as power requirements, balancing, variance and mean values fo r
+this quantity, extreme values, etc .
+Note 4 . Some slots have a single entry as their value, and some have a list of entrie s
+(even though there may only be one element in that list) . The unit representin g
+each kind of slot indicates the kind of structure to use to fill incarnations of tha t
+kind of slot—set, bag, list, single item, etc . That unit also specifies the type an d
+range of the entries that are permissible thereon .
+Note 5 . The slot called `Rarity' reflects the fact that, during a recent run ,
+EURISKO examined nine objects, known to be weapons, to see if they were
+energy guns ; one of them was . This is the kind of bookkeeping record whic h
+heuristic rules might want to access ; e .g ., rules which say "If C is a specialization of G, and (empirically) very few G's turn out to be C's, then . . ." .
+Note 6. As EURISKO worked in this domain, over a hundred new workhors e
+concepts were trivially synthesized by EURISKO : concepts of the form FocusOnX ,
+where X is one of the 146 concepts . Each such FocusOnX concept represents a
+task, and is pointed to by one or more agendae, initially the Games agenda . I t
+records the various times that it was the top task and energy was expende d
+working on it, when that happened, what the results were, how long it took ,
+what reasons recommended, it, etc . The FocusOnEnergyGun task thus serves
+two purposes :
+(i) it is a task on an agenda, and when selected it draws EURISKO'S attentio n
+to the concept EnergyGun ; various generation rules might then cause EURISK O
+to explore modifications to EnergyGun, analogies to it, patterns in its use, etc .
+(ii) it is a record of all the times that that task has ever been worked on, an d
+as such forms data which can be examined by rules, e .g ., this one : "If most
+attempts to do X have been slow but fruitful, then . . ." . That is, it serves as dat a
+to induct upon .
+Note 7 . The preface My means "treated as a
+
+EURISKO
+
+unit, a data structure in a
+
+	
+
+78
+
+D .B . LENAT
+
+computer program" . So MyCreator refers to the person who first typed in th e
+unit called EnergyGun, or to the name of the heuristic rule which firs t
+synthesized it (in which case MyTimeOfCreation would have to point to a task a s
+well as to a date) . If the EnergyGun unit had a slot called just Creator, it would b e
+filled with the name of the person who invented the energy gun . Similarly, if it had
+a slot called TimeOfCreation, it would be the date on which the energy gun wa s
+first discovered . Such information might be useful to the program, incidentally, i f
+there were some pattern in the usage of weapons developed by inventor X, o r
+developed during a certain period of time .
+Note 8 . Many of EURIsK0's slots have inverses . Thus Attacklnfo and AttackInfoOf are inverse slots . IsA and Examples have the same relationship ; thu s
+EnergyGun says it IsA Defensive WeaponType . If we ask for Examples(DefensiveWeaponType) the value is the list (BeamLaser PulseLase r
+SandCaster EnergyGun Repulsor), which includes EnergyGun . On the uni t
+called IsA, its Inverse slot is filled with the entry Examples . The Inverse slot of
+the Inverse unit is filled with Inverse—so if slot s is the inverse of r, then r i s
+the inverse of s .
+Of the 146 added concepts, two represented new types of activities : playing a
+game, and running a simulation . Later, a couple other games were added t o
+EURISKO (Tic-tac-toe and Go) to ensure that the general games concepts trul y
+were general . Managing a simulation caused us to augment EURISKO with thre e
+new heuristics (H61, H62, H63) : these (respectively) check for termination, tr y
+to project the ultimate outcome of the simulation, and check for infinite loop s
+during simulation . One method they employ, e .g ., is to monitor the relativ e
+strengths of the two opponents : if a pattern develops in the progression o f
+these (e .g . . the ratio is always in favor of side 2 and it is increasing i n
+imbalance) . a winner can be projected . If the strengths remain basicall y
+unchanged for several iterations, an infinite loop (i .e ., a draw) can be projected .
+Two new If types of slot were introduced, IfSimulating and IfDecidingTermination ; the three new heuristics had values for these new slots as well a s
+other, more conventional If slots . Two new categories of heuristics wer e
+defined : TerminationHeurs and SimulationHeurs . Their quaSlot forms wer e
+useful `unary functions' which map a game—such as TCS—into a set o f
+heuristics for simulating it, and into a set of heuristics for checking terminatio n
+of the simulation . The inverse links to these two slots are called UsedlnTerminating and UsedlnSimulating . They point from a rule to the game(s) o r
+process(es) it simulates (or tries to terminate) . For instance, heuristic H61 has a
+slot called UsedlnTerminating, whose value is the singleton list (Traveller FleetBattle) .
+The new units collectively specify the rules of the game and the constraint s
+on the design process . How did we get EURISKO to play the game? The uni t
+Games is a topic, and as such can have an agenda . One of the new units,
+
+	
+
+NATURE OF HEURISTICS III
+
+79
+
+PlayTravellerFleetBattle, had no examples, so a general heuristic added a ne w
+task to the Games agenda : "Find examples of PlayTravellerFleetBattle" . Th e
+Games topic was selected as the current topic (by pointing to it with a cursor ,
+though it could have been selected indirectly by supplying a user model tha t
+claimed the user is very interested in games) . Once Games was the chose n
+topic, there were only a few tasks with higher priority . The first one EURISK O
+ran defined the difference between Games and TwoPersonGames, and made a
+note that sometime EURISKO should look into defining some of those Non TwoPersonGames .
+Finally, EURISKO got around to trying to find examples of PlayTravellerFleetBattle . Each example involved a call on a fleet-designing phase followe d
+by a battle simulation phase . The new concepts and rules helped carry out thes e
+processes . After each simulated battle, EURISKO paused to try to abstract fro m
+the results some new design heuristics . The first step was to isolate th e
+differences between the two fleets . Often they would be similar, and th e
+differences would exist mostly at the level of design of particular individua l
+ships . Eurisko then framed many different general rules, any one of whic h
+would suffice to prefer the winning design over the losing one . No new
+techniques are used for this induction process ; rather, the apparent power i s
+due to a good choice of representation for the rules, one naturally suited t o
+rules, to design rules, and even more particularly to TCS ship design rules . We
+shall have much more to say about this is Section 5 . A fast test of the candidat e
+rules was made, using any relevant recorded battles from the past . If more tha n
+one proposed heuristic remained, new variant fleets were designed and simulated, each one embodying one but violating the other heuristics . In cases of
+circular victories (A beats B who beats C who beats A) all the candidates
+involved were retained, but with somewhat lowered worth . Such situation s
+were interpreted as analogues of local maxima, and EURISKO would try for a
+very different fleet design for the next iteration .
+So fleets fight (each battle taking between 2 and 30 minutes), and the battle i s
+analyzed to determine which design policies are winning, and—occasionallywhat fortuitous circumstances can be abstracted into new design heuristics . A n
+example of the former (gradual parameter adjustment) was when the Agility of
+ships gradually decreased, in favor of heavier and heavier Armor plating of th e
+hulls . An example of the latter (fortuitous monsters) was when a purel y
+defensive ship was included in an otherwise-awful fleet, and that fleet could
+never be fully defeated because that defensive ship, being very small, unarmored, and super agile, could not be hit by any of the weapons of the large r
+nearly-victorious fleet.
+EURISKO has by now spent 1300 CPU hours on a personal Lisp machine, th e
+Xerox 1100, managing this heuristically-guided evolution process . The autho r
+culled through the runs of EURISKO every 12 hours or so of machine time (i .e . ,
+each morning, after letting it run all night on one or more 1100's), weeding ou t
+heuristics he deemed invalid or undesirable, rewarding those he understood
+
+	
+
+80
+
+D .B . LENAT
+
+and liked, etc . Thus the final crediting of the win should be about 60/40 %
+Lenat/EuRIsxo, though the significant point here is that neither party coul d
+have won alone . The program came up with all the innovative designs an d
+design rules (i .e ., the loopholes in the TCS formulation), and recognized th e
+significance of most of these . It was a human observor, however, (the author )
+who appreciated the rest, and who occasionally noticed errors or flaws in th e
+synthesized design rules which would have wasted inordinate amounts of time
+before being corrected by EURISKO .
+Most of the battles are tactically trivial, the contest being decided b y
+the designs of the two fleets ; that—and the 100-page thickness of the rulebooks—were the reason this appeared to be a valid domain for Euxrsxo . It is
+also important—for Euxrsxo to have a good chance of finding new results—tha t
+the size of the search space (legal fleet designs) be immense : with 50
+parameters per ship . about 10 values for each parameter (sometimes fewer .
+often an infinite number), and up to 100 distinct ships to design and include i n
+each fleet, any systematic or monte carlo analysis of the problem is unlikely t o
+succeed . In fact, the designers had done a detailed linear programming mode l
+of the game, and their computer runs convinced them that a fleet of about 2 0
+behemoths was the optimal design . This was close to the starting fleet design th e
+author supplied to EURISKO, and it was also close to the designs that most of th e
+tournament entrants came up with .
+EURISKO was originally supplied with what appeared to be a good flee t
+design (twenty large ships, each fairly fast and moderately armor-plated, eac h
+with some small weapons and one huge spinal weapon) . EURISKO also had man y
+`mutation' operators, such as changing the number of ships, their size, thei r
+weaponry, etc . The many constraints—the TCS rules and formulae—were used
+to constrain the generation of mutant fleets, and to prune away illegal one s
+before simulating them . At first, mutations were random . Soon, patterns wer e
+perceived : more ships were better ; more armor was better ; smaller ships wer e
+better ; etc . Gradually, as each fleet beat the previous one (and a few rando m
+ancestors), its "lessons" were abstracted into new, very specific heuristics .
+These rules are specific not only to ship design, but to the particular set of TCS
+rules in effect during 1981 . The design rules were then used to further constrai n
+the mutation process .
+One very general result that EURISKO abstracted from this evolutionary
+design process was a `nearly extreme' heuristic .
+In almost all Traveller TCS fleet design situations ,
+the right decision is go for a nearly—but not quite—extreme solution .
+Thus, the final ships had Agility 2 (slightly above the absolute minimum), on e
+weapon of each type of small weapons (rather than 0 or many), the fleet ha d
+almost as many ships as it could legally have but not quite (96 instead of 100) ,
+etc . Big weapons (enormous spinal mounts capable of blasting another ship to
+
+	
+
+NATURE OF HEURISTICS III
+
+gl
+
+pieces with a single shot) were gradually phased out, in favor of an enormou s
+number of small missile weapons . The fleet had almost all (75) ships of this type
+though there was one ship which was small and super agile and purel y
+defensive (and literally unhittable by any reasonable enemy ship), and a coupl e
+monstrous hulks which had no chance of defense against normal ships, bu t
+which had weapons just barely accurate enough to hit any enemy ships tha t
+were (of course!) small and agile and purely defensive .
+Some of the strangest elements of the final fleet were discovered accidentall y
+rather than as the result of a long, continuous evolution process . The usefulnes s
+of a tiny defensive ship was apprehended after a `lifeboat' was the only survivo r
+from one side's fleet, yet round after round it could not be hit at all . That
+design was immortalized into a design strategy ("Include one such ship in you r
+fleet!"), and a very general rule began looking for ships that could destroy it .
+Finally, one was found ; it was quite strange, and would never have bee n
+included except to counter the possibility that the enemy might have smal l
+defensive ships too . Against any normally-armed ship, it would quickly b e
+destroyed . Basically, this new ship had moderate size, no armor, the larges t
+possible guidance computer, the slowest possible engines for its size an d
+equipment, and one single, enormous accelerator weapon—a weapon usuall y
+ignored because its broad beam glances harmlessly off large armor-plated ships ,
+but which is very easy to aim . This combination is ineffective for most combat ,
+but is just enough to fire at the little boats it might be sent against . We were a
+little disappointed that none of the other entrants had small defensive "stalemate guarantors" of the sort we took .
+Almost all the other entrants in the final tournament had fleets that consisted
+of about 20 ships, each with a huge spinal mount weapon, low armor, fairl y
+high agility, and a large number of secondary energy weapons (laser-typ e
+weapons). This contrasted with EURISKO'S fleet in almost all ways . Most ships i n
+our fleet did sprout one solitary laser among their 50 or so weapon batteries ,
+but not because it was useful in combat—just to absorb damage from enem y
+fire (thanks to the somewhat unrealistic scheme by which damage is inflicted o n
+ships which have been hit) . After an exchange of fire, most of the enem y
+behemoths did indeed sink one of EURISKO'S ships, for a total loss of about 1 5
+ships . In return, EURISKO'S 96 ships sank about 5 of the enemy . So just prior to
+the second exchange of fire, the enemy was down to 15 ships, and EURISKO 81 .
+After a second round of fire, the numbers were 11 and 70 . Two mor e
+exchanges brought the totals to 1 and 46, and one more round of fire wiped ou t
+the enemy . In this scenario—which was the most common one in all EURISKO ' S
+battles during the tournament—there is no need at all to bring any of it s
+specialty ships into the front lines at any time .
+The tournament was run in such a way that, after one player wins a battle ,
+his fleet is completely reconstituted and repaired to its original state, i n
+preparation for the next rung of the ladder .
+
+	
+
+82
+
+D .B . LENAT
+
+pattern became clear . Its second opponent did some calculations and resigne d
+without ever firing a shot . The subsequent oponents resigned during their first
+or second round of combat with this fleet . EURISKO ' S few specialty ship s
+remained unused until the final round of the tournament, battling for 1st versu s
+2nd place . That opponent also had ships with heavy armor, few large weapons ,
+low agility, etc . He was lacking any fast ships or fast-ship-killers, though . Th e
+author simply pointed out to him that if EURISKO were losing then (according to
+the TCS rules) our side need put only our fast ship out the front line, withdra w
+all the others and repair them, and—once they were finished repairing themselves—effectively start the battle all over again . This could go on ad infinitum ,
+until such time as EURISKO appeared to be winning, and in that case we woul d
+let the battle continue to termination . The opponent did a few calculations an d
+surrendered without fighting . Thus, while most of the tournament battles too k
+2–4 hours, most of those involving EURISKO took only a few minutes .
+The tournament directors were chagrined that a bizarre fleet such as this on e
+captured the day, and a similar fleet (though not so extreme) took secon d
+place . The rules for future years' TCS tournaments were changed to eliminate
+the design singularities which EURISKO found . For example, repairing o f
+damaged ships was prohibited, so the utility of the unhittable ship becam e
+negligible .
+Details of EURISKO ' S victory at the tournament and a complete listing of th e
+design of our winning fleet are given in [14] . Rules for the competition are
+given in three parts, each of them necessary, each published in a separat e
+softbound book of about 200 total pages : One on small ship design, one o n
+large ship design, and one on fleet design and combat rules . These are availabl e
+from Game Designers' Workshop, Normal, Illinois, as well as from game an d
+hobby shops nationwide in the U .S .A .
+When rules for the 1982 tournament were announced, EURISKO was set t o
+work on finding a new fleet design . Although many of its best designs an d
+design rules were now illegal or useless, most of the general heuristics i t
+synthesized about the game were still valid . Using the `nearly-extreme' heuristic, for instance, it quickly designed a ship with practically no defense, and tha t
+ship filled a key role in the final fleet . Coincidentally, just as the defensive shi p
+made a difference in the 1981 final round, the offensive ships made a differenc e
+in the 1982 final round . In each case, their presence caused the opponent t o
+resign without firing a shot . The bulwark of our 1981 fleet was a ship that wa s
+slow and heavily armored ; the majority of ships in our 1982 fleet were very fas t
+and completely unarmored . Just as most `experienced' players jeered at th e
+1981 fleet because it had practically no large weapons, they jeered at the 1982
+fleet because it was unarmored and it still had no large weapons, even thoug h
+the rules changes had made them much cheaper .
+What EURJSKO found were not fundamental rules for fleet and ship design ;
+rather, it uncovered anomalies, fortuitous interactions among rules, unrealistic
+
+	
+
+NATURE OF HEURISTICS III
+
+83
+
+loopholes that hadn't been forseen by the designers of the TCS simulation
+system . There may be little of what EURI5KO found that has application to rea l
+naval design ; most of its findings pertained to the fine structure of the TC S
+rules, not to the real world . For example, a crew hit reduces the number o f
+crewmen on a ship from n down to the largest power of 10 smaller than n (e.g.,
+from 370 to 100, from 82 to 10) ; EURISKO therefore designed ships requiring 9 9
+crewmen, and crewed them with 101 people ; the first crew hit therefore had n o
+effect on the ship's battleworthiness .
+The fact that EURISKO's discoveries were synergistic loopholes rather than
+genuine naval insights is not in itself bad, as our goal was to win th e
+tournament, not break new ground in real warfare . In fact, the very unrealit y
+of the TCS rules—as any 100-page model of the real world is bound to b e
+incomplete and have rough edges—promised to aid us in our task . Here was a
+search space that had not been explored much by human beings yet ; mos t
+designers were applying analogues of rules that hold in real life, and tha t
+yielded them reasonable designs—fleets of the kind the TCS people anticipated . EURISKO was able to walk around in the space defined by the set o f
+rules, somewhat awkwardly, but (thanks to its absence of common sens e
+knowledge) with few preconceptions about what an optimal design might be .
+Perhaps we will know that the program has `arrived' when it first fails
+to win the TCS tournament . This notion of a large, unexplored search space ,
+not necessarily well-matched to our everyday comnon-sense intuitions, wil l
+come up again and again in the following pages . It appears to characteriz e
+those domains for which automated discovery (of both concepts and heuristics )
+is currently most viable .
+The rules will indeed change for July, 1983, including the elimination o f
+drop-tanks (fuel tanks that can be jettisoned ; this improves the speed of a ship
+but may strand it after the battle) and other changes that will force a complet e
+redesign . We look forward to the new challenge .
+3 . Results of
+3 .1 .
+
+EURISKO
+
+EURISKO
+
+Applied to Other Task s
+
+applied to elementary mathematics
+
+The first domain we added concepts about was mathematics, specifically th e
+same starting collection of finite set theory concepts AM began with . Fifty
+heuristics were added, which subsumed most of AM's old set of 243 . Thi s
+condensation was the result of joint effort on the part of the author, W .W .
+Bledsoe, and H .A . Simon, begun in 1978 at Carnegie-Mellon University . No t
+surprisingly, EURISKO then duplicated many of the results of AM : findin g
+elementary set theory theorems, extreme properties of set operations, an d
+defining useful new objects and operations about 50% of the time . The othe r
+50% of its time was spent about half in generating awful concepts (still a bit
+
+	
+
+84
+
+D .B . LENAT
+
+better than AM' S hit-rate, though), and half in attempting to produce new
+heuristics and types of slots . Even though these latter activities were quite rare ,
+they were quite timeconsuming when they did occur . The various set-theor y
+examples presented in [12] were drawn from runs of EURISKO .
+The knowledge base now contains number theory (divisibility theory )
+concepts as well . Most number theory concepts were discovered by EURISKO
+and later hand-smoothed by the author : e .g ., a valid but inefficient factorin g
+algorithm was replaced by an efficient one . It is hoped that EURISKO may fin d
+some new results on fringes of that area .
+About 200 math concepts were present in the system, to work in set theor y
+and number theory . After about 500 hours of running, another thousan d
+concepts had been considered, and 200 of them had proven interestin g
+(empirically, in the program's judgment, and later confirmed by human inspection) . Of these new concepts, 11 were valuable, specific new heuristics, an d
+7 were useful new types of slots . Of the 7 new slot types, four were slots tha t
+only heuristics could possess .
+It is worth explaining those four new If and Then types of slots which wer e
+synthesized : If-Constant, If-Identity, If-Unchanged, and Then-Conjecture . Th e
+three If slots were needed because of the high frequency with which ne w
+functions turned out to be closely related to (i) a constant function, (ii) th e
+identity function, (iii) the same function they were synthesized from . After
+synthesizing the new Then slot, EURISKO defined the two new bookkeeping slots
+listed above : ThenConjectureRecord and ThenConjectureFailedRecord . Eac h
+(unit representing a) heuristic rule, call it H, can have either or both of thes e
+bookkeeping slots, as well as having a ThenConjecture slot . The bookkepin g
+slots keep track of how often (for this heuristic H) the ThenConjectureSlot has
+been evaluated, and what fraction of the time it signalled an error (an Abor t
+message) and forced H's execution to terminate .
+Several useful heuristics were discovered by EURISKO . Here is one example :
+"If an inverse function is going to be used even once ,
+then it's usually worthwhile to search for a fast algorith m
+for computing it . "
+This was abstracted from a couple experiences where—in number theory—a n
+operation was very easy to compute, but its inverse took a long time . In particular ,
+Times was quick, but Times-Inv (finding all possible factorizations of a number )
+was lengthy . The amount of time taken up was large even by comparison to th e
+time required to look for algorithms, so EURJSKO produced this heuristic . As wit h
+most heuristics, EURISKO would have run better if it had had this heuristic from th e
+beginning .
+Sadly, no powerful new heuristics, specific to set theory or number theory ,
+were devised . This may reflect the `well-trodden' character of elementary
+
+	
+
+NATURE OF HEURISTICS III
+
+85
+
+mathematics ; i .e ., so many great minds have wandered in that territory so lon g
+that there is little left to find from shallow experiential induction and analogy .
+The failure also might be due to the rigid, traditional way in which EURISKO' S
+math knowledge was organized and represented .
+3 .2 .
+
+EURISKO
+
+applied to Else programmin g
+
+Two hundred of the most common INTERLISP functions have been represented as units within EURISKO . This may sound impressive, but falls far short of
+our original goal, which was to have a separate unit representing each one o f
+EURISKO'S functions and any LISP functions they call, giving descriptive in formation about it . This was to hold for (i) Else primitives, such as EQ an d
+MAPCAR, (ii) hand coded LISP functions used by the EURISKO system, such a s
+MapUnits and FindRandomSubset, and (iii) implicit unary functions—i .e ., al l
+the types of slots a unit might possess, such as MyCreator and IfPotentiallyRelevant . We have only begun to scratch the surface on representing LISP
+primitives ; about one half of EURISKO'S own functions have units representin g
+them, and all of the slots have such a unit .
+These units about Else, programming, and EURISKO itself enable the EURISK O
+program to monitor and modify its own behavior, as well as synthesize an d
+modify new LISP functions . EURISKO gathers data about use . just as it did abou t
+elementary mathematics or naval fleets .
+For example, EURISKO was originally given units for EQ and EQUAL, wit h
+no explicit connection recorded between them . Eventually, it got around t o
+recording examples (and nonexamples) for each, and conjectured that EQ wa s
+a restriction (a more specialized predicate) of EQUAL, which is true . A heuristi c
+suggested disjoining an EQ test onto the front of EQUAL, as this migh t
+speed EQUAL up . Surprisingly (to the author, though not to EURISKO), it did !
+This turned out to be a small bug in INTERLISP-D, which was then immediatel y
+fixed . The bug made EQUAL much slower than EQ in the case of identica l
+arguments passed to EQUAL .
+Once it had the conjecture about EQ being a special kind of EQUAL ,
+EURISKO was able to look through its code and specialize bits of it by replacin g
+EQUAL by EQ, or to generalize them by substituting in the reverse order . A s
+the author had been somewhat careful in coding the program, it is no t
+surprising that most of these generalizations were useless, and most of th e
+specializations were downright bugs, but occasional improvements in its ow n
+code were made by this policy .
+A very general heuristic EURISKO possessed said : "If f can often be used in plac e
+of g, and f uses less resources, then replace g by f wherever possible" This wa s
+specialized by EURISKO into a new Else programming heuristic which we recogniz e
+as a valid one :
+"If you can use EQ instead of EQUAL, do it to save time"
+
+	
+
+86
+
+D .B . LENAT
+
+Next, EURISKO analyzed the differences between EQ and EQUAL .
+Specifically, it defined the set of structures which can be EQUAL but not EQ ,
+and then defined the complement of that set . This turned out to be the concep t
+we refer to as Lis p atoms . In analogy to humankind, once EURISKO discovered
+atoms it was able to destroy its environment (by clobbering CDR of atoms) ,
+and once that capability existed it was hard to prevent it from happening .
+Its two `discoveries' were EQ (instead of EQUAL) and NCONC (instead o f
+APPEND) ; both of these were fast but sometimes wrong (or even hazardous t o
+apply) . This led EURISKO to define a class of use functions that were fast bu t
+dangerous, indeed a useful concept for INTERLISP programmers to form .
+Later, EURISKO began to generalize some useful use predicates, in some case s
+predicates we had defined using AND as their central connective . On e
+generalization technique was to remove a conjunct or two, and this often led to
+errors in evaluation . As a result, one additional interesting use heuristic wa s
+found :
+"Sometimes `AND' means `do in sequence', and sometimes i t
+means `doable simultaneously', and only the latter case is likely t o
+yield good results if you're considering generalizing a piece of code
+by removing conjuncts . "
+EURISKO ' S progress in this domain was entertaining, and a fundamenta l
+feature of this domain became clear : large programs are carefully engineere d
+artifacts, complex constructs with thousands of pieces in a kind of unstabl e
+equilibrium . Any sort of random perturbation is likely to produce an error
+rather than a novel mutant . The analogy to biological evolution is strong . Th e
+high `hit rate' Are enjoyed, mutating Lisp functions to find new math concepts ,
+was due to the intimate ties between Lis p and mathematics . EURISKO ha d
+successes in automatic programming only when it modified functions which ha d
+been coded as units . Why was this ?
+In a unit, each chunk of real Lis p code—an entry on a slot of the unit—was
+quite small and fell into the sterotypical category for that type of slot . For
+instance, consider the slot called ThenDefineNewConcepts . If a uni t
+(representing a Lis p function) had some entries on that slot, one knew exactl y
+what their format would be like (a series of calls on unit-defining and initializing routines), what their purpose was (to bring new units into existence), wha t
+kinds of things they were likely to be doing (copying from another unit wit h
+some modifications), how long these things should take (about 10 seconds pe r
+unit defined), etc . This foreknowledge allowed meaningful changes to be mad e
+almost all the time, rather than almost never (in the case of modifying a large ,
+opaque lump of LISP code about which nothing is known) .
+3 .3. EURISKO applied to other task s
+There have been six additional domains in which large-scale applications o f
+EURISKO were done . Below we briefly describe five of these tasks and the
+
+	
+
+NATURE OF HEURISTICS III
+
+87
+
+outcomes of applying EURISKO . The sixth domain, OilSpills, relies more on RL L
+than on EURISKO per se, and is covered in detail in [6] .
+(1) Evolution . One task domain was biological evolution : the simulation of
+organisms competing, followed by the most fit ones reproducing mutate d
+offspring for the next simulated generation . Heuristics for guiding the mutatio n
+process (to increase the viability of the offspring) were easily induced . Some of
+these were as trivial as noting that whenever an improved animal was produce d
+with a change in parameter X, that animal also happened to have a certai n
+change in parameter Y ; this got compiled into the heuristic that in the futur e
+any mutations of X ought to have a higher chance to modify Y as well . A n
+example of this from the simulation was "decreased ability to defend i n
+combat" and "increased sensitivity to nearness of predators" . An exampl e
+from homo sapiens might be "increased skull size" and "increased cephalopelvic diameter", though it appears our DNA lacks this heuristic .
+The net effect of having these heuristics for guiding plausible mutations wa s
+that, in a single generation, an offspring would emerge with a whole constellation of related mutations that worked together . For example, one ha d
+thicker fur, a thicker fat layer, whiter fur, smaller ears, etc . It is not know n
+whether there is any biological validity to this radical hypothesis, but there i s
+no doubt that the simulated evolution progressed almost not at all whe n
+mutation was random, and quite rapidly when mutation was under control of a
+body of heuristic rules . See [10] .
+(2) Games . A second EURISKO task domain we have not discussed in broa d
+terms yet is that of Games . It was mentioned above, in Second 2, that EURISKO
+was applied to other games besides Traveller TCS . Indeed, several genera l
+Games concepts were added to the knowledge base : material, position, tactic ,
+two-person game . fairness, player, opponent, etc . Also, a few heuristics wer e
+inserted, as very general strategies : simultaneous action, feint, pin, trap . Thes e
+were little used in TCS, since the battles themselves were strategically trivial .
+or in tic-tac-toe, since the entire search space is too small to warrant that leve l
+of consideration . In Go, however, these did get used . The level of play wa s
+never very high, but the system demonstrated the application of the genera l
+games strategies, and found specializations of them to Go . This is significan t
+because they were derived using Chess and Bridge as model games, by a
+system builder who did not even know the rules for Go .
+One area of current research is getting EURISKO to discover interesting ne w
+games ; that is, make up a set of rules . simulate the game . and evaluate i t
+according to various criteria (surprise ending, size of search spacing, etc .) Th e
+game-independent strategies should be specialized into specific, powerfu l
+heuristics by EURISKO . Occasionally, several heuristics which were abstracte d
+from experiences in various games should be generalized into a new high-leve l
+strategy . The task was suggested by discussions with Herbert Simon in 1977 :
+
+	
+
+88
+
+D .B . LENAT
+
+the first parts of the programme were done by Ramano Rao, using
+during the summer of 1981 .
+
+EURISKO
+
+(3) VLSI design . The most recent task EURISKO has been applied to is that o f
+three-dimensional VLSI circuit design, and the related problem of discoverin g
+new physical devices for that technology . This work has been quite successful ,
+and is discussed in [11], so we shall limit our remarks to a couple brie f
+paragraphs here . Technical information about building so-called highrise VLS I
+chips can be found in [5] .
+The paradigm for EURISK0's exploration is a loop in which it generates a
+device, finds its I/O behavior, tries to `parse' this into functionality it alread y
+knows about and can use, and then evaluates the results . At first, we had thi s
+loop take place at the level of charge carriers moving through semiconductin g
+material, various types of dopants, electric fields being applied to regions of th e
+plane, materials of different types being abutted, etc . Many of the well-know n
+primitive devices were synthesized quickly, such as the MOSFET transistor an d
+the silicon diode . This is because they were short sentences in the language w e
+had defined (a language with verbs like Abut, ApplyEField, and with noun s
+like nDopedRegion, IntrinsicChannelRegion) .
+Our expert, Professor James Gibbons of Stanford University's Center fo r
+Integrated Systems, quickly decided that we were working at too low a level ,
+and we switched to the level of conduction paths . The philosophy was that i f
+we could produce an interesting design at that level, he could find a way t o
+realize it in hardware . Our first efforts were systematic searches, and this gav e
+us an appreciation for the size of the search space . A very compact three dimensional design for a flip-flop was also serendipitously synthesized . We soo n
+switched back into the AM and EURISKO paradigm of using heuristics to guide the
+synthesis of new devices . Almost immediately, symmetry heuristics produced a
+very powerful yet simple device, one which simultaneously computes NAND an d
+OR, using only two small metal regions, two n-doped regions, two p-dope d
+regions, and one intrinsic channel region . These devices now form the primitiv e
+building blocks of our high-rise chip designs . When stacked into arrays, eac h
+device uses only one region of each type (n, p, metal, channel) . We illustrate th e
+device in Fig . 1, but refer to [111 for a detailed explanation of EURISK0's forays int o
+this domain .
+Criteria for interestingness of new devices include nonlinearity, state, computing previously-known function using less space, fewer componenets, les s
+power, faster, easier to produce, etc . A device which is superior along any o f
+these dimensions, even if it is slightly inferior along others, might be useful an d
+is worth naming and saving .
+Besides many useful devices and circuits, we now have a few useful heuristic s
+for the task of designing three-dimensional VLSI circuits ; in every secon d
+metal layer, wires should run N–S (and in the other metal layers, E–W) ; an y
+3-D folding of a 2-D design should replace (most of) the pairs of gates sharing a
+
+	
+
+NATURE OF HEURISTICS III
+
+89
+
+JMOS cross, the first XMOS device . Side view . When either metal tile is High, a
+channel connects the two negatively-(n-)doped regions . When either metal tile is Low, conductio n
+occurs between the positively-(p-)doped regions . Note that, if one metal tile is High and one Low, a
+channel of electrons and a channel of holes both exist and flow (at right angles) inside the central ,
+intrinsic Channel region (nearly obscured in the diagram) . The devices tesselate three-space.
+FIG . 1 . EURISKO ' S
+
+common control by single pieces of metal serving simultaneously as gates fo r
+regions above and below them ; etc .
+(4) Heuretics. A fourth task domain for EURISKO was that of Heuretics (th e
+study of heuristics) itself . In [9] we discussed the nature of heuristics, why w e
+consider Heuretics to be a scientific field in which one can do experiments an d
+form conjectures, and what we have learned from this work . In operational
+terms, EURISKO spent time forming and testing heuristics about learning ne w
+heuristics . How does it do this? Here is one sequence of behaviors EURISK O
+carried out :
+A heuristic H12 had been used many times, and—since heuristics are jus t
+special kinds of operators—another heuristic fired, one which said "If a n
+operator has been used many times successfully, it's worth trying to generaliz e
+it" . So a task was formulated and added to an agenda, and eventually it wa s
+worked on . That task said to try to form generalizations of H12 . Man y
+heuristics applied (were potentially relevant to satisfying this new task), an d
+created such new units . One heuristic noticed that the main connective in th e
+If-Potentially-Relevant slot of H12 was AND, and decided to generalize H1 2
+by replacing that connective with OR . Indeed, that new heuristic H12' did
+claim it was potentially relevant much more often, but it never was truly
+relevant any more often, nor did it take noticably less time to evaluate H12' s
+If-Potentially-Relevant slot . All in all, this kind of generalization had turne d
+out to be a mistake . When EuRISKO detected this, it eliminated H12', and i t
+synthesized a few new heuristics each of which—if they had only existe d
+earlier—would have prevented H12' from ever being allowed to survive . One
+
+	
+
+90
+
+D .B . LENAT
+
+of these said to never replace AND by OR in an If slot of a heuristic ; one said
+never to generalize the If Potentially-Relevant slot of a heuristic ; one said
+never change the main connective in a slot . Since EURISKO knew that most o f
+these heuristics would be wrong, or at least extreme, it gave each one onl y
+some chance of being followed, and detailed records were kept of thei r
+performances . Ultimately, the first new heuristic (and a variant of the secon d
+one) remained as permanent entries in EURISKO ' S knowledge base .
+It is important to note the level at which EURISKO is working : it finds new
+concepts and conjectures in, say, naval fleet design . It finds new heuristics in
+that domain as well, as it also finds some new heuristics about how to find ne w
+heuristics . Strange `bugs' can arise at those two highest levels ; we give a n
+example of each that EURISKO encountered :
+One of the first heuristics that EURISKO synthesized (H59) quickly attaine d
+nearly the highest Worth possible (999) . Quite excitedly, we examined it an d
+could not understand at first what it was doing that was so terrific . We
+monitored it carefully, and finally realized how it worked : whenever a new
+conjecture was made with high worth, this rule put its own name down as on e
+of the discoverers! It turned out to be particularly difficult to prevent thi s
+generic type of finessing of EURISK0'S evaluation mechanism . Since the rules
+had full access to EURISKO'S code, they would have access to any safeguards we
+might try to implement . We finally opted for having a small `meta-level' o f
+protected code that the rest of the system could not modify .
+The second `bug' is even stranger . A heuristic arose which (as part of a
+daring but ill-advised experiment EURISKO was conducting) said that al l
+machine-synthesized heuristics were terrible and should be eliminated . Luckily ,
+EURISKO chose this very heuristic as one of the first to eliminate, and th e
+problem solved itself .
+(5) Representation . The fifth task domain not discussed earlier is that of
+representation of knowledge . This is a very difficult area, one in which peopl e
+have not made dramatic inroads in the last few millenia . EURISKO'S task is quit e
+constrained, actually : look for useful new slots which are specific to the variou s
+domains you are working in . Some heuristics guide EURISKO in deciding when
+it's time to define a new type of slot . For instance :
+If the average number of entries on s slots (for those units that have any entries on an s slot) i s
+quite high—i .e ., three times the average over all types of slots
+then try to find specializations s ; that will enable the partitioning of entries on all the s slots in th e
+system .
+
+When the VLSI domain was explored, one slot that became overtaxed wa s
+Parts . Previously, it had had very few entries, but now devices were comin g
+along with dozens and sometimes hundreds of parts . The rule above fired, and
+a task was formed, to try to specialize Parts . When this task was ultimately
+
+	
+
+NATURE OF HEURISTICS III
+
+chosen and worked on, other heuristics guided
+tings to make :
+
+91
+
+n.URISK0
+
+into meaningful split-
+
+If you must decide how to specialize slot s ,
+then try to find a set of predicates that cover the entries ;
+some suggestions are : defined the same way, same syntactic type, used same way ,
+related to same Topic, structurally similar .
+
+In the case of the Parts slot, this heuristic succeeded in causing a split base d
+on syntactic type : gates, doped regions, channel regions, wires, etc . had
+separate recognizable formats . Henceforth, each VLSI device had no explici t
+Parts slot ; rather, it had slots called Gates, DopedRegions, etc . Later, when th e
+Terminals slot was being strained to its limit, EURISKO suggested splitting it into
+InputTerminals and XorOutputTerminals (sets of terminals having the property
+that precisely one element in each set can be an output terminal) .
+Once a new slot is defined, existing heuristics can readily be specialized to
+deal with it (i .e ., those that already deal with generalizations of that slot) . Each
+slot has a definition, remember, and existing units can have this slot (accordin g
+to its MakesSenseFor slot) will have some of their existing slots shortened o r
+replaced, by adding this new slot and some of the entries that used to exis t
+elsewhere on the unit . Incrementally, the slot is integrated into the network o f
+slots that defines the representation of knowledge in the system .
+This type of activity—formulating new domain-specific slots—happene d
+rarely, but we believe it to be one of the most important long-range activitie s
+EURISKO can do . When a vocabulary is well chosen, thoughts become easy t o
+express ; the set of slots is essentially such a vocabulary, and must be augmented as new domains are explored .
+4. Conclusions about Mechanizing the Process of Discover y
+From the work on AM and EURISKO, we have acquired some insights into
+automated discovery . Some domains are better suited to this process tha n
+others, and the discovery program must contain certain elements in any case .
+We summarize these conclusions here, and then use them to explain th e
+following phenomena : why AM worked so well, why AM ultimately failed, why i t
+took so long to do EURISKO, and why EURISKO now works . Finally, we use th e
+conclusions to explain our plans for future research in this area .
+(1) The domain should be as little explored as possible. Fields which ar e
+already very well understood are not promising candidates in which to searc h
+for new discoveries, either at the domain- or at the heuristic-level . Until a
+machine can match human breadth of vision, insight, sources for metaphor an d
+analogy, etc ., its main advantage must lie in breaking new ground rather tha n
+scouring old ground for neglected gems . Set theory is not likely to yield many
+
+	
+
+92
+
+D .B . LEN AT
+
+new results easily ; young fields such as graph theory are more promising :
+neonatal fields such as VLSI design are even more attractive . Another dange r
+in choosing a very well-established field is that by now much of even th e
+research activities in that field have become algorithmic and scripted .
+But what if one's goal is to explore the phenomenon of discovery, no t
+particulary to produce useful new ones? We still advise steering clear o f
+well-developed fields . In them . not only has knowledge accreted . but a n
+adequate representation has also formed in which to hold that knowledge . Iff
+your program starts with this adequate representation . which it is likely to do .
+then the discovery of facts and heuristics will be greatly facilitated—which wil l
+give you misleading information about the process of discovery . For example .
+even though AM later discovered arithmetic, little significance can be attache d
+to that, as it already possessed the notion of bag (multiset) . which is the natural
+way to represent arguments to arithmetic functions .
+(2) There must be a way to simulate--or directly carry out—experiments . Th e
+field of exobiology satisfies the former criterion of being almost completel y
+unexplored, but fails miserably on this one . Building a program to sugges t
+experiments in molecular genetics sounds like a promising task—until one ask s
+how the proposed experiments will be evaluated, how the program is suppose d
+to evaluate partially worked out hypotheses along the way, etc . In some case s
+the outside world can be replaced by a teletype hookup to a human expert, bu t
+this is never quite as good as working in a field which is represented internall y
+in the machine . Two approaches to this are a formalization (such as the axiom s
+and definitions for some field of mathematics) and a simulation (such as a set o f
+routines that compute answers to Mechanics situations they are asked about) .
+One disadvantage of simulators is that the discovery program cannot g o
+'beyond' a reformulation of the same knowledge that went into the simulator .
+Given a Newtonian simulator, the program may come up with Newton's laws .
+or Lagrange's, but not Einstein's .
+(3) The 'search space' should be too immense for other methods to work. N o
+human should be able to manually . exhaustively search the same space as th e
+program is walking around in . One big advantage the machine has over th e
+person is that of tirelessness . It is not an accident that EURISKO's searches in th e
+space of fleet designs consumed over a thousand CPU hours, nor that its VLS I
+explorations took ten times that much .
+Usually this criterion means "too big for systematic exploration", but all w e
+are requiring is that it mean "too big for manual exhaustive search" . DENDRAL ' S
+problem space is a good example : chemists claimed (in refereed article s
+published in the best chemical journals) to have found all structural isomers o f
+various formulae ; DENDRAL was able to systematically search the space, an d
+often found omissions from these lists . This is a case of problem solving rathe r
+than discovery, but the constraint we are trying to articulate is a general one of
+
+	
+
+NATURE OF HEURISTICS III
+
+93
+
+what it means for a problem to have the right `size' for attack by AI methods .
+Note that this criterion has a converse : the search space should not be to o
+immense for heuristic methods to work . Looking for useful VLSI devices is a n
+example of this bracketing ; interesting devices arise about once in 500 plausibl e
+candidates examined . If they were once in a billion, the task would not b e
+suitable for automation in the 1980s ; if they were once in five, one wouldn' t
+need an AI program to find them .
+(4) There should be many objects, operators, kinds of objects, and kinds o f
+operators . They should be related hierarchically and in other ways . This makes a
+frame-based (class-oriented) representation useful : Each "way in which two
+entities can be related" is a different type of slot . A hierarchical organizatio n
+makes the usual modes of inheritance important . The large number of object s
+and operators raises the need for an intelligent program, one which can kee p
+track of complex interactions among many entities .
+(5) The task domain must be rich in heuristic structure . Complexity of th e
+domain raises the utility of plausible, inexact reasoning, as more precis e
+inference becomes unmanageable or impossible . There should be many goo d
+heuristics which can apply, and no good algorithms . Theorem proving i n
+propositional calculus is a poor domain for automated discovery, as it admit s
+only a few heuristics ; it is an even worse domain for discovery of ne w
+heuristics, because what few heuristics do apply in propositional calculus are
+already well known . Let us be a little more specific about the need fo r
+heuristics vis-a-vis algorithms :
+(6) There must be ways to generate, to prune, and to evaluate . Many heuristics
+of each of three types should be available : heuristics which generate (sugges t
+plausible moves), heuristics which evaluate (judge the worth and specifi c
+problems with the discoveries), and heuristics which prune (eliminate implausible paths before they are explored too deeply) . It is acceptable for a n
+algorithm to exist for one or even two of these processes, but not for all three .
+(7) The `language' one uses to represent the concepts must be a natural one ,
+given the set of objects and operators . This is one of the most crucial conclusions ,
+and one we did not arrive at until recently . At a very abstract level, one ca n
+view the domain task as being one in which domain operators (e .g ., la b
+procedures, mathematical functions) are applied to domain objects (e .g ., cultures, sets) . In addition, EURISKO has a collection of higher level operator s
+which combine domain entities (both objects and operators) into new one s
+(e .g ., AddPlasmid, Compose, Conjoin) and which perform surgery on individual domain entities to produce modified ones (e .g ., Mutate, Generalize ,
+Coalesce) . The task of an AM-like discoverer is to apply these higher-level
+operators in a fruitful, efficient manner, having a high `hit rate' . That is, a hig h
+percentage of the time the result should be a new, useful domain entity . The
+
+	
+
+44
+
+D .B . LENAT
+
+task of a EuRisxo-like discoverer is to find heuristics which guide the applicatio n
+of the higher-level operators, so that the results will often be fruitful . If th e
+high-level operators are well matched to the way the domain entities ar e
+represented, then not too much guidance will be required ; most of th e
+applications will yield meaningful new concepts . If there is a serious mismatch ,
+then the problem may not be remedied even by a good set of guidin g
+heuristics . See [1] .
+An example of a mismatch is one of differing granularity : the high-level
+operators are good at working on 2-line chunks of `code', but your representation only includes three types of slots, so each unit has three enormou s
+chunks of code that `represent' it . When a mismatch is present, either th e
+high-level operators or the details of the representation scheme must b e
+adjusted until a match is (re)established .
+But the high-level operators are nearly domain-independent : compose .
+coalesce, repeat, disjoin, weaken . etc . So almost all the necessary accomodation must be done not by them but by the representation scheme i n
+which the domain knowledge is encoded . For instance, if a frame-base d
+representation is employed, then the set of slots must be adjusted until th e
+right 'granularity' is achieved (e .g ., each slot having about two lines worth o f
+entries) .
+In other words, even though the discovery of new heuristics is important . th e
+presence (and maintenance) of an appropriate representation for knowledge i s
+even more necessary . Once you do have such a match, as in AM's case, the mai n
+problem then appears to be the discovery of new heuristics .
+(8) Criteria which make a domain suitable for AM-like exploration (discover y
+of new concepts and conjectures) are—taken to extremes—the same criteri a
+which make a domain suitable for EuRisxo-like exploration (discovery of ne w
+heuristics) . This is an interesting corollary to the need for heuristic structure .
+To be well-suited to AM-like exploration, a domain must be open-ended .
+uncharted, internally formalizable, and possess a rich structure of heuristics . In
+extreme cases . the domain is so unexplored that not even the heuristics ar e
+available ; i .e . . there are no human experts in the field . In that situation .
+EURISxo's approach may be fruitfully applied, since any useful heuristics i t
+produces will be welcome new discoveries .
+
+5. Interpreting
+
+AM
+
+and
+
+EURisxo
+
+in Light of These Conclusion s
+
+Of the domains in which EURISKO has so far been applied . the two which mos t
+closely satisfy all the above criteria are the Traveller TCS game and th e
+three-dimensional VLSI design task . These are in fact the two areas in which
+EuRISxo has discovered valuable domain-level concepts and useful new heuristic s
+as well .
+In this subsection we consider the behavior of AM and EURISKO, applying the
+
+	
+
+NATURE OF HEURISTICS III
+
+95
+
+previous criteria to explain successes, failures, and difficulties encountered .
+This is an admittedly circular argument, since those criteria were abstracte d
+from just such experiences . Only future research with EURISKO, in new tas k
+domains and more deeply in its present ones, will be able to test those claims .
+First, we address the issue of why AM worked . The denseness of useful
+mathematical concepts appears crucial ; namely, that a large fraction of the
+time, when we modified some old concepts, the things we got were useful ne w
+concepts . As the next to last criterion above indicated, denseness is dependen t
+on the set of operators one has for getting new concepts, and the representation one uses . In AM, the representation was frame-based at a superficia l
+level, but each concept's definition was a single chunk of Lis p code . That is ,
+each concept was supplied with a LISP program which computed its characteristic function . To see if X is a SetOfSets, e .g ., one goes to the concept calle d
+SetOfSets, look for its Defn property, and finds an expression lik e
+(A (s) (AND (Apply* (Defn Set) s )
+(EVERY s (Defn Set))) )
+This predicate checks that s is a set and that so is every element of s . Wha t
+did, typically, was to modify such characteristic functions, combine them ,
+etc ., and then—once it had a new piece of LISP code—see what concept it was
+the characteristic function of . For instance, if asked to generalize SetOfSets, A M
+could substitute List for Set, and get a new piece of Lis p that said
+AM
+
+(A (s) (AND (Apply* (Defn List) s )
+(EVERY s (Defn List))) )
+AM would then simply assume that this was the characteristic function fo r
+some concept similar to, but more general than, SetOfSets . It would set up a
+new unit, giving it this predicate as a Defn, and eventually might get around t o
+trying to find examples of such things, look for conjectures about them, and s o
+on . Often, as in this case, the result was indeed meaningful .
+Thus AM was actually not walking around in the space of mathematica l
+concepts, it was walking around in the space of `small Lis p predicates' . It s
+primitives were functions that modified Lisp predicates, combined them, etc . ,
+and the reason AM achieved good results is because these high level operations .
+applied to short Lisp code for characteristic functions, often yields short Lis p
+code for characteristic functions of different but useful concepts . When cast i n
+this form, it appears much more like a fluke that AM worked . It is thanks to the
+natural relationship between Lisp and mathematics (therefore thanks to Joh n
+McCarthy, Alonzo Church, and others) that common math functions can b e
+stated so succinctly in Lis p . Brevity is a key attribute in any kind of asemanti c
+exploration . If useful concepts are short expressions in your language, then yo u
+have some chance of coming across them often, even if you don't know muc h
+about the terrain .
+
+	
+
+96
+
+D .B . LENAT
+
+As AM worked on, it built up larger and larger definitions for its derive d
+concepts ; instead of being a couple lines long, they became half a page i n
+length . The old high-level combiners and mutators no longer were able t o
+maintain a high `hit rate' . AM needed at least one of the following :
+(i) new high-level operators (never likely to happen too often!) ,
+(ii) new heuristics to guide the process so that syntactic serendipity would no t
+have to be relied upon (this is what EURISKO was aimed at) ,
+(iii) a new and different set of slots (or, equivalently, a different set o f
+programming primitives than Lisp ), so that the concepts' definitions would onc e
+again be short expressions which the high-level operators could work o n
+fruitfully, or, finally ,
+(iv) a good interface to a human expert, so as to work in the mode known a s
+man–machine interaction [2] .
+The final two alternatives are the most powerful and plausible . The fourt h
+one, man–machine interaction, is not so useful in the fields EURISKO explores, as
+there are as yet no human experts in Traveller TCS, 3D VLSI design, etc . Th e
+third alternative was not considered until 1979 . In 1976 we began trying t o
+simply get a program, like AM, to get new heuristics . The obvious approach was
+to let the heuristics (which served AM so well for so long) apply to each other .
+Time after time, the results were terrible . We now see the reason : eac h
+heuristic, though represented superficially as a unit, had two executable slot s
+that basically defined it : IF and THEN . Each of those slots had a large chun k
+of Lisp code in it, and the heuristics tried valiantly to guide high-level operator s
+as they combined and modified these huge chunks of Lis p code . The situatio n
+here was one of an even worse mismatch than existed in AM when we gave up o n
+that ; many of the heuristics had IF or THEN slots that were over a page long .
+This problem, and its solution, had been remarkably well predicted by Amare l
+[1] many years earlier .
+Gradually, over the past six years, our attempts have met with more an d
+more success . What had we been doing? As time went on, we found ourselve s
+defining more and more kinds of slots that a heuristic might have, an d
+occasionally new types of slots for 'object-level' concepts as well . This ne w
+language allowed the size of the pieces of Lisp code on each slot of eac h
+heuristic to shrink . As the average size declined, from 60 lines to 3, the ol d
+high-level operators (combiners and mutators) began to produce a high percentage of `winners' once again . Valid, valuable heuristics were being synthesized . To prevent EURISKO from eventually thrashing, this set of slots must b e
+dynamically expandable, and indeed that has been a major recent focus of ou r
+work . For every seven heuristics EURISKO finds, on the average, a new kind o f
+slot is defined .
+Once one tackles the problem, it is not difficult to find a useful set of slots t o
+replace IF and THEN . The method we (and EURISKO) use is to look over th e
+current IF and THEN slots' values, looking for commonality in the code
+
+	
+
+NATURE OF HEURISTICS III
+
+97
+
+therein . For instance, many rules called PRINT near the very end of thei r
+execution ; that caused us to add ThenFinallyPrint as a slot that heuristics coul d
+have, give it the proper definitions, eliminate the print commands from th e
+THEN slot of all the heuristics, and add them (in shorter form, since we coul d
+leave off the common details) to the ThenFinallyPrint slots . This happened ove r
+and over again, for various categories of tests and actions, until now we n o
+longer have an IF or THEN slot per se . Each type of test or action falls into th e
+purview of some specialized kind of slot . If a proper kind cannot be found, tha t
+is a signal (to us, and now to EURISKO) that a new kind of slot should be defined .
+The criteria in Section 4 are guiding our present research directions o n
+EURISKO . We are focussing on domains which are large, unexplored, complex, an d
+rich with heuristic structure, and being very conscious to employ a
+representation which is well matched with our set of high-level concept synthesis operators . The task which satisfies these criteria most closely is th e
+design of three dimensional VLSI devices, and that is the task we are choosin g
+to concentrate upon . More theoretically, we are investigating ways to discove r
+appropriate new slots, judgmental rules for monitoring the goodness of match
+between representation and high level operators, and new entries for the set o f
+high-level operators that generate, prune, and evaluate new concepts .
+Our original 1976 assumption was that heuristics could be treated just lik e
+math concepts . and we could apply the same methods (heuristic search) to
+discover new ones . But we were fortunate in choosing elementary mathematic s
+as the test domain for AM ; heuristics are like most other domains, it' s
+mathematics that's special and (thanks to LISP) particularly easy . As demonstrated by the recent successful performances of our EURISKO program, we ar e
+developing an understanding of what it takes to find new concepts in othe r
+fields, including the discovery of new heuristics .
+ACKNOWLEDGMEN T
+This work has benefited from the many useful comments by Saul Amarel . Dan Bobrow. John Seely
+Brown, Bruce Buchanan . Ed Feigenbaum . Greg Harris, Judea Pearl . Elaine Rich, James Saxe .
+Mark Stefik . and the late John Gaschnig . EURISKO is written in RLL. a self-describing an d
+self-modifying representation language constructed by Russ Greiner . Greg Harris, and the author .
+I am grateful to XEROX PARC's CIS and Stanford University's HPP for providing unparallele d
+computational environments, and to ONR (N00014-80-C-0609), ARPA . and XEROX for financia l
+support .
+
+REFERENCE S
+1. Amarel, S ., On the representation of problems of reasoning about actions . in : D . Michie (Ed .) .
+Machine Intelligence 3 (Elsevier . New York . 1968) 131–171 .
+2. Bledsoe . W .W . and Bruell P. . A man–machine theorem-proving system . Artificial Intelligence 5
+(1974) 51–72 .
+3. Davis, R . and Lenat . D . . Knowledge Based Systems in AI (McGraw-Hill . New York, 1981) .
+
+	
+
+98
+
+D .B . LENAT
+
+4. Feigenbaum, E .A ., Knowledge engineering : the practical side of artificial intelligence, HP P
+Memo, Stanford University, Stanford, CA, 1980 .
+5. Gibbons, J . and Lee, K .F ., One-gate-wide CMOS inverter on laser-recrystalized polysilicon ,
+IEEE Electron Device Letters 1(6) (1980) .
+6. Hayes-Roth, F., Waterman, D . and Lenat, D . (Eds .), Building Expert Systems, Proc . 1980 San
+Diego Workshop in Expert Systems (Addison-Wesley, Reading, MA, 1982) .
+7. Knuth, D ., Surreal Numbers (Addison-Wesley, Reading, MA, 1974) .
+8. Lenat, D .B . and Greiner, R .D ., RLL : a representation language language, Proc. First Annua l
+Meeting of the American Association for Artificial Intelligence (AAAI), Stanford, CA, 1980 .
+9. Lenat, D .B ., The nature of heuristics, Artificial Intelligence 19(2) (1982) 189-249.
+10. Lenat, D .B ., Learning by discovery : three case studies in natural and artificial learning systems ,
+in : R .S . Michalski . T . Mitchell and J .G . Carbonell (Eds .), Machine Learning (Tioga Press, Pal o
+Alto, CA, 1982) .
+11. Lenat, D .B ., Sutherland W.R . and Gibbons, J ., Heuristic search for new microcircuit structures, AI Magazine 3(3) (1982) 17-33 .
+12. Lenat, D .B ., Theory formation by heuristic search ; the nature of heuristics II : Background an d
+examples, Artificial Intelligence 21(1, 2) (1983) 31-59 .
+13. McCarthy, J . and Hayes, P ., Some philosophical problems from the standpoint of artificia l
+intelligence, in : B . Meltzer and D . Michie (Eds .), Machine Intelligence 4 (Edinburgh Universit y
+Press, Edinburgh, 1969) 463-502 .
+14. Wiseman, Results of the 1981 Trillion credit squadron competition, J . Travellers Aid Soc.
+(1981) .
+
+Received August 1982 ; revised version received October 1982
+
+

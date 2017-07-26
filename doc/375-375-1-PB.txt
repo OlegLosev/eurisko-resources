@@ -1,0 +1,2831 @@
+AI Magazine Volume 3 Number 3 (1982) (© AAAI)
+
+Heuristic Search for
+New Microcircuit
+Structures:
+An Application of Artificial Intelligence
+William
+
+Douglas B. Lenat
+
+Sutherland,
+
+Heuristic Programming Project
+Department
+of Computer Science
+Stanford Unavers%ty
+
+R. Sutherland
+
+Sproull,
+
+d Associates, Inc
+
+James Gibbons
+Stanford Electronacs
+Stanford
+
+Summary
+We are applyEurisko
+is an AI program
+that learns by discovery
+ing Eurisko
+to the task of inventing
+new kinds of three-dimensional
+microelectronic
+devices that can then be fabricated
+using recently
+deThree experiments
+have been
+veloped laser recrystallization
+techniques
+conducted,
+and some novel designs and design rules have emerged.
+The paradigm
+for Eurisko’s
+exploration
+is a loop in which it. generat,es
+a new device configuration,
+computes
+its I/O behavior,
+tries to “parse”
+this into a functionality
+it already knows about and can use, and then
+evaluates
+the results
+In the first experiment,
+this loop took place at
+the level of charged carriers
+moving under the effects of electric
+fields
+thl ough abutted
+regions of doped and undoped semiconductors.
+Many
+of the well-known
+primitive
+devices were synthesized
+quickly,
+such as
+the MOSFET,
+Junction
+Diode, and Bipolar
+Transistor.
+This was unsurprising,
+as they were short sentences in the descriptive
+language we
+had defined (a language
+with verbs like Abut and ApplyEField,
+and
+with nouns like nDopedRegion
+and IntrinsicChannelRegion)
+Future
+We wish to thank
+those graduate
+students
+who have aided us in the
+construction
+of RLL, the language
+in which Eurisko
+is written,
+most
+notably
+Greg Harris at CMIJ and Russ Grciner
+at Stanford.
+For advice
+and ideas during the design and construction
+of Eurisko,
+we thank .John
+Seely Brown, Bruce Buchanan,
+Ed Feigenbaum,
+Mike Genesereth,
+and
+Herb Simon
+Harold
+Brown and Mark
+Stefik and their collaborators
+paved the way for the encroachment
+of AI int>o VJSI design, and we
+are grateful
+to them for reports of their efforts.
+The excellent computational facilities
+of Xerox PARC’s CIS made it possible to build Eurisko
+quickly
+and to run it for long periods of time on several machines.
+A
+round of thanks
+to the Interlisp-D
+group both for their language
+and
+for excellent
+response to suggestions
+and bugs
+Theoretical
+aspects of
+this research were funded by ONR N00014-80--C-0609.
+
+Laboratory
+Unaversaty
+
+innovation
+at this level would require adding a large knowledge
+base of
+physical
+equations,
+judgmental
+rules for employing
+them, and numerical routines
+for efficiently
+applying
+them
+Rather than carrying
+out this expansion,
+we decided to seek a higher,
+less numerical
+level of abstraction
+at which to design new devices
+Prcviously,
+our program
+had worked
+at a purely
+geometric
+level, where
+each region had a precise size, shape, and orientat,ion.
+Briefly,
+we considered a purely
+topological
+level, where only conduction
+paths mattered
+This proved
+too abstract,
+as most of the designs that were
+efficient
+at that level were unrealizable
+geometrically.
+WC derived
+an
+The tile model posit,s that each
+intermediate
+level, that of “tiles.”
+region (channel,
+metal, etc ) is a cube (or other space-filling
+element) of
+three-space
+of approximately
+the same size A device is a lattice of tiles
+The philosophy
+was that if Eurisko
+in a particular
+3-D configuration
+could produce an interesting
+design at that level, Gibbons
+could find a
+way to fabricate
+it using the new high-rise
+chip techniques.
+In our first attempts
+tematic
+exhaustive
+an appreciation
+for
+run, the program
+dimensional
+design
+
+to work at the tile level, Eurisko
+carried out syssearches with few useful new designs
+This gave us
+the size of the starch space. During
+one week-long
+serendipitously
+synthesized
+a very compact
+threefor a flip-flop
+
+Our final experiment
+was also at the tile level, but in this case
+Eurisko
+employed
+a body of heuristics
+to guide the synthesis
+of new
+devices
+These informal
+judgmental
+rules served as both plausible move
+generators
+and implausible
+move eliminators
+Almost
+immediately,
+the
+“Symmetrize”
+heuristic
+produced
+a very powerful yet simple device, one
+which simultaneously
+computes
+NAND
+and OR using only two small
+metal regions,
+two n-doped regions, two p-doped regions, and one int.rinsic channel
+region.
+These devices are composahle
+in two ways-
+
+THE
+
+AT
+
+MAGAZINE
+
+Summer 1982
+
+17
+
+Relevant
+Some
+
+important
+
+1
+
+Operational
+
+2
+
+AI
+
+systems
+
+that
+
+solving,
+
+important
+
+that
+
+underlie
+
+that
+
+and monitor
+
+subfield
+
+called
+
+knowledge
+
+search,
+
+and design
+
+microelectronic
+
+fabrication
+
+Recrystalization
+
+of silicon
+
+our explorations
+
+can reason-and
+
+can introspect
+
+of the AI
+
+to problem
+
+1
+
+advances
+programs
+
+AI
+
+3. Emergence
+
+Some
+
+AI
+
+films
+
+Recent
+
+tasks
+
+of this
+
+discover
+their
+
+new concepts-in
+
+engineering
+
+to make multilayer
+
+interdisciplinary
+
+own performance
+
+in several
+
+advances
+
+Developments
+
+that
+
+synthesis
+
+specialized
+
+and discover
+
+and its accumulation
+
+technical
+
+include
+
+domains
+
+new algorithms
+of experience
+
+of knowledge,
+and heuristics,
+in applying
+
+heuristic
+
+methods
+
+domains
+
+provide
+
+important
+
+“high-rise”
+
+assumptions
+
+circuit
+
+structures,
+
+that
+
+can support
+
+to this
+
+and structures
+
+and other
+
+projects
+
+no longer
+
+limited
+
+include:
+to wafer-
+
+sized areas,
+2
+
+The use of (nearly-)intrinsic
+channel material-that
+is, a region
+only on what types of doping its neighboring
+regions exhibit,
+
+3
+
+Increasing
+computer
+control
+more faithfully
+representable
+
+4
+
+The potential
+testing
+
+5
+
+to merge
+
+CAD
+
+of fabrication
+equipment--fabrication
+inside a knowledge
+base,
+and CAM
+
+in the electronics
+
+domain
+
+Doping patterns
+of fabrication,”
+
+need not be rectangular,
+but may be hexagonal
+but rather “complexity
+of design ”
+
+1
+
+The recent
+
+developments
+
+they pack into the plane and they stack on top of each other, so the
+asymptotic
+number of regions used is reduced t,o one of each type
+The
+device is unconventional
+in that currents
+of both holes and electrons
+must coexist (and cross) inside a single thin film layer
+In April
+1982,
+the design was “proved”
+by Gibbons
+by successfully
+fabricating
+them
+in his labor atory
+These devices now form the primitive
+building
+blocks
+of Eurisko’s
+latest high-rise
+chip designs
+Besides the useful devices,
+we now have a few useful heuristics
+for
+the task of designing
+three-dimensional
+VLSI circuits:
+in every second
+metal layer, wires should run N-S (and in the other metal layers, E-W);
+any 3-D folding
+of a 2-D design should replace (most of) the pairs of
+gates sharing a common control by single pieces of metal serving simultaneously
+as gat.es for regions above and below t,hem; etc
+Our current research
+is aimed at getting
+Eurisko
+to design three-dimensional
+microelectronic
+devices for more complex functions
+and to discover addif.ional informal
+rules for designing
+such circuits
+
+Background:
+Recent
+and Microelectronic
+
+Developments
+Fabrication
+
+in AI
+
+The late seventies produced technological
+improvements
+in both microelectronic
+fabrication
+capabilities
+and in artificial intelligence
+systems (see Fig. 1). These parallel developments have suggested using AI techniques for designing
+or discovering new microclect,ronic
+circuit structures.
+This
+article reports on one such interdisciplinary
+research effort.
+Relevant
+recent developments
+in microelectronic
+One central advance in microcircircuit
+fabrication.
+cuit fabrication
+m&hods
+that is motivating
+our effort,s is
+the ability t,o build three-dimensional
+st,ructuresso-called
+A thin film of deposited silicon can
+“high-rise
+chips.”
+
+THE
+
+are becoming
+
+into a new form
+
+of electrons
+
+or holes,
+
+more precisely
+
+of operation
+
+where
+
+design,
+
+defined
+
+depending
+
+and thus
+
+fabrication,
+
+and
+
+are intertwined,
+
+Figure
+
+18
+
+operations
+
+a channel
+
+AI
+
+MAGAZINE
+
+Summer
+
+1982
+
+or even irregular
+
+upon
+
+which
+
+this
+
+The limiting
+
+research
+
+factor
+
+is no longer
+
+“difficulty
+
+is founded
+
+be melted in place and recrystallized
+into transistor-grade
+material. Appropriate
+related steps of doping, oxide growth,
+and metal deposition have been shown t,o produce working
+devices. Lee et al. (1978) showed that both enhancement
+and depletion mode devices could be made in recrystallized
+polysilicon, and Gibbons and Lee (1980) produced a one-gatewide CMOS inverter in which a single piece of metal served
+as the gate control for two transistors-one
+above the metal
+and one below it.
+MO!?
+chip,
+One begins with a normal t,wo-dimensional
+adds a new layer of amorphous
+silicon “frost”
+on top of
+it, scans and recrystalizes
+it with a laser, dopes the new
+silicon layer, deposits a new gate-oxide and metal pattern
+on top of that, then deposits a new layer of silicon frost,
+scans it, etc. In this way, arbitrarily
+many alternating
+layers
+of metal and semiconductor
+are assembled into a “high-rise
+The
+chip,” much like a layer cake or a piece of plywood.
+resulting structure
+contains many active devices in a very
+small volume. To date, the number of layers has been small
+(only a few 3-ply layers), but this is due more to a lack
+of worthwhile
+designs to fabricate rather than to technical
+problems with the process.
+
+An intriguing
+opportunity
+is to dispense with the “bottom silicon crystal” entirely-just
+start with, say, a sheet of
+glass. In this way, the area of the structure is not limited
+to single-crystal
+wafer-sized regions, but could be arbitrarily
+large (e.g., the size of a CRT display screen, or a dashboard,
+or a desk-top).
+While these possibilities
+are exciting and
+probably will be important
+in the future, they would demand
+
+a major laboratory
+retooling
+One big advantage of the laser
+recrystallization
+process is that many existing commercial
+VLSI fabrication
+facilities
+already have the equipment
+required for that process and, thus, can produce high-rise chips
+provided they are at most wafer-sized.
+One concern is that of yzeld. Given no dramatic increase
+in the reliability
+of fabrication
+techniques,
+any enormous
+structure is bound to contain many faults. Besides the usual
+design techniques
+for overcoming
+this (e.g., redundancy),
+a new technology
+that may be important
+is the ability to
+dynamically
+monitor
+the complex structure
+as it is being
+fabricated, layer by layer. That is, one might fabricate “wit,h
+the power on.” If part of one layer has too many faults, the
+program might alter the design of the rest of the layer at
+that moment before the computer advances the laser or ion
+implantation
+beam
+If an entire layer is unacceptable,
+one
+might, even evaporate it and try again. This merging of CAD
+and CAM might open up a new paradigm for the design and
+production
+of microelectronic
+structures.
+The second major innovation
+we are relying on is the
+use of intrinsic--or
+nearly-intrinsicPmchannel
+material.
+This
+is a region of semiconductor
+material that is so lightly doped
+that it can support a channel of electrons or holes, depending
+only on what types of doping its neighboring regions exhibit.
+This advance, like t,he one before it, explodes the size and
+complexity
+of the design problem.
+As more and more of the fabrication
+process comes under
+computer control, it becomes easier---and more worthwhilc-to represent fabrication
+knowledge within a knowledge base.
+Once the knowledge
+is accessible to artificial
+intelligence
+t,hey can carry out tasks involving
+planning,
+programs,
+dynamic monitoring
+and replanning,
+and (as we shall discuss in detail) guided exploration
+for novel devices, mask
+configurations,
+fabrication
+sequences, and post-production
+tailoring via recrystallization.
+With computers doing much of t,he design and fabrication, there is less need to make the doping patterns rectangular. For example, if a gate is to join five regions, we can
+shape it as a hexagon (still leaving one edge of the hexagon
+free to have metal deposited over it, prior to doping, if that
+is the order of fabrication
+steps that finally is employed).
+All of these notions are exciting.
+The excitement
+is
+dimmed slightly by the question: “What do WC use all this
+for, exactly?”
+To answer that question, we turn to a very
+different part of computer science-artificial
+intelligence.
+The limiting
+step in the VLSI world is not so much
+fabrication
+techniques as coping with the combinatorial
+explosion of the design problem.
+A vast new and as yet
+unexplored
+design space for three-dimensional
+microcircuit
+elements is being opened.
+The size of this search space
+makes it a promising domain for some kind of AI approach
+Recent developments
+in AI suggest trying an automated induction approach, that is, building a program that learnsby discoveryPnew
+physical devices, circuits, and more or less
+informal rules for designing them
+What are the AI results
+that suggest this?
+
+Relevant
+recent
+developments
+in artificial
+intelligence.
+In the past decade, a style of AI program has
+emerged known as expert systems.
+These programs work
+in real-life technical
+domains, such as medical diagnosis,
+mineral or oil exploration,
+and planning genetics experiments
+(see, e.g., Feigenbaum, 1977). The human expert works with
+a computer scientist, known as a knowledge engineer, who
+enters the expert’s knowledge into a program.
+The first
+body of knowledge extracted from the expert inva.riably comprises terms, facts, standard procedures, etc.-the
+kind of
+knowledge one would read about in journals and tcxthooks
+But programs with only this type of information
+do not,
+perform well. A cyclic procedure is followed to improve the
+prograin-the
+knowledge engineer has the program try to
+work on a problem or cast, the expert disagrees with its
+reasoning at some point, and the knowledge engineer forces
+the expert, at that moment, to introspect, on what extra
+knowledge he or she is bringing to bear. This usually results
+in the expert explicating
+a judgmental
+rule, an informal hit
+of wisdom we refer to as a heurrstzc. These heuristic rules
+are rarely discussed verbally. Rather, the apprentice (intern,
+graduate student, etc.) is expected to induce them from
+experience by watching
+a master at work.
+As more and
+more heuristics are added to the program, it incrementally
+approaches the expert in competence at the task.
+Most. AT texts talk about heurist,ics as if they were rules
+that helped you constrain
+a search by pruning away implausible moves Some of the heuristics that emerge in the
+knowledge engineering cycle do indeed have this flavor, but
+many heuristics appear to serve a very different role-- they
+propose plausible moves to try, plausible promising actions
+to carry out in certain situations
+In the “implausible
+constrainer” sense, as you add heuristics you have less and less
+to consider; in the “plausible suggester” sense, when you add
+more heuristics you have more to do. This notion of heuristics as plausible move generators is useful when the space to
+be explored is too immense to even consider having a legal
+move generator as your primary engine.
+The field of knowledge engineering
+has hy now contributed much in the way of representations
+for knowledge,
+control structures for managing large collections of heuristic
+rules, languages that, facilitate the construction
+and dehugging of enormous programs, ways of validating
+the performance of expert syst,ems, etc. One can think of our tasks--designing three-dimensional
+microcircuitsPas
+such an expert
+t,ask It involves a search through an enormous space of possibilities,
+there is much technical information
+to represent
+and use, it is a task of interest, and practical
+utility,
+and
+it is a domain where no algorithmic
+approach is known at
+present. In short, it satisfies most of the criteria for at,tack
+by the knowledge engineering approach.
+The nature of the three-dimensional
+microcircuit
+design
+task is one of open-ended exploration
+in a large space where
+the goals are criteria
+such as lower power, higher gain,
+smaller space, less time, fewer masks, etc. These criteria
+are not too diflicult
+to test, but they are of little aid in in-
+
+THE N MAGAZINE
+
+Summer
+
+1982
+
+19
+
+venting novel designs that satisfy them. Although most expert syst~e~ns have performed tasks that were classificatory
+(c g , diagnosis), only some have dealt with problems of
+design, and a couple have tackled problems that involved
+open-cndcd concept discovery and explorat,ion (see, e.g., AM,
+Davis and Lenat,, 1981; Browser, Dankel, 1979).
+AM was given the definitions of a hundred concepts from
+finite set theory and a body of two hundred heuristic rules
+that guided it in forming plausible definitions, gathering
+data about those new concepts, noticing regularities in the
+dat,a, forming plausible conjectures thereby, designing and
+carrying out experiments to test them, and (to close the loop)
+extracting useful new definitions based on these results.
+To get the flavor of AM, consider this mathematics
+heuristic:
+Given an interesting function f : A X A + B,
+It’s worthwhile
+
+defining and studying g(z) = f(x, 2)
+
+When f is Multiplication,
+the derived function g is Squaring;
+when [ is Addition, the heuristic causes us to define and
+study Doubling. When f is a predicate such as Greater-Than,
+it causes us to notice that a number is never greater than
+itself. When f is Int,ersection, it points us tJo the fact that
+Intersect(z,
+X) = 2. The use of this heuristic is not limited
+to mathema,tics, of course. We could make f the binary
+relation Employed-By, in which case g defines the predicate
+Self-Employed.
+Once a new concept has been defined, it is
+of-ten a relatively straightforward aflair to find instances of it
+and then to look for patterns in that data (see Polya, 1945).
+In one hour-long run on a KI -10, the AM program defined
+two hundred new concepts, of which about half were reasonable, recognizable mathematics objects (including the empty
+set, natural numbers, and primes), operators (including
+compose-with-itself,
+addition, factoring), and conjectures
+(including de Morgans laws, the unique factorization theorem,
+and a strange regularity involving numbers with very many
+divisors).
+One difIiculty with AM was that, as it began to work
+in fields further and further removed from set theory, its
+initial set of heuristics was not adequate to guide it away
+from implausible concepts (e.g., numbers that are both odd
+and even) and toward plausible ones. This need for new,
+domain-specific heuristics for each new field raises a serious
+problem with our microcircuit design task.
+The task of exploring the space of high-rise chip designs
+is analogous to AM exploring the space of set theory concepts
+in all major respects save one-there are as yet no human
+cxpcrts in the field. There is no one who knows what the
+heuristics are. It is easy to find and program hundreds of
+heuristics for dealing with sets and functions, but it is impossible to do so for high-rise chips. The few people now working in t,he field arc employing analogues of heuristics from
+two-dimensional VLSI design, which in turn got most of its
+heuristics from even older technologies where, for example,
+wires were cheap and small entities The economies, tradeoffs, and opportunities for local optimizations and counterintuit,ive designs are very different in VLSI design, and even
+20 TIIE AI MAGAZINE
+
+Summer 1982
+
+after several years only a partial set of design heuristics has
+emerged. We expect just as radical a change in design when
+going from two to three dimensions, and nil of those new
+heuristics are waiting to be discovered.
+The relevance of AI does not end a.t this point. WC refer
+to a program that learns new heuristics by discovery, inducing them from experiences it has while exploring. This
+program, Eurisko, is described at, length in Lenat (1982a,
+198213). In brief, its presumption is that just as a body of
+heuristics was able to guide AM in discovering set theory
+concepts, a body of heuristics might be able to guide a program in discovering, testing, and modifying new heuristics
+This might seem to be dangerously circular, but in fact some
+useful results have been obtained by applying a heuristic to
+itself. Consider the following heuristic:
+IF F is sometimes useful but sometimes just takes up a
+lot of time,
+THEN try to find some specializations of F.
+
+This rule was rclcvant and useful sometimes, but sometimes
+took up a lot of time to apply. Therefore, the heuristic was
+relevant, to itself. Eurisko applied it to itself and produced
+several new, more specialized heuristics, a useful one of which
+was:
+IF F is sometimes useful, but, usually just takes up a lot
+of time,
+THEN try to find some extreme specializations of F.
+
+Eurisko explored several domains, including set theory,
+number theory, games, biological evolution, and the design
+of naval fleets. The latter is perha.ps of most relevance to
+Eurisko was given two hundred
+our circuit design task
+pages of rules and constraints on designing individual ships,
+plus a simulator which allowed it to determine which final
+fleet could beat which other fleets. It then designed fleet
+after fleet, using its simulator as the “natural selection”
+mechanism as it “evolved” bct,tcr and better fleet designs
+The search space-the number of parameters-was much too
+large for any sort of systematic (e.g., linear programming) 01
+even monte carlo approach to the problem to succeed
+For instance, when one fleet beat another, Eurisko had to
+analyze the differences between them, which usually meant,
+analyzing the differences between individual ships. Even
+once a single parameter appeared to be important (c.g , one
+fleet, was more heavily armored), experiments must be done
+(i.e., new designs made) to investigate the overall benefits of
+armoring.
+After a while, Eurisko also noticed another kind of
+regularity.
+For almost each parameter, the optimal value
+seemed to be almost, but not quite, an extreme value. This
+was formed into a heuristic rule that enabled Eurisko to very
+rapidly settle in on a winning fleet design. That new heuristic said
+IF designing either an individual ship or a fleet for
+Traveller TCS, and a certain parameter is having its
+value changed,
+
+THEN
+value.
+
+change it to a nearly-but
+
+not quite-extremal
+
+The final fleet Eurisko designed had a large number of
+ships-each
+was fairly small, each had nearly as many types
+of weapons as allowed, each was nearly as heavily armored
+as possible, each was nearly as slow as possible, etc.
+Each evening during June 1981, Lenat would start
+Eurisko running on this task on one or more Xerox 1100
+(Dolphin) machines. All night it would try out new designs
+and occasionally new design rules and run simulated battles
+to evaluate them. In the morning, a quick glance over its new
+ideas would be in order to occasionally give an extra reward
+t,o one that Eurisko failed to appreciate fully. For example,
+one morning Lenat noticed a fleet that was decimated,
+except for a small lifeboat that could not be defeated because it
+had been designed with incredibly
+expensive computer COIItrols that enabled it to outmanuevcr
+all incoming fire. The
+significance of this was not fully appreciated by Eurisko, but
+we made sure to include one such small unhit,table craft in
+the final tournament
+fleet. On July 4, 1981, that fleet, won
+the nat,ional (Traveller TCS Origins) tournament
+by winning
+seven consecut,ive battles. Following the victory of Eurisko’s
+highly unconventional
+fleet, some of the rules were changed
+for this year’s tournament.
+In particular,
+repairing of ships
+is no longer permitted
+and this turns out to eliminate
+the
+usefulness of the small unhittable
+ship.
+Because the general design heuristics for Travellcr TCS
+are (probably) still valid, even with the changes in the rules,
+it, should take Eurisko much less t,ime to design a good
+fleet for this year’s competition.
+If it had not abstracted
+its experiences into heuristics, we would have had to start
+Eurisko all over again this year, slowly evolving a fiect design.
+There was a regional tournament
+in the Bay Area over
+Washington’s
+birthday in which a dozen rule changes were
+announced only a couple days before t,he event. Since the
+design heuristics were still valid, Eurisko did come up with a
+good design in two days and its fleet won that tournament,.
+One rule change was that victory is now tied to monetary
+damage, not ultimate survival
+Another rule change involved
+limiting the number of exchanges of fire to 40. Eurisko tried
+nearly-extreme
+designs and came up with a ship that in many
+ways is the opposite of its little lifeboat.
+This new ship is
+large, has huge weapons, but no defense whatsoever.
+Since
+there arc only forty rounds of fire allowed, one builds forty
+of these ships and puts one up each round. Yes, it gets sunk,
+but since most of one’s money goes for defenses in Traveller
+TCS, the monetary damage one inflicts on the enemy is great
+The rule changes had a great impact on the final designs,
+but little on the heuristics.
+Because it discovered a body of
+design rules, Eurisko became (in a small way) an expert, at
+designing Travcller TCS fleets.
+Research with Eurisko in various domains has established its abilit,y to learn simple judgmental
+rules by abstracting them from experience, by modifying
+existing rules, and
+occasionally by analogy to existing rules. This ability to discover heuristics is crucial in our high-rise chip design task,
+
+where task-specific
+heuristics probably exist and are necessary for good performance,
+but are as yet, undiscovered
+by
+people. Another way of saying this is that WC are embarked
+on the task of creating an “expert syst,em” for a field in
+which there are as yet no human experts to copy from or
+learn from and that we propose to try doing this through
+Eurisko’s ability to discover useful heuristic expertise itself.
+
+The Opportunity:
+Using AI Methods
+to Search for New Microcircuit
+Structures
+With the above technological
+capabilities as background,
+in July 1981 we began to consider how to apply Al capabilities
+to the synthesis of novel microelectronic
+structures.
+Our
+basic approach has three simple and obvious steps:
+The program starts with some primitive microcircuit concepts as built-in knowledge along with simple
+rules and evaluation criteria.
+IJsing composition rules, it combines several known
+entities into a new one. In rare cases, a rule takes a
+single known entity and mutates it
+This new structure, rule, operation, etc is then
+evaluat,ed for interest and either retained or junked
+as appropriate
+The most common instance of action 2 is to take known
+primitive
+(or complex) microcircuits
+and produce new ones.
+More rarely, new heuristic rules are produced.
+Even more
+rarely, new evaluation criteria emerge.
+Within
+this strategic paradigm
+of design exploration,
+there are obviously many tactical choices (see Fig. 2).
+Finally, there is a battery of implewlentation-level
+tasks
+and decisions. Some of t,hese involve Al (e.g., exactly how is
+knowledge t,o be represented, what, control structure is used,
+what language or program is employed) and some involve
+microelectronics
+(e.g., exactly how will the designs he fabricated).
+The “opportunity”
+mentioned in the title to this sect,ion
+derives from the colocation and interest in collaboration
+of
+the creator of the Eurisko program (Lenat), the fahricat)or of
+the first few high-rise chips (Gibbons), and someone familiar
+with both fields (Sutherland).
+Thus, the implementationlevel problems have precise answers The representation
+and
+control arc taken from Eurisko (frames and agendac), and
+the fabrication
+(including
+design of masks) is performed by
+Gibbons and his staff. By using the already extant Eurisko
+program, we were able to concentrate on knowledge ratliel
+than on programming
+and quickly obtain some results. We
+believed it, would be adequate for our task, as it, had already
+discovered concepts and design strategies in other domains.
+This article is a report on six months of part-t,ime exploration of this opportunity
+by the three authors. During
+this time, we have tried several approaches to questions l-4,
+in Figure 2. The rest, of this article documents our efrorts
+to dat,e and what, we have learned as a result. Just trying
+t,o make some of the choices implied above has been most
+
+THE AI MAGAZINE
+
+Summer
+
+1982
+
+21
+
+1
+
+What level of representation
+
+2
+
+What kinds of combining
+
+3
+
+How are new combinations
+likely usefulness)?
+
+is appropriate
+
+operations
+
+of elements
+
+Tactical
+
+microcircuit
+
+are needed given the primitive
+
+4. What are good criteria for evaluating
+thrown out as not good for anything?
+Figure 2
+
+for primitive
+
+constructed
+a new complex
+
+(e.g., randomly
+structure
+
+Experiment
+1: Eurisko
+Applied
+to
+Random
+Generation
+at the Carrier
+
+Level
+
+Our initial idea was to include knowledge about properties of semiconductor
+regions such as doping, diffusion and
+drift, recombination,
+etc. Rules for synthesizing new devices
+would place different kinds of regions in contact and then interactions would be deduced. We had only some very general
+evaluation criteria in mind at this point. Gain, non-linearity
+frequency dependent behavior, etc., seemed like interesting
+properties that would make a new device promising cvcn bcfore any specific application
+for it were known.
+This first “carrier level” of representation
+was largely explored by hand. WC tried to sort out the primitive
+elements,
+rules, and evaluation methods tjhat, as a start, could generate
+and notice well known devices such as the Junction Diode,
+and MOSFET.
+Since we tailored our
+Bipolar Transistor,
+primitive
+components
+and operators on this basis, indeed,
+those well known devices wcrc short expressions easily found
+Name:
+Generalizations:
+
+ISA:
+
+InitialWorth:
+Worth:
+DomainOf:
+RangeOf:
+FocusTask:
+TypicalExample:
+Examples:
+MyCreator:
+MyTimeOfCreation:
+MyModeOfCreation:
+
+22
+
+THE N MAGAZINE
+
+Sunmler
+
+1982
+
+element representation
+
+chosen?
+
+or with some kind of common-sense
+
+to decide if this structure
+
+choices to be made in automatic
+
+illuminating.
+In our discussions and early program runs, we
+have invented important
+new structures and design heuristics
+and improved our understanding
+of the space of choices.
+
+elements?
+
+exploration
+
+should be recorded
+
+for microcircuit
+
+once we began running
+
+knowledge
+
+about
+
+as useful or
+
+structures.
+
+the Eurisko
+
+program.
+
+The representation
+we initially
+used at this carrier level
+quickly evolved as a result of Eurisko’s noticing useful improvements.
+That is, the Eurisko program monitored
+how
+well the representation
+matched the processing that was
+going on, and made suggestions,
+from time to time, of
+ways in which that representation
+might be improved.
+Let,
+In the original
+repreus consider an example of this.
+sentation we provided to Eurisko, each individual
+device was
+a unit (frame, Being, etc.) one of whose slots was called
+“Terminals."
+This slot was always so big (i.e., had, empirically, so many entries) that eventually Eurisko finally decided
+to split it into pieces by defining two useful specializations
+of
+this slot-XMustBeInputTerminalsV
+and “XorInputTerminals”
+(a list of sets of terminals,
+such that for each set, one and
+only one element must be an input terminal).
+Below arc four concepts as they appeared in Eurisko.
+The first represents the set of all physical devices; the second
+is the archetype for an individual
+device; the third represents
+a particular
+individual
+device; the fourth represents a heuristic rule which takes thermal motion of carriers into account.
+
+SetClfAllDevices
+(SetOfAllPhysicalDevicePhysicsObjects
+SetOfAllPhysicalObjects
+SetOfAllDevicePhysicsObjects
+SetOfAllDevicePhysicsConcepts
+SetOfAllComplexStructures
+SetOfAllComplexStructuresBuiltOutOfComplexStructures
+Anything)
+(AbstractDevicePhysicsObject
+DevicePhysicsConcept
+AbstractObject
+SetOfUnits
+Set
+Anything)
+500
+800
+(Abut DAbut CopyDevice ApplyEField
+ApplyCEField)
+(Abut DAbut CopyDevice ApplyEField
+ApplyCEField)
+FocusOnDevices
+TypicalDevice
+(TypicalDevice
+SimpleNRegionDevice
+SimplePRegionDevice)
+Lenat
+"19-July-81
+13:37:18"
+(Copy&Edit SetOfAllShips)
+
+Name:
+ISA:
+
+InitialWorth:
+Worth:
+PartOf:
+Parts:
+SimulationHeuristics:
+FocusTask:
+MyTypicalExampleOf:
+MyCreator:
+MyTimeOfCreation:
+MyModeOfCreation:
+Name :
+
+ISA:
+
+InitialWorth:
+Worth:
+PartOf:
+Parts:
+
+SimulationHeuristics:
+Terminals:
+InputTerminals:
+XorInputTerminals:
+FocusTask:
+MyCreator:
+MyTimeOfCreation:
+MyModeOfCreation:
+
+Name:
+ISA:
+
+UsedInSimulating:
+English:
+
+Abbrev:
+IfCurrentTaskIsToWorkOnA:
+IfCurrentTaskIsToPerformA:
+
+TypicalDevice
+(SetOfAllPhysicalDevicePhysicsObjects
+SetOfAllPhysicalObjects
+SetOfAllDevicePhysicsObjects
+SetOfAllDevicePhysicsConcepts
+SetOfAllComplexStructures
+SetOfAllComplexStructuresBuiltOutOfComplexStructures
+Anything)
+500
+500
+Device
+(SolidStateMaterials
+EFields Devices)
+(~65 H66)
+FocusOnTypicalDevice
+SetOfAllDevices
+Lenat
+"19-July-81
+13:40:55"
+(Eurisko suggested Copy&Edit TypicalShip)
+Device-817
+(SetOfAllPhysicalDevicePhysicsObjects
+SetOfAllPhysicalObjects
+SetOfAllDevicePhysicsObjects
+SetOfAllDevicePhysicsConcepts
+SetOfAllComplexStructures
+SetOfAllComplexStructuresBuiltOutOfComplexStructures
+Anything)
+500
+600
+Device-809
+((SolidStateMaterials:
+NRegion-1953 PRegion-75
+(EFields:
+EField-930
+OrthogonalEField-18)
+(Devices: no subdevices))
+(~65 H66)
+(NRegion-1953 NRegion-1954)
+NIL
+((NRegion-1953
+NRegion-1954))
+FocusOnDevice-817
+(Task-82 "Find examples of SetOfAllDevices")
+"25-July-81
+16:02:29"
+(ApplyEField
+(ApplyOrthogonalEField
+(Abut NRegion PRegion NRegion)))
+
+NRegion-1954)
+
+H65
+(SimulationHeuristic
+Heuristic
+MultiValuedOp
+SideEffectsOp
+AbstractOp
+OP
+Anything)
+(TypicalDevice)
+(If you are simulating
+a physical
+device,
+Then it's
+important
+to simulate
+the thermal meanderings
+of carriers
+in the solid state materials
+in the device)
+(If a device has solid state materials,
+Then simulate
+thermal motion of carriers)
+PhysicalDevice
+Simulation
+
+-
+
+IfSimulating:
+IfPotentiallyRelevant:
+
+PhysicalDevice
+( X (dev)
+(Setq SpaceToUse
+(TheSubsetOf (Parts dev)
+(WhichAre 'SolidStateMaterials))))
+IfTrulyRelevant:
+(X (> (MoreThanlKindOfElement
+SpaceToUse))
+ThenPrintToUser:
+Simulated the thermal motion of the carriers
+in d)
+ThenCompute:
+<lisp code that finds the type of carrier for each
+region, computes the penetration depths into all
+neighboring regions >
+ThenAnalyze:
+<lisp code that analyzes what occurs at each boundary>
+ThenFillInEntries:
+<lisp code that adds values to dev’s Behavior slot>
+Arity:
+I
+Domain:
+Task
+Range:
+(Entries
+for (Behavior dev))
+InitialWorth:
+700
+Worth:
+750
+Generalizations:
+(TypicalOp TypicalHeuristic
+H60)
+MyCreator:
+Lenat
+"19-July-81
+15:11:03"
+MyTimeOfCreation:
+MyModeOfCreation:
+(Copy&Edit H6O)
+MyLastRunOn:
+SimplePRegionDevice
+MyThenComputeRecord:
+(12 successes,
+averaging 72 seconds each)
+MyThenComputeFailedRecord:
+(I failure,
+averaging 4 seconds each)
+MyThenPrintToUserRecord:
+(12 successes,
+averaging 9 seconds each)
+(12 successes,
+averaging 89 seconds each)
+MyOverallRecord:
+MyOverallFailedRecord:
+(I failure,
+averaging 16 seconds each)
+<a dozen other such record-keeping
+slots>
+Although this article is not focusing on representation
+of
+knowledge, let us briefly illustrate
+how new domain-specific
+kinds of slots arc generated by Eurisko
+We have already seen
+the usefulness of doing this kind of activity when Terminals
+was specialized to form two new slots, InputTerminals
+and
+XorInputTerminals
+In 1165, the IfPotentiallyRelevant
+slot used to contain
+an extra condition
+not shown above-a
+predicate
+testing
+whether or not the current task (the one chosen from the
+agenda) dealt with simulating
+a physical device. So many
+heuristics had IfPotentiallyRelevantslotswhosevalueswerc
+"test whether or not, the current, task deals with simulatdecided to make that a new slot
+ing 37” that Eurisko
+called Ifsimulating.
+So H65 now only has to have an If'I'he IfSimulating
+slot with the value PhysicalDevice.
+PotentiallyRelevant
+slot could now be shortened (and in
+many cases completely eliminated).
+Whenever it was needed
+asked for a heuristic’s
+Ifpoten( i.e., some rule interpreter
+tiallyRelevant)an
+extratest would besynthesized
+automatically from that heuristic’s IfSimulating
+slot,.
+A second case of forming
+a new slot happened later
+when Eurisko noticed that,-in
+several domains, not just
+VLSI-many
+of the If- slots had constructions
+of the form
+(Setq SpaceToUse X1. It defined a new kind of slot, IfSearchSpaceCanBeComputed, that, is simply filled with X, and
+whose side effect is to bind the variable SpaceToUse to X.
+A third example of this process was when Eurisko noticed
+that many of these slots had values of the form (Subset
+The new slot, in this case, called If(s d) (WhichAre ‘y))
+
+24
+
+THE AT MAGAZINE
+
+Surlurler
+
+1982
+
+SubspaceCanBeComputed, is simply filled with the list (s y),
+By this
+in this case the list (Parts SolidStateMaterials)
+compact entry, the new H65 communicates
+t,hat it wants
+t,o assure that some parts of the device are solid st,atr
+materials, and assuming this to be the case, binds the variahlc SpaceToUse to the set, of parts which are solid stat,c
+materials.
+Note how, as this process of defining new slots goes on,
+the heuristic gets a few extra slots, but the length of the
+entries goes down dramatically
+This focus on adding new kinds of slots is not a digression, but rather the main new source of power that Eurisko
+uses AM worked because its representation-LISP
+predicates-was
+very natural for the concepts they represented
+characteristic
+functions for mathematics
+concepts. This was
+really a lucky accident due to John McCarthy
+deszgnzng LISP
+to bc a natural language for mat,hematics.
+Random mutations and compositions
+of the LISP code often resulted in
+code that, was the characteristic
+function of an interesting,
+useful mathematical
+concept. But LISP is not a natural language for representing
+heuristics.
+Encoded as large lumps
+of LISP code, almost any small change or combination
+is
+bound to be disastrous.
+Above we saw how Eurisko has
+evolved a natural, well-matched
+language for sta.ting heuristics compactly-a
+language that, facilitates
+their discovery
+and combination,
+something Conway and Stefik would call
+a syntheszs language. Their article in this issue of The Al
+Magazzne expands upon that idea
+Much of the knowlcdgr
+
+in H65 is embedded
+
+deeply within
+
+This is somewhat
+unfortunate
+from the
+the Then- dok.
+point of view of modifying
+H65 to get new heuristics.
+I-165 computes penetration
+depths, analyzes each interregion
+boundary, and decides where annihilation
+will occur, depletion layers form, etc
+All this is packed into two slotsThenCompute and ThenAnalyze. One very general result from
+Eurisko’s work in other domains was that it is more important to finely categorize and partition
+the If- parts of a
+heuristic rule than the Then- parts. This appears to hold
+for our three-dimensional
+microelectronic
+circuit design task
+as well, as there was little urging to split the Then- slots in
+any way. This seems to be related to the fact that most
+of the new heuristics synthesized, both in this domain and
+in others Eurisko has worked on, have had modifications
+to If- parts-very
+few successful new heuristics have had
+modifications
+to Then- parts. It remains to be seen whether
+this is a phenomenon
+to be studied or a defect to be overcome.
+The main observations to make from the four units are:
+1. Concepts are represented as lists of attributes (slots)
+and associated values. This structuring allows rules
+to be very specific yet still remain brief.
+2. Some slots are prefaced My- to indicate that they
+refer to the unit as a data st,ruct,ure. This implcmcnts the distinction bctwecn object- and mela-level
+knowledge.
+3 Heuristics are representled essentially the same way
+as all t,he other knowledge. This enables heuristics
+to apply to each other as well as to VLSI concepts.
+4. The conditions and actions of a heuristic are spread
+out over many slots. This enables new heuristics to
+be created as small variants of known ones.
+5. A great amount, of bookkeeping and recordkeeping is
+done. This enables later attempts at induction about.
+the knowledge and its use.
+6
+
+An
+
+Separate units are maintained for TheSetOfAllX’s,
+TypicalX, and each X This forces the builders and
+users of the system to avoid ambiguity.
+
+The basic control structure
+is that of best-first
+agenda of tasks is maintained,
+with symbolic
+
+supporting
+
+the plxusibilit,y
+
+something
+
+like t,hat below:
+
+of each task.
+
+:
+ISA:
+RunAs :
+English :
+UnitToWorkOn:
+SlotToWorkOn:
+Priority:
+Reasons :
+Name
+
+OnAgenda :
+MyIsA:
+My.. .etc
+
+search.
+reasons
+
+One task looked
+
+At, each moment,
+the highest
+
+priority,
+
+Eurisko is working on the t,ask with
+which in turn is a number derivccl from
+
+the reasons supporting the task. To work on a task, Eurisko
+scans through its collection of heuristic rules, finds those
+which are relevant, and executes (obeys) them. During the
+execution of a heuristic, three types of actions can occur:
+1 new tasks can be proposed and added to the agenda,
+2. new concepts can be defined, and
+3. new values can be found and added to some slot of
+some unit.
+
+Although all three actions might occur many times for each
+task, for the task below (Task-2610) we would expect that
+sometime while working on Task-2610, during the execution
+of some heuristic H that was relevant to it, one of H’s actions
+would be to fill in some values for the I/OBehavior slot of the
+unit called Device-817.
+Some slots arc filled in when the unit is first created
+(e.g., Name, ISA, InitialWorth,
+Parts, MyCreator, MyTimeOfCreation, etc.), some are filled in gra.dually and continuously
+as part of rccordkeeping (e g., MyOverallRecord),
+and some
+
+are filled in only during the execution of tasks that specifically
+call for finding those entries (e g., Examples, Specializations).
+Experiment
+Systematic
+
+2: Eurisko
+Generation
+
+Applied
+at the
+
+to
+Tile
+
+Level
+
+To extend Eurisko to discover physically
+
+novel devices
+ones
+with
+nonlinear
+gain
+due
+to
+striped
+doping pat(e.g.,
+terns), we would have to program the various equations
+involved~- -equations which are much more complex in form
+and usage than the trivial ones Eurisko employed, such as
+the one to compute the thickness of a depiction region. Additionally, we would have to extract and include into the
+knowledge base many heuristics for when and how to use the
+equations, what terms to ignore under what circumstances,
+etc. Doing this was beyond the scope of an initial exploration. Rather, we moved on to a higher level of functional
+abstraction
+We briefly considered a very abstract topological level of
+representation and rejected it as admitting too many interesting designs that could never be realized geomet,rically.
+
+Task-2610
+(SimulationTask
+DevicePhysicsTask
+TaskToFind Task Anything)
+((Run 24, Task 180, Task 195) (Run 26, Task 14) 1
+“Find the I/O behavior of Device-817”
+Device-8i7
+I/OBehavior
+743
+((Device-817
+is taking up a lot of room so let’s
+see if it’s
+a loser)
+(Device-817 was recently
+created and we should gather data on it)
+(The I/OBehavior
+of Device-809 wanted this to be done))
+(DevicePhysics)
+(EuriskoUnit)
+
+THE AI MAGAZINE
+
+Summer 1982
+
+25
+
+gate oxide
+
+Figure 3
+two n-tiles
+
+A simple MOS gate
+are connected
+together
+
+can be any conductor
+standard
+
+“red over green”
+
+Thus,
+
+If the Metal tile is high,
+electrically
+The “Metal”
+
+this
+
+transistor
+
+gate
+
+might
+
+A similar
+
+the
+tile
+
+be drawn
+
+as a
+
+gate exists
+
+with
+
+the metal tile below, rather than above, the n-c-n tiles
+Two
+other primitive
+gates exist, using p-c-p rather than n-c-n
+For
+them, conduction
+occurs if and only if the metal tile is low
+
+WC then settled upon an intermediate
+level we call the
+A device is composed of a set of regions. The five
+types considered were n-doped, p-doped, channel, insulator,
+and metal. Each region is conceived as a tile and every tile in
+the device has the same size and shape For now, visualize
+a tile as being cubical.
+These tiles are then packed into
+three-dimensional
+arrays and each such array corresponds to
+a three-dimensional
+microcircuit
+tzle model.
+
+The n- and p-tiles refer to negativelyand positivelydoped substrate material.
+Channel tiles represent undoped
+substrate (i.e., more or less intrinsic channel material) which
+are by default presumed to be coated with gate oxide on both
+their top and bottom surfa.ces. Metal tiles represent not just
+t,rue metal, but any conductor
+at all (such as polysilicon)
+which can serve as a gate
+Constraints
+on the building of structures are few. Layers
+of semiconductor
+tiles (p, n, and c) alternate with metal
+la,yers (metal and insulator tiles). In slightly more det,ail, our
+first guess at the possible tiles in the metal layer were SolidMetal, SolidInsulator,
+TopHalfMetal,
+and BottomHalfMetal.
+The half and half t,iles were used for providing electrical contacts across a substrate tile without, short,ing to it-that
+is,
+each ones serves as a miniature version of a wire. Other types
+of tiles were experimented with, such as CenterMetal and Centerrnsulator,
+MetalThread (i e., a vertical core of metal surrounded by insulator on all sides), and even diagonal metal.
+Finally, we decided t,o conceptualize
+each metal layer as if
+it were two separate, independent, layers one on top of the
+other. The only possible t,iles in each layer are Metal and
+Insulator.
+To get the effect of TopMetal, one places a metal
+tile over an insulator; to get aSolidMetal,one
+places ametal
+
+26
+
+THE AI MAGAZINE
+
+Summer
+
+1982
+
+tile over a metal tile; etc
+Since each channel tile is coated on both its top and
+bottom surfaces with a thin layer of gate oxide, an MOS gai,c
+is formed if a metal tile is placed above or below the channel
+tile, and two n- (or two p-) tiles flank t,hc channel tile (see
+Fig. 3).
+For electrical
+behavior, we used a swit,ch level model
+which connects source and drain tiles when the approprial,e
+gate control signal is present. In terms of tiles, the details
+are:
+IF you see n-c-n, with m above (or below) c,
+and m is “high,”
+THEN the two n tiles will bc conncctcd together
+electrically
+IF you see p-c-p, with m above (or below) c,
+and m is “low,”
+THEN the two p tiles will be connected
+electrically
+
+together
+
+These are somewhat, simplified;
+for cxamplc, in t,he first
+rule, we should also check that at least one of the n tiles is
+low. From t,he simulator’s point of view, this is not necessary,
+since if both n tiles are hzgh, that is equivalent, to theil
+being connected together electrically
+(i.e., there is only one
+idealized voltage level called “high”)
+Unlike purely topological models, a latt,ice of tiles cannot
+be stretched and twisted into unrealistic connectivities.
+The
+lattice retains enough geometric reality to permit exploring
+three-dimensional
+structures
+and expect them to be realizable and fabricatable
+in a straightforward
+manner. Yet the
+tilt model is simple-it
+avoids most of the det,ails that, hog
+
+Substrate Layer
+
+Metal Layer
+
+Substrate Layer
+
+Figure
+
+4
+
+a flip-flop
+but rather
+checking,
+
+A side view of a device
+
+designed
+
+by Eurisko
+
+The rightmost
+column was not provided
+was assumed to exist due to a programming
+a bug introduced
+
+by Eurisko
+
+down any fully authentic geometric model
+The tile model
+focuses on the neighbors of a region rather than the details
+of size, shape, orientation,
+how to fabricate it, etc.
+From another viewpoint,
+by changing from the carrier
+model to the tile model, we shifted the domain of exploration
+from an analysis of potentially
+interesting
+semiconductor
+configurations
+(interesting
+based on electrical characteristics
+such as nonlinearity)
+to an exploration
+of the combinatorial
+possibilities
+inherent in various arrangements
+of tiles in a
+lattice (such as recognizable functionality).
+Eurisko was able to handle this shift surprisingly
+easily.
+Within
+a week it was generating
+and examining
+arrays of
+t,iles. It soon became clear that we were very poor at visualizing t,he various devices Eurisko came up wit,h. To aid us, we
+bought a collect,ion of 1” square, .25” thick ceramic shower
+tiles of various colors
+Employing
+them, we rea.lined why
+Eurisko was (wrongly)
+claiming
+the structure
+in Figure 4
+acted like a flip-flop
+Due to a programming
+bug (introduced
+by Eurisko, incidentally,
+in its attempts to modify its own code), Eurisko
+was not always checking its array bounds properly.
+It
+thought, that, the right neighbor of the rightmost
+column of
+tiles (in Fig. 4) was the leftmost column of tiles, and not only
+that but, with up-down invert,ed. This structure is const,ructible in three-space, namely as the surface we call a Mobius
+strip. If one builds the device shown in Figure 4, holds it by
+t,hc ends, gives it, a half twist, and fuses the two ends together,
+the behavior of the device IS that, of a conventional
+flip-flop,
+as Eurisko claimed (see Fig. 5). Although
+it could be built,
+and although it does use significantly
+fewer regions than a
+standard memory cell, given present fabrication
+techniques
+
+“improving”
+
+that
+
+it claimed
+
+was
+
+by Eurisko explicitly,
+bug in array bounds
+itself
+
+it is not a cost-effective design for large-scale production.
+WC have already covered the answer to decision 1 from
+Figure 2, that is, the level of representation
+chosen.
+A?
+for 2, the combining operations are quite simple in the tile
+model-~ -one simply stacks up tiles into three-dimensional
+arrays.
+Combination
+translates to adjacency-two
+devices
+arc combined by pushing them next to each other.
+The
+combined device is more than the sum of its parts in three
+cases:
+1 Two metal tiles-one
+from each subdevice-happen
+to wind up touching. In this case, a new electrical
+connection has been made.
+2 A metal tile from one subdevice happens to wind up
+directly above or below a (oxide-coated) channel tile
+from the other subdevice and there are some doped
+tiles adjacent to the channel tile.
+3 Two doped tile+ one from each subdevice-happen
+t,o wind up touching
+If they are both of the same
+type, a new (low-grade) electrical connection is made;
+if they are of different types a junction diode is
+formed.
+The answer to 3, from Figure 2, is that the combination
+process was random-often
+one of the subdevices is a simple
+single tile.
+The answer to 4 is more involved. Question 4 asked how
+a synthesized device was evaluated. The steps involved here
+are as follows:
+First, a pass is made through the (unit. representing and
+describing the) device to find all regions that are electrically connected to each other permanently.
+This can
+
+THE AI MAGAZINE
+
+Summer
+
+1982
+
+27
+
+N2
+
+N3
+
+Nl
+-B
+
+N3
+
+Nl
+
+A-
+
+N4
+
+N4
+0
+
+Figure
+
+5
+
+0
+
+The circuit
+
+Eurisko
+
+thought
+
+occur within a substrate layer (whenever two like-doped
+tiles are adjacent) or within a met,al layer (whenever two
+metal tiles are adjacent) or between two layers (whenever
+a metal tile is above or below a doped tile). By finding
+the transitive closure of such pairwise connectivities, the
+entire device is partitioned into electrically connected
+equivalence classes
+Second, a pass is made to find all the possible gat,es (MOS
+transistors) in the device. This occurs wherever a metal
+tile is above or below a channel tile and (at least) a pair of
+like-doped tiles are adjacent, to the channel tile. A rule
+checks to see if the regions (equivalence classes) which
+would be connected by this gate (were it “on”) are the
+same. If so, this gate will always be a NO-OP and, hence,
+can be ignored.
+Once the gates are known, the device can be partitioned
+by the equivalence relation “Might possibly be connected to,
+by gates ” Ideally, one input terminal
+will exist for each
+such region If more than one exists, a short might develop,
+so special care must be taken in those cases. Additional
+constraints
+are brought to bear. Finally, a set of all legal
+divisions of terminals into inputs and outputs is computed.
+For a given set of input terminals,
+all logical inputs
+are computed and simulated through the circuit. Situations
+involving “state” require more than one call on the simulator.
+At this point, (some of) the I/O behavior of the device is
+known.
+28
+
+THE AI MAGAZINE
+
+Summer
+
+1982
+
+the device
+
+in Figure
+
+4 was equivalent
+
+to
+
+The input/output
+behavior is then “parsed” into large1
+functional units already known by the system In the case of
+a device created from subdevices, t,his behavior will usually
+refer to at least some of those subdevices. The basic elements
+initially
+supplied were logical operators (such as AND), flipflops, stack cells, light controllers,
+7-segment decoders, and
+a large set of mathematical
+operations
+(such as factoring,
+squaring, unioning, etc.) that were available essentially “for
+free” as one of Eurisko’s
+earlier domains was elementary
+mathematics.
+There was also a remote possibility
+that the
+program would stumble onto a device whose behavior could
+most easily be explained in terms of some Traveller fleet
+battle operation,
+or some biological concept, etc., but this
+never occurred.
+Once the description
+of the device’s behavior is at as
+high a level as possible, it is evaluated by a set of heuristics.
+These check for such events as the following:
+1. computing the same function
+or space or power;
+2
+
+as X, but in less time
+
+computing the same functions as X and Y, but in
+much less than the combined space;
+
+3. symmetry;
+
+et,c
+
+Thousands of hours of runs with this version of the program (over t,he course of about one month-yes,
+we were
+using multiple Dolphins) convinced us that the “hit rate” for
+good devices was below one in a billion and gave us a healthy
+
+RI
+
+gate oxide
+
+Metal
+tile
+/
+Figure
+
+6
+
+Side view of a gate
+
+augmented
+
+with
+
+a new metal
+
+tile
+
+to make it more symmetric
+
+respect for the size of the search space for even such small
+devices as 3 X 3 X 3 ones.
+Experiment
+Best-first
+
+3: Eurisko
+Generation
+
+Applied
+to
+at the Tile Level
+
+Blindly searching for interesting
+microcircuit
+structures
+is combinatorially
+too explosive to be profitable
+for even
+very small devices.
+The solution was to remain true to
+our paradigm of rule-guided
+heuristic search-that
+is, find
+(eit,her manually or by having Eurisko discover them) some
+heuristics which could guide the program toward plausible
+new devices to consider.
+The legal move space was too
+large LO have merely zmplauszble prunzng heuristics-most
+of the generfition would have to be constrained by plauszble
+generation heuristics. For this experiment, Eurisko remained
+at the tile level, as described in the last section.
+As we are exploring completely new territory,
+it is “fair”
+to provide as much help as possible to the program
+Its
+final evaluation will be in t,erms of genuine new discoveries it
+motivated
+or made itself.
+With that in mind, we allowed
+Eurisko to use all the very general, domain-independent
+heuristics
+that it had accumulated
+from other domains.
+These included some strategies such as noticing trends and
+tendencies, augmenting structures to make them more symmetric, examining extreme cases, etc.
+Previously,
+in the unguided search experiment,
+a new
+small (3 X 3 X 3) device was synthesized every .9 second. Now,
+with a hundred heuristics guiding the generation process, it
+took about 30 seconds to produce each device design. These
+
+times are for Xerox 1100’s (Dolphins) which currently run a
+version of Eurisko at approximately
+l/4 the speed of Eurisko
+on a DISC 2060.
+Despite the slowdown of 1.5 orders of magnitude,
+the
+frequency of valuable new devices rose from one in 10,000 to
+one in 10. In fact, six of the first t,wclve devices turned out
+to be exceptionally
+valuable. A symmetrizing
+heuristic was
+responsible for them. Let us see how they arose.
+In the very first case, the heuristic t,ook a highly valued
+known device-a
+gate-and
+tried to make it more symmetric.
+If you look at the standard
+gate (Fig. 3), you
+can see the same obvious addition
+to make it more symmetric, namely, add one metal tile below the channel tile (see
+Fig. 6).
+This symmetrized
+structure is quite important.
+It is an
+efficient way to compute OR, as the two doped regions will
+be at the same voltage level if either metal is high. (Recall
+that all Channel tiles are coated with gate oxide both above
+and below.)
+One of the next few devices to emerge was the same
+thing as the one depicted in Figure 6, but with p-doped
+semiconductor
+regions instead of n-dopcd. This is a compact
+way to compute NAND, as the doped regions are at the same
+level unless both metals are high.
+The very next device produced by the symmetry heuristic was the one presented in Figure 7 It is the other, slightly
+messier, way to symmetrize
+the g&e.
+This device is also quite importa.nt.
+It, has a single
+piece of metal controlling
+t,wo “poles.”
+Many circuits, fol
+example, inverters, employ two gates whose control signals
+
+THE N MAGAZINE
+
+Summer
+
+1982
+
+29
+
+Figure
+
+7
+
+The second
+
+way Eurisko
+
+are tied t,ogether. In three-dimensional
+microcircuit
+design,
+both of these gates can be realized by the single device above,
+thereby saving an extra metal tile (for the second gate) not
+to mention several metal tiles which would have functioned
+like a wire comlecting the two metal gate tiles.
+The next device t,he heuristic produced was a slightly
+less-preferred symmetrizing,
+less highly rated because it used
+p as well as n tiles (see Fig. 8).
+This device turned out, to have a very interesting
+behavior.
+When the metal is high, the two lower, n-doped
+regions are connected electrically;
+when the metal is low,
+the two upper, p-doped regions are connected
+This device
+did not surprise Gibbons at all, as he had independently
+come up with it earlier. It formed t,he building block for the
+first high-rise chip ever produced, his one-gate-wide
+CMOS
+inverter (Gibbons and Lee, 1980). When the input signal A
+is high, the lower (n-doped) regions are connected, so the
+rightmost
+n-doped region is 0 (low). But the rightmost
+nand p-doped tiles are both joined by a metal tile that is also
+taken to be the out,put, so in this case the output is low.
+Similarly,
+if the input A is low, a charmel forms across the
+top and the output is high
+The next device produced by the symmetry heuristic was
+similar in mat,erials to the one above, but it was a horizontal
+arrangement of them. Figure 9 provides a view of the device.
+When the metal is high, the two n-doped tiles are connected; when it is low, the two p-doped tiles are connected.
+Note how this exploits the intrinsic
+nature of the central
+channel tile capable of supporting
+a current of electrons or
+of holes.
+The next few symmetrizings
+were uninteresting
+The
+
+30
+
+THE
+
+Al MAGAZINE
+
+Summer
+
+1982
+
+symmetrized
+
+a gate
+
+(side view)
+
+twelfth one took the design from Figure 9 and added a gate
+underneath
+it, t,hus making it more symmetric.
+This new
+device, which we call the JMOS cross, is the building h1oc.k of
+our current designs, a new design technology we call XMOS
+(pronounced
+“cross-moss”).
+As shown in Figure 10, it can bc
+used to compute both NAND and OR simultaneously
+and it
+tesselates three space (it packs side to side and also on top
+of each other), so t,hat in t,he long run we get these functions
+at a cost of just one metal tile, one channel tile, one n-doped
+tile, and one p-doped tile. It was extremely unintuitive
+that,
+this could possibly be done at all before we saw this design
+By not fixing two of the input,s t,o be 1, as we do in Figure 10,
+more complex conditional
+expressions can be computed by
+these devices.
+Conclusions
+
+One important
+choice for the VLSI design task is the level
+of abstraction
+employed.
+The charge model needs a lot of
+mathematical
+back-up to deal with the electrical properties
+This model operates relaof t,he component
+interactions.
+tively closely to natural phenomena with little abstraction
+The tile model, in contrast,
+retains enough geometrical
+detail to keep us honest with respect to fabrication
+constraints along with enough electrical
+det,ail to determine
+functional
+utility
+It ignores enough detail that thousands
+of carrier-model-level
+devices map int,o the same t,ile-modellevel device.
+But even this is not sufficient in and of itself to allow random or systemat,ic search to be fruitful
+A few heuristics had to be added to guide the search fo‘ol
+heuristic had
+plausible devices.
+Of thycsc, a symmetrizing
+
+9
+
+1
+
+A
+
+-* NOT(A)
+
+0
+
+Figure
+
+8
+
+The third
+
+it into a one-gate
+
+way Eurisko
+
+wide inverter
+
+symmetrized
+
+a gate
+
+The two metal
+
+tiles
+
+(side view)
+
+The electrical
+
+are not touching
+
+connections
+
+shown
+
+turn
+
+each other
+
+The fourth symmetrizing
+(side view)
+The metal tile
+Figure 9
+is laid on top of, and obscures,
+the Channel tile Either the two
+n-tiles or the two p-tiles will be electrically
+connected,
+depending
+on whether
+
+the metal
+
+tile is (respectively)
+
+high or low
+
+THE N MAGAZINE
+
+Summer
+
+1982
+
+31
+
+10
+
+Figure
+extra
+
+A fifth
+
+piece of metal
+
+symmetrizing,
+added
+
+related
+
+In the center
+
+to
+
+tile (almost completely
+obscured
+in the figure)
+the same plane as the four doped tiles
+
+great success-half
+of its first dozen suggestions turned out
+to be valuable new devices. In a next try, we will probably
+try to merge the best features of both the charged carrier and
+the tile models, perhaps in a sequential way (i.e., worry more
+carefully about, electrical details once an interesting
+lattice
+arrangement
+is found)
+The operation of the Eurisko program was satisfactory
+In this new field, we were able to enter the knowledge for the
+t,wo different models relatively easily. The existing learning
+heuristics remained applicable.
+One of the conclusions from
+earlier research on Eurisko was the import,ance of gcncrat,ing new, task-specific
+kinds of slots, as well as new heuristics. This turned out to be true for the VLSI design task as
+well, and in this article we have .illustrated
+several cases of
+automatic
+and semi-automatic
+defining of new slot types.
+Although
+it was expected,
+the futility
+of exhaustive
+search --even at “the right level”-was
+strongly reinforced
+WC do not, yet have a satisfact,ory
+understanding
+of appropriate construction
+heuristics which provide a reasonable
+hit rate on useful structures.
+Even our initial attempts at,
+such heuristics paid off handsomely,
+however, so we are encouraged to cont,inue our investigation.
+The discipline of thought required of us in trying this
+In such a
+comput,er applicat,ion
+was extremely
+valuable.
+new unexplored field, the organization
+of our thoughts into
+a computer-digestible
+form led us by hand to the discovery
+of several new devices and device possibilities which we shall
+not catalog in this article
+One example of this was the not,ion
+
+32
+
+THE AI MAGAZINE
+
+Summer
+
+1982
+
+Figure
+
+9’s but
+
+of the device
+
+with
+
+an
+
+is a Channel
+
+The Channel
+
+tile lies in
+
+of doping a region only half-way down, thereby leading to a
+new kind of precharging
+of devices provided they are not
+retriggered too quickly.
+,Just the act of representing
+knowledge in Eurisko occasionally provided us with novel insights.
+The use of an
+array-like data structure led to the notion of a circuit as a
+lattice of regions (of a few t,ypes), ra.ther than the conveIltional decomposition
+of it into small devices hooked togethel
+by wires
+Some of Eurisko’s designs do have several metal
+regions in a row, acting like a wire, but most of its useful
+devices have few if any of these chains, and where they do
+exit they are short and (most, of) those metal regions serve a
+dual purpose such as acting as a gate.
+There is no need t,o restrict ourselves to cubic tiles, OI
+any sort of rectangular
+prismatic regions, of course. Going
+to fish-and-gccsc might hc a bit, t,oo fa.r, however
+C:urrent,ly
+Eurisko tesselates space with cylinders whose cross-section is
+hexagonal. One problem with this is the difficulty obtaining
+bathroom
+tiles with that shape, so it is hard to visualize
+the designs Eurisko comes up with
+This is not a purely
+whimsical
+dificult,y
+Seeing a set of designs, one for each
+plane, spread out on a flat screen, makes it, arduous to trace
+functionality.
+Some of this problem goes away by having
+Eurisko describe what is going on at higher and higher levels
+of functional
+abstraction.
+IJnfortunately,
+by the time it, can
+do this for any given design, it is usually ready to move on
+to the next one What was needed was a more nat,ural was
+to visualize the 3-D structures.
+
+To provide that power, we have equipped a doubly-wide
+Dolphin display screen with a stereoscopic viewer so we can
+literally
+see the structure
+Eurisko is considering
+at each
+We considered various methods for 3-D viewing
+moment.
+including
+varifocal
+mirrors,
+expensive optical image-fusing
+setups, oscilla.tor-driven
+polarizing goggles, etc., and finally
+found we could get by with an inexpensive fusion device-a
+first-surface
+mirror held vertically
+near the bridge of one’s
+nose Six other Ylat” windows on the Dolphin screen display further information
+to the user-the
+state of Eurisko’s
+agendae, details of the current task and why it was chosen,
+details of the current concept(s) being worked on, the heuristics being applied to further the current task, etc.
+We were also able to assess t,he expertise needed to do
+the job. This expert,ise is quite wide ranging and includes
+knowledge about geometry, semiconductor
+electronics,
+and
+fabrication
+processing.
+The most important
+conclusion is that there are indeed
+many unintuitive,
+simple, yet powerful device designs lying
+“near the surface” in the space of three-dimensional
+microcircuits Heuristics which suggest plausible changes and combinations appear to be necessary and sufficient to economically find such devices
+Eurisko appears to be a promising
+vehicle for exploring this space as it can find such heuristics,
+even t,hough they may be counterintuitive
+to human beings.
+Future
+
+Directions
+
+Our efforts to date have reinforced our initial opinions
+that this is a fruitful
+area of application
+of AI. We have
+barely scratched the surface and considering the small effort
+expended believe there is much paydirt to be mined. We offer
+no claims that we have found the right level of representation
+or abstraction yet. It is clear that much more exploration
+by
+many more people will he required. In fact, it is likely that
+the interplay of viewpoints from different a.pproaches will be
+most productive.
+One such effort is described in Stefik and
+Conway’s article elsewhere in this issue.
+We certainly
+hope to see other levels of representation
+and abstraction explored. Building an expert system with t,he
+knowledge and mathematics
+needed for dealing with semiconductor
+properties
+at an electron/hole
+level is one clear
+direction for future work
+That is, extending Experiment
+1
+could be profitSable.
+Another
+promising
+direction
+is to incorporate
+more
+knowledge about fabrication
+processes and equipment.
+As
+mentioned before, the computerization
+of fabrication
+equipment is making fabrication
+knowledge and parameters more
+precise. Additionally,
+computer controlled equipment could
+directly use processing commands derived from a knowledgcbased process design system. Such a related application
+of
+process design as opposed to device design will require a
+solid knowledge base of semiconductor
+and related material
+properties.
+To give one simple example, a device may be
+no faster, use no less power, etc. than an old design, yet be
+highly prized because it requires fewer masks to produce.
+
+The novel feature of an AI system working in an emerging field alongside people who are just learning their expertise
+deserves careful scrutiny. Trying to do this in another quite
+unrelated field could provide valuable insight about heuristics for learning.
+We note again that the traditional
+paradigm for microelectronics
+is design, fabrication,
+and test.
+These three
+steps are performed
+serially-one
+is completed
+before the
+next begins.
+It is now becoming possible to merge these
+three. Computer
+systems process the design data, cont,rol
+the fabrication,
+and run the tests. By coordinating
+the programs that do these activities,
+a real and new integration
+of the microelectronic
+construction
+process is possible. Our
+little exploration
+has helped to convince us of this potential. We discussed in the article the possibility of fabricating
+with the power on, testing (each pa.rt, of) each layer as it is
+deposited.
+Low yield regions might cause rapid redesign of
+the rest of that layer In exceptional
+cases the entire layer
+could be evaporated and tried over again. “Backup”
+would
+finally have been pushed not merely to the hardware level,
+but to the level of fabrication
+of hardware!
+Our final remark is a strategic one on the possibility
+of major industrial
+or national impact if this AI application
+can be successfully pursued.
+As we enter the era of VLSI
+technology,
+there are shortages of critical people, an explosion of design complexity,
+and increasingly
+aggra,vating test
+requirements,
+to name only a few of the problems hindering the field. The advent of three-dimensional
+VIST t,echnology explodes t,he magnitude
+of all of those problems.
+Any
+industrial
+firm or nation which could successfully devote a
+large number of computation
+cycles on a sustained basis to
+intelligent exploration
+of microelectronic
+design, fabrication,
+and test possibilities would certainly be ahead. We enjoy the
+dream.
+References
+Dankel, D D., II, (1979) Browsing in large dat,a bases IJCAI 6,
+188-190
+Davis, R., & Lenat, D. B. (Eds ) (1981) Knowledge-based systems
+in artificial intelligence. New York: McGraw-Hill
+Feigenbaum,
+E. A. (1977) The art of artificial
+intelligence:
+I. Themes and case studies in knowledge engineering.
+IJCAI 5,
+1014~1029
+CMOS inverter
+Gibbons,
+J., & Lee, K (1980) One-gate-wide
+on laser-recrystallized
+polysilicon
+IEEE Electron Device Letters
+IXDL-1, 6.
+Lee, K F., Gibbons,
+.J., Saraswat, K. C , Kamins,
+T I., Lam,
+H. W , Tasch, A T , & Holloway,
+T. C. (Eds ) (1978) AlP
+Conference Proceedings
+Lenat, D B (1982a) Eurisko: Discovery of heuristics by heuristic
+search.
+Working
+paper, Computer
+Science Dept., Stanford
+University.
+Lenat, D. B. (1982b) The nature of heuristics.
+Artzficzal Intelligence
+Polya, G. (1945) How to solve it Princeton,
+N.J.: Princeton ITnivcrsity Press
+
+THE AI MAGAZINE
+
+Summer
+
+1982
+
+33
+
+

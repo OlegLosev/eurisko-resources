@@ -1,0 +1,132 @@
+Towards Meta-Level Descriptive ILP
+Pedro Torres∗ † and Simon Colton∗
+∗
+
+Department of Computing, Imperial College, London, UK. sgc,ptorres@doc.ic.ac.uk
+† Supported by Funda¸ca
+˜o para a Ciˆencia e a Tecnologia, (SFRH/BD/12437/2003).
+Abstract. We introduce a formal setting for a first-order production
+rule approach to descriptive learning and we consider searching for sets
+of production rules as opposed to a direct search for concepts. We sketch
+the Parrot algorithm which generates a basic set of production rules
+capable of producing a set of user-given concepts and present some preliminary ideas on how to enrich this set.
+
+1
+
+Introduction
+
+Descriptive Inductive Logic Programming approaches aim to find interesting
+relationships in unclassified relational data. Claudien [4] and WARMR [3] both
+work in this setting, using a declarative language bias to define the search space.
+HR [1] forms clausal theories consisting of classification rules and association
+rules and has recently been described in ILP terms [2]. Unlike Claudien and
+WARMR, which use language biases, HR employs production rules to define the
+search space and various measures of interestingness to direct the search.
+In a study involving algebraic structures [5], we extended our theory formation approach with a generic first-order production rule. By writing explicit
+definitions of first-order production rules, the user could add to the set of production rules used by HR. We extend this approach here, and we investigate how
+a search for sets of production rules could be carried out. If such a search can be
+efficiently implemented, this opens up the possibility of automatically generating
+production rule based theory formation systems tailored to a specific domain.
+Such tailoring will be enabled by the user presenting core background theory
+and interesting concepts derived from them, with our system able to generate
+production rule sets that produce the interesting concepts from the core ones,
+and hopefully additional interesting material.
+
+2
+
+First-order representation of production rules
+
+Let {τi }N
+i=1 be a collection of sets, which we will call types. We define a concept to
+be a relation defined between any n types. We call n the arity of the concept. We
+will here consider concepts of the form {(x1 , . . . , xn ) ∈ τ1 × · · · × τn | φ}, where φ
+is some first-order logic formula for which the only free variables are x1 , . . . , xn
+and any other variables are bounded. The above concept will be written as
+[x1 , . . . , xn ] : φ(x1 , . . . , xn ). We write C for the set of all concepts.
+A production rule is a function π : D → C, where D ⊂ C q , for some q, called
+the arity of π. A production rule can be defined by specifying the transformation
+
+it operates on the logical formulas defining the input concepts. Suppose we have
+x ∈ τ1 , y ∈ τ2 and z ∈ τ3 . We can define, for example, π as a function carrying
+out the mapping ([x, y] : φ(x, y), [y, z] : ϕ(y, z)) 7→ [x, z] : ∃y .(φ(x, y) ∧ ϕ(y, z)).
+From an initial set of background concepts {C1 , . . . , Ck }, by recurringly applying production rules with appropriate domains, we can define new concepts,
+e.g. C = π6 (π4 (π1 (C1 , C2 ), π2 (C2 , C3 )), π5 (π3 (C4 ))). Given a set of initial concepts C and a set of production rules Π, we recursively define Π ∗ (C) as the set
+of all concepts which: (i) are in C or (ii) can be written as π(C1 , . . . , Cn ) where
+π is in Π and every Ci is in Π ∗ (C). The set Π ∗ (C) can be intuitively described
+as the set of all concepts that can be produced from the concepts in C by using
+the production rules in Π. If we fix C, the set Π defines exactly which concepts
+are in the search space. The essential difference between language biases and
+sets of production rules is that the former usually let the user directly restrict
+the syntactical form of all the concepts formed, whereas the latter restrict the
+stepwise syntactical construction of new concepts from old ones.
+One way of making conjectures in a production rule based system is to compare concepts produced. Suppose we have two concepts of the same arity and
+types for which all the available examples which satisfy one also satisfy the
+other. In these circumstances, it is possible to conjecture that they are equivalent. Similar situations may lead to implication and non-existence conjectures.
+The association rules that such a system may come up with are therefore all
+of the form [∀x .C1 (x) → C2 (x)], [∀x .C1 (x) ↔ C2 (x)] or [∀x .¬C1 (x)] where x is
+some set of variables and C1 and C2 are concepts in Π ∗ (C).
+It is possible to define a conjecture as a 0-arity concept. In this light, conjecture making techniques are simply particular production rules of arity 2 (they
+take two concepts) which yield concepts of arity 0 (i.e. conjectures). By using
+these definitions, concepts and conjectures can be treated at the same level.
+Furthermore, we can define an order relation on the space of sets of production
+rules. Given a set of initial concepts, C, and two sets of production rules, Π1 and
+Π2 , we say that (Π1 ≤C Π2 ) iff Π1∗ (C) ⊆ Π2∗ (C). In this case, Π2 is said to be
+richer than Π1 .
+
+3
+
+Searching for production rules
+
+The main idea we explore is that, instead of searching for concepts with a fixed
+set of production rules, we can start by analysing examples of previously formed
+(interesting) theories in a chosen domain and build a set of production rules
+tailored to that particular domain.
+In order to perform the search for sets of production rules, we have sketched
+three high-level algorithms: (i) the Expander algorithm for computing Π ∗ (C),
+up to some defined depth, from user-defined C and Π; (ii) the Parrot algorithm
+which takes a large set of formed concepts, C, all ultimately constructed from
+some elementary concepts C0 , and defines a set of production rules, Π0 , such
+that Π0∗ (C0 ) ⊇ C; (iii) the Enricher algorithm, which takes a set of production
+rules and iteratively enriches this set.
+
+Expander is a simple algorithm which considers all legal sequential application of production rules up to some prescribed depth. In the Parrot algorithm,
+each concept, C, in the user-given set of concepts, C, can be expressed as a first
+order formula making use of some old concepts C0 (C). It is therefore possible to
+craft a production rule which takes the concepts C0 (C) and produces C. If this
+is done for all the concepts in C, we get a set of production rules, Π0 , which can
+generate all of the concepts in C from the elementary concepts they are based
+on. Since we have put concepts and conjectures on the same level, the above
+reasoning means that, if the user includes conjectures (or, possibly, theorems)
+on the set of concepts C, the production rule set given by Parrot will also be
+able to make those conjectures. If the set of concepts, C, is very restricted, the
+production rule set output by Parrot may not be able to generate much more
+than C itself. If this is the case, we will want to enrich that set.
+A simple way to enrich a set of production rules, Π, is to remove a production rule π and add two separate production rules π1 and π2 such that, for
+every C in the domain of π, we have π(C) = π1 (π2 (C)). In this example we
+have considered rules of arity 1 but this decomposition idea can be generalised
+to higher arities. Given a set of production rules, there is a considerable number
+of possible decompositions enriching that set. To facilitate the analysis of these
+decompositions we have defined a set of so called primitive production rules
+which are closely based on the syntax of first order logic. By using the primitive production rules, we can write different composite production rules using a
+common vocabulary and search for matching subparts.
+The Enricher algorithm is given a set of production rules and performs a
+best-first search through all decompositions. It uses Expander to compute the
+concepts which each particular decomposition adds and calculates a score for
+each decomposition based on measures defined by the user. For example, using
+this algorithm, the user can ask for an enrichment which favours concepts with
+higher applicability (i.e. higher proportion of which satisfy the concept).
+In the longer version of this paper we plan to give details of the three theoretical algorithms mentioned above and toy examples of their application. This
+will include the complete definition of the primitive production rules, which play
+an important role in the Enricher algorithm, and the analysis of some of their
+properties.
+
+References
+1. S. Colton. Automated Theory Formation in Pure Mathematics. Springer, 2002.
+2. S. Colton and S. Muggleton. Mathematical applications of Inductive Logic Programming. Machine Learning (online first) 2005.
+3. Luc Dehaspe and Hannu Toivonen. Discovery of frequent DATALOG patterns. Data
+Mining and Knowledge Discovery, 3(1):7–36, 1999.
+4. L. De Raedt and L. Dehaspe. Clausal discovery. Machine Learning, 26:99–146, 1997.
+5. P. Torres and S. Colton. Using model generation in automated concept formation.
+In Proceedings of the Automated Reasoning Workshop, 2006.
+
+

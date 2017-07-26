@@ -1,0 +1,5 @@
+var DISQUSWIDGETS;
+
+if (typeof DISQUSWIDGETS != 'undefined') {
+    DISQUSWIDGETS.displayCount({"text":{"and":"and","comments":{"zero":"0 Comments","multiple":"{num} Comments","one":"1 Comment"}},"counts":[{"id":"30913 http:\/\/www.overcomingbias.com\/?p=30913","comments":37},{"id":"30904 http:\/\/www.overcomingbias.com\/?p=30904","comments":19},{"id":"30921 http:\/\/www.overcomingbias.com\/?p=30921","comments":12},{"id":"30905 http:\/\/www.overcomingbias.com\/?p=30905","comments":35},{"id":"30919 http:\/\/www.overcomingbias.com\/?p=30919","comments":17},{"id":"30907 http:\/\/www.overcomingbias.com\/?p=30907","comments":84},{"id":"30909 http:\/\/www.overcomingbias.com\/?p=30909","comments":65},{"id":"30901 http:\/\/www.overcomingbias.com\/?p=30901","comments":7},{"id":"30903 http:\/\/www.overcomingbias.com\/?p=30903","comments":10},{"id":"30900 http:\/\/www.overcomingbias.com\/?p=30900","comments":21}]});
+}

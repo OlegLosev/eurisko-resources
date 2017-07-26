@@ -1,0 +1,988 @@
+Replae this le with prentsmaro.sty for your meeting,
+or with entsmaro.sty for your meeting. Both an be
+found at the ENTCS Maro Home Page.
+
+Combining AI Systems for Classiation in
+Non-assoiative Algebra
+a
+
+b
+
+Volker Sorge , Andreas Meier , Roy MCasland
+
+a
+
+1,
+
+Simon Colton
+
+Shool of Computer Siene, University of Birmingham, UK
+
+V. Sorge s. bham. a. uk
+b
+
+DFKI GmbH, Saarbr
+uken, Germany
+
+ameier72 web. de
+
+
+Shool of Informatis, University of Edinburgh, UK
+
+rmasla inf. ed. a. uk
+d
+
+Department of Computing, Imperial College London, UK
+
+sg do. i. a. uk
+
+Abstrat
+
+The automati onstrution of mathematial theorems is a hallenging task for Artiial Intelligene systems, whih has pushed many researh boundaries in dierent
+branhes of AI. We desribe how the onstrution of lassiation theorems in
+algebrai domains of mathematis has driven researh not only on the individual
+mathematial reasoning tehniques, but also the integration of these tehniques.
+We have developed a bootstrapping algorithm for the automati generation of suh
+theorems whih relies on the power of model generation, rst order theorem proving,
+omputer algebra, mahine learning and satisability solving. In partiular, the onstrution of algebrai invariants demands an intriate interplay of these tehniques.
+We demonstrate the eetiveness of this approah by generating novel theorems
+whih have so far been beyond the reah of automated reasoning systems.
+Key words:
+
+Automated Disovery, Finite Algebra
+
+1 Introdution
+Classiation of abstrat objets suh as integers, graphs, knots and groups
+has been a major driving fore in pure mathematis. Classiation projets
+have been partiularly fruitful in the domain of nite algebra, for instane the
+lassiation of nite simple groups has been hailed as \one of the greatest
+intelletual ahievements of the 20th Century" [9℄. However, the majority of
+1
+
+The author's work was supported by EPSRC MathFIT grant GR/S31099.
+
+
+
+2007 Published by Elsevier Siene B. V.
+
+d
+
+Sorge, Meier, MCasland, Colton
+
+nite algebrai strutures have yet to suumb to an appropriate lassiation
+suh as isomorphism or its generalisation, isotopism.
+We are interested in nite algebrai strutures that onsist of one set together with a binary operation on the elements of the set. They are haraterised in terms of the axioms to whih the multipliation adheres. There has
+been muh researh in automated mathematis into nding the most suint
+way of representing the axioms of ertain algebrai strutures. In partiular,
+new axiomati representations of groups have been found [10,11℄. Also, more
+restritive axioms bring into question the existene of instanes of algebrai
+strutures at partiular sizes, and automated tehniques have been used to
+solve suh existene problems. By searhing for instanes of algebrai strutures at various sizes, model generators and onstraint solvers have proved
+existene problems both positively, by nding instanes, and negatively, by
+exhausting the searh spae without nding solutions. The Finder system has
+been used to solve many quasigroup existene problems [20℄, and representatives of every isotopy and isomorphism lass for quasigroups and loops have
+been generated up to order 11 [13℄. Suh enumerations often form an initial
+part of a lassiation projet.
+We are interested in automating more sophistiated lassiation tasks of
+algebrai strutures with relatively less restritive axioms. Here the problem
+is not existene, but rather an abundane of instanes, whih gives rise to similarly large numbers of isomorphism and isotopism lasses for the struture.
+Beause hand-rafting lassiation theorems with potentially thousands of
+ases is infeasible, any automated approah to generating suh theorems has
+the potential to substantially add to the body of knowledge in pure mathematis. We present a fully automati bootstrapping algorithm for onstruting
+lassiation theorems diretly. It is given three inputs: the axioms, A, of a
+struture of interest, the equivalene relation, E , whih denes the lasses for
+the lassiation, and the size n of the algebrai struture for whih the tree
+is required. The output is a fully veried lassiation theorem expressed as
+a deision tree whih an deide the equivalene lass of any algebrai struture of size n satisfying A. By fully veried, we mean that in addition to the
+theorem, a proof of its orretness and ompleteness is also provided.
+While the algorithm is general in priniple, in pratise some additional
+eort is needed to obtain results. In partiular, a key aspet of the algorithm
+is its ability to generate algebrai invariants, whih are properties of algebrai
+strutures that are xed for members of the same equivalene lass. Another
+aspet is that proof problems have to be suitably simplied to be feasible
+for automated theorem proving. These simpliations often need to exploit
+knowledge on both the equivalene relation and the algebrai strutures.
+We have onentrated our eorts on quasigroups and loops together with
+the two most important algebrai equivalene relations in that domain, namely
+isomorphism and isotopism, whih are dened in the next setion. For isomorphism lassiations, we used a mahine learning approah to generate invari2
+
+Sorge, Meier, MCasland, Colton
+
+ants. However, it turned out that this approah was not suÆient for isotopy
+lassiations, whih demanded a signiantly more omplex approah. We
+devote the next setion to this aspet, before desribing the overall bootstrapping algorithm. Following this, we desribe the theorems we have generated,
+most of whih are novel and all of whih were beyond the reah of existing
+systems. The original bootstrapping algorithm for isomorphism has been presented in [5℄; the mathematial details for generating isotopy invariants are
+given in [21℄.
+This approah makes use of a dozen dierent mathematial reasoning implementations whih employ rst order theorem proving, satisability solving,
+omputer algebra, mahine learning and model generation. As suh, we believe this represents one of the most omplex integrations of AI systems yet
+attempted. We speulate on the future of suh ombined reasoning systems
+in the onlusions.
+
+2 Generating Algebrai Invariants
+As mentioned above, a key aspet of the bootstrapping algorithm is its ability
+to generate algebrai invariants. These are properties that are true for every
+member of an equivalene lass for a partiular equivalene relation. If, in
+addition, the property is true for the members of exatly one equivalene
+lass, we all this invariant a disriminant, as it an be used to dierentiate
+between lasses. That is, if an algebrai instane has it, and another does not,
+then they annot be members of the same equivalene lass.
+We have onentrated on the domain of quasigroups and loops. Both are
+strutures with one binary operation that have the Latin square property,
+i.e., eah element ours exatly one in eah row and eah olumn of their
+multipliation table. Loops have, in addition, an identity element [16℄. Both
+quasigroups or loops are generally not assoiative; indeed an assoiative quasigroup is a group. We have foused on the two most important equivalene
+relations in that domain, namely isomorphism and isotopism. We say that
+two quasigroups (Q; ) and (Q0 ; Æ) are isomorphi to eah other if there exists
+a bijetive homomorphism f between Q and Q0 . That is, 8 x; y 2 Q; x = y
+implies f (x) = f (y ), and 8 x0 2 Q0 9 x 2 Q suh that f (x) = x0 (bijetive). In
+addition, 8x; y 2 Q; f (x) Æ f (y ) = f (x  y ) (homomorphism). We all f an
+isomorphism between Q and Q0 and the equivalene lasses indued by f are
+termed isomorphism lasses. We say that two quasigroups (Q; ) and (Q0 ; Æ)
+are isotopi to eah other if there are bijetive mappings ; ;  of Q suh that
+8x; y 2 Q; (x) Æ  (y ) =  (x  y ). Isotopy is an equivalene relation and the
+equivalene lasses indued by it are alled isotopism lasses. Isotopism is a
+generalisation of isomorphism, sine Q and Q0 are isotopi if  =  =  . In
+other words, two strutures an be isotopi but not neessarily isomorphi to
+eah other.
+As disussed in the next setion, the bootstrapping algorithm is required to
+3
+
+Sorge, Meier, MCasland, Colton
+
+generate a disriminant for a given pair of non-equivalent algebrai instanes.
+For isomorphism, we have formulated this as a binary mahine learning problem, and used the HR theory formation system to generate suitable disriminants [4,5℄. However, this approah was not suessful for generating isotopy
+invariants, and we needed to derive alternative methods, whih are desribed
+below. Note that due to the fat that every quasigroup has a loop isotope we
+an restrit the problem of generating suh isotopi invariants for loops.
+
+2.1 Isotopy Invariants 1: Substrutures
+A ommon mathematial approah to nding invariant properties of algebrai
+strutures is to examine substrutures. In ontrast to isomorphy, under isotopy olumns, rows, and values in the multipliation table an be mapped
+independently from eah other, and a relation between the three an therefore
+not be exploited to gain an invariant. Nevertheless, we an onstrut an invariant by looking at the number of dierent elements a substruture ontains.
+Observe that in our ontext a substruture is not neessarily losed under the
+operation. The invariants presented here have { to the best of our knowledge
+{ not been reported in the literature on loops, hene represent a novel way of
+haraterising loops. For the mathematial details see [21℄.
+Given a set of row elements fr1 ; : : : ; r g and a set of olumn elements
+f1 ; : : : ;  g, we onsider their orresponding values in the multipliation table, i.e., elements v11 ; : : : ; v suh that v = r   . We then ount the
+number of distint elements that make up the v . As the  mapping in the
+isotopy relation is a bijetion, we know that this property is preserved under
+isotopism. In order to ompare this property between loops, however, we have
+to make it independent from the row and olumn values. We therefore ount
+the number of substrutures of a given size n  m and the number of distint
+values they ontain. Thus for every k  n  m, any isotope of the given loop has
+to have the same number of n  m substrutures that ontain exatly k values.
+Or, in other words, if two loops dier in the number of n  m substrutures
+that ontain exatly k values, then the two loops are not isotopi.
+As an example, onsider the following two loops:
+n
+
+m
+
+nm
+
+i;j
+
+i
+
+j
+
+ij
+
+L8 0 1 2 3 4 5
+0
+1
+2
+3
+4
+5
+
+0
+1
+2
+3
+4
+5
+
+1
+2
+0
+5
+3
+4
+
+2
+0
+1
+4
+5
+3
+
+3
+4
+5
+1
+0
+2
+
+4
+5
+3
+0
+2
+1
+
+5
+3
+4
+2
+1
+0
+
+L9 0 1 2 3 4 5
+0
+1
+2
+3
+4
+5
+
+0
+1
+2
+3
+4
+5
+
+1
+0
+3
+2
+5
+4
+
+2
+5
+1
+4
+0
+3
+
+3
+4
+5
+0
+1
+2
+
+4
+2
+0
+5
+3
+1
+
+5
+3
+4
+1
+2
+0
+
+Here, L8 ontains 3  3 substrutures that ontain only three values, for instane the upper left square, whereas L9 does not ontain a single substruture
+4
+
+Sorge, Meier, MCasland, Colton
+
+of that form. Formally we get the property
+9r1 ; r2 ; r3
+
+!
+
+91 ; 2 ; 3 9 v1 ; v2 ; v3
+
+= r2 ^ r1 6= r3 ^ r2 6= r3 ^ 1 6= 2 ^ 1 6= 3 ^ 2 6= 3
+
+r1 6
+
+= v2 ^ v1 6= v3 ^ v2 6= v3 ^
+
+^ v1 6
+
+V3 V3 W3 (
+=1 j =1 k=1
+
+ri  j
+
+=v )
+k
+
+i
+
+Note that the above formulation of the disriminant ontains a unique existene quantier 9!. Expanding this would lead to an even larger formula.
+Nevertheless, the above property is still relatively small. Generally we have
+to quantify the dierent substrutures in the loops under onsideration to obtain a disriminant. That is, we have to formulate the onept that one loop
+ontains more substrutures of a ertain type than the other one.
+
+2.2 Isotopy Invariants 2: Universal Identities
+A seond type of isotopy invariant involves the onept of universal identities,
+rst introdued be Faloner [6℄. Before dening universal identities, we have
+to introdue the general onept of loop identities.
+A loop identity is a universally quantied equation of the form w1 = w2 ,
+where w1 ; w2 are words of a loop, i.e., ombinations of variables and the loop
+operation . Every loop identity holds for the trivial loop, i.e., the loop with
+only one element, however many identities (e.g., 8x; y x  y = x) do not hold
+for any loop of greater order. Moreover, while identities are preserved under
+isomorphisms, they are not neessarily preserved under isotopism.
+In [6℄, Faloner introdued the idea of universal identity, namely one that is
+preserved under isotopy. Universal identities depend on the onept of derived
+identities that is dened using two additional quasigroup operations = and n,
+whih, in turn, an be dened as
+(i) x  (x=y ) = y and x=(x  y ) = y ,
+(ii) (xny )  x = y and (y  x)nx = y ,
+by exploiting the fat that the operation of a quasigroup is left and right
+anellative. Observe that we use = and n similar to Faloner in [6℄, while
+the symbols are often used onversely by other authors (f. [15,3℄). Given
+a universally quantied identity w1 = w2 where w1 and w2 are words in n
+variables x1 , . . . , x and the operation  we reate an identity w1 = w2 in
+n + 2 variables x1 , . . . , x , y , z and the operations (; n; =) where w is dened
+reursively as follows
+(i) x = x
+(ii) u  v = (uny )  (z=v )
+The identity w1 = w2 is alled a derived identity, the denition of given here
+is a simpliation of that given in [6℄. Faloner shows that a derived identity,
+that is onstruted from a loop identity that holds for the free loop, is always
+5
+n
+
+n
+
+i
+
+i
+
+Sorge, Meier, MCasland, Colton
+
+a universal identity, that is an isotopism invariant.
+As an example onsider the two loops and their isotopy disriminant below.
+The given universal identity holds for L4 but does not hold for L8 .
+
+L4 0 1 2 3 4 5
+0
+1
+2
+3
+4
+5
+
+0
+1
+2
+3
+4
+5
+
+1
+2
+0
+5
+3
+4
+
+2
+0
+1
+4
+5
+3
+
+3
+5
+4
+1
+0
+2
+
+4
+3
+5
+0
+2
+1
+
+L8 0 1 2 3 4 5
+
+5
+4
+3
+2
+1
+0
+
+0
+1
+2
+3
+4
+5
+
+0
+1
+2
+3
+4
+5
+
+1
+2
+0
+5
+3
+4
+
+2
+0
+1
+4
+5
+3
+
+3
+4
+5
+1
+0
+2
+
+4
+5
+3
+0
+2
+1
+
+5
+3
+4
+2
+1
+0
+
+x 8y 8z (x=y )  (((x=y )  (z nx))  (z nx))= ((x=y )  (z nx))  ((x=y )  (z nx))
+
+8
+
+This universal identity was derived from the following loop identity:
+
+x x  ((x  x)  x) = (x  x)  (x  x)
+
+8
+
+Faloner's onept of universal identity depends on deriving identities from
+equations that hold for the free loop. However, in our senario we an only
+generate nite models and a direted searh for identities holding for the free
+loop is infeasible. Thus to generate a large number of isotopy invariants we
+employ a proess of interleaving model generation and rst order theorem
+proving with intermediate transformations of the respetive results. Figure 1
+shematially depits this proess. We rst systematially generate identities
+I for whih we hek whether they are loop identities, by trying to generate a
+non-trivial model of size 4  n  8 that satises I using the model generator
+Mae [12℄. All identities for whih a loop exists are then transformed into
+derived identities U as desribed above. Eah U is then passed on to at least
+one rst order theorem prover in order to show that it is indeed an isotopy
+invariant, whih is not neessarily guaranteed anymore by onstrution. We
+employ both Vampire [17℄ and E [18℄ for this task. Combined, these show
+that around 80% of our derived identities are indeed isotopy invariants. These
+identities are then olleted in a pool of onrmed isotopy invariants.
+Note that for eah U , we show that it is an invariant under isotopy independently of the size of a loop. We an therefore reuse these universal identities
+in dierent lassiations. If we need to test some isotopy invariants if they
+an be used as disriminants during the lassiation of loops of a partiular
+size n, we lter them again using the model generator Finder [19℄ to generate
+loops of size n that satisfy the invariant. We then only use those invariants
+for whih at least one loop of order n exists, and try them as possible disriminant during the lassiation. Note that we use dierent model generators
+beause Mae an deal better with generating models of dierent small sizes,
+whereas Finder is more eÆient when faed with more than one operation on
+a struture. Note also that the model generation and theorem proving stages
+are run in parallel by distributing the problems on a large luster.
+6
+
+Sorge, Meier, MCasland, Colton
+
+Generate Equations
+(LISP)
+
+Mace
+
+Mace
+
+Mace
+
+If Loops of order
+at most 8 exist
+
+Generate Universal Identity
+(LISP)
+
+Vampire
+
+Vampire
+
+E−Prover
+
+E−Prover
+
+If UID is
+isotopy invariant
+
+Set of
+Isotopy
+Invariants
+
+Finder
+
+Finder
+
+Finder
+
+If Loops of
+order n exists
+
+Isotopy
+Invariants
+to attempt
+
+Bootstrapping Algorithm
+
+Fig. 1. Generating isotopy invariants from universal identities.
+
+3 Bootstrapping Algorithm
+The bootstrapping algorithm to generate lassiation theorems takes a set
+of properties P , a ardinality n, and an equivalene relation E as input. It
+returns a deision tree that ontains the lassiation theorem for the algebrai strutures of order n that satisfy P with respet to E , as well as a set
+of representants for eah equivalene lass. During the onstrution, a full
+proof of both the orretness and the ompleteness of the lassiation theorem is generated. We rst give an informal overview of the algorithm before
+elaborating some of its details more formally in the remainder of the setion.
+Informally the algorithm works as follows. Firstly, it initialises a deision
+tree with the root node N labelled with the properties P . We denote the
+properties that a node is labelled by as PN . The algorithm works iteratively,
+starting with the root node and moving on to suessive nodes in the tree.
+The algorithm onstruts an example of an algebrai struture of order n
+7
+
+Sorge, Meier, MCasland, Colton
+
+satisfying PN . When no example an be produed, the algorithm will prove
+that no struture of size n with properties PN an exist. When an example
+does exist, the algorithm does one of the following two things: (1) It shows
+that the node represents an equivalene lass with respet to E , i.e., it proves
+that all strutures of order n that satisfy the properties PN are equivalent to
+eah other under E , or, (2) it onstruts another algebrai struture satisfying
+PN , whih is not equivalent to the rst one. Note that ases (1) and (2) are
+mutually exlusive and an be performed in parallel. In ase (2) the algorithm
+omputes a disriminating property P for the two strutures, suh that P holds
+for one struture and :P holds for the other struture. This property is then
+used to further expand the deision tree by adding two new nodes N 0 and N 00
+below N , with labels PN = PN [ fP g and PN = PN [ f:P g, respetively.
+The algorithm then iterates over these nodes and onstruts the tree aordingly. After new nodes have been reated for eah of these nodes the
+above steps are arried out again. The algorithm terminates one no more
+expansions an be applied. The leaf nodes then either represent equivalene
+lasses or are empty, i.e., no struture exists with the properties given in the
+node. The nal lassiation theorem orresponds to the disjuntion of the
+properties given as labels of the leaf nodes. An example of a partial deision
+tree and some details of how it was onstruted is given in the results setion.
+The bootstrapping algorithm itself is a framework that ombines several
+reasoning tehniques, whih play their part in ahieving the overall goal. It
+relies on other third party systems to generate algebrai strutures and disriminants, and to verify the onstrution of the deision tree in eah step.
+We use the following methodologies in the dierent steps of the algorithm:
+0
+
+00
+
+Generating Strutures
+
+We use model generation to onstrut algebrai strutures. In the rst
+step, the algorithm simply alls a model generator to return a struture orresponding to the input axioms. Throughout the proess, model generators
+are used to onstrut example strutures that are not equivalent to an already
+given one. We use three dierent model generators for this, namely Mae [12℄,
+Sem [23℄, and Finder [19℄, as eah has its partiular strengths and weaknesses
+depending on the problem domain and equivalene relation in question.
+
+Generating Disriminants
+
+The approah to onstruting disriminating properties varies from equivalene relation to equivalene relation. We desribed various approahes to
+this in the previous setion.
+
+Verifying Properties
+
+Throughout the bootstrapping proedure all the results oming from third
+party systems are independently veried by rst order automated theorem
+8
+
+Sorge, Meier, MCasland, Colton
+
+provers. Thus for a given disriminant P and two algebrai strutures Q and
+Q0 , we show that (1) P is a proper disriminant for the equivalene relation
+E , (2) P holds for Q, and (3) P does not hold for Q0 . Proving these properties expliitly guarantees the overall orretness of the onstruted deision
+tree. The proofs themselves are generally not very hallenging; we have experimented with several provers. We found the Spass [22℄, Vampire [17℄ and
+E [18℄ provers to be the most useful for our problems.
+
+Verifying Equivalene Classes
+
+The most diÆult veriation problems ourring during the lassiation
+involve showing that a given node forms an equivalene lass with respet
+to the relation E , i.e., to prove that a partiular set of properties is indeed
+lassifying. These types of proof are neessary to fully verify the ompleteness of a deision tree. More preisely, we have to show that all algebrai
+strutures of ardinality n that satisfy the desribing property of the node are
+equivalent. Although the theorems are essentially seond order, sine we work
+in a nite domain, they an be expressed as propositional logi problems by
+enumerating all possible equivalene mappings for strutures of ardinality n.
+This enables us to translate our problems into satisability problems and exploit the strength of state of the art SAT solvers. Depending on the problem
+domain and equivalene relation in question, we an either use solvers with
+or without equality. Currently we have integrated the systems zCha [14℄,
+CVClite [2℄, and DPLLT [7℄.
+If translated naively, many of the proof problems would be beyond the
+apabilities of existing SAT solvers or theorem provers. To derease omplexity
+we have implemented some omputer algebra algorithms in GAP [8℄ that
+exploit some mathematial domain knowledge to redue the omplexity of
+the isomorphism and isotopism problems we have enountered. In partiular,
+we have implemented the following methods:
+
+Verifying Isomorphism Classes
+
+For the isomorphism equivalene relation, the number of mappings to onsider in a naive approah would be n! for strutures of size n. However we an
+improve upon this by exploiting the notion of a generating system: a struture A with binary operation Æ is said to be generated by a set of elements
+fa1 ; : : : ; a g  A if every element of A an be expressed as a ombination {
+usually alled a fatorisation or word { of the a under the operation Æ. We
+all a set of generators together with the orresponding fatorisations a generating system. Generating systems are invariant under isomorphism. Hene,
+if we an show that all algebrai strutures with ardinality n satisfying a
+property P share a generating system, we an redue the number of mappings
+to onsider, when showing that all strutures satisfying P are isomorphi, to
+the mappings on generators only.
+9
+m
+
+i
+
+Sorge, Meier, MCasland, Colton
+
+Verifying Isotopism Classes
+
+For the isotopism equivalene relation, the naive approah is even worse
+than for isomorphism, sine we would need to onsider (n!)3 mappings. We
+annot ut down on the number of ases as easily as in the isomorphism ase by
+using generating systems sine they are not invariant under isotopy. Instead,
+our simpliation strategy depends on the fat that a loop Q is an isotope of
+Q0 if it is isomorphi to an fg -isotope of Q0 , where (Q0 ; ) is an fg -isotope of
+(Q0 ; ) if (x  g )  (f  y ) = x  y for all x; y 2 Q0 and some xed elements f; g 2 Q0
+(i.e.,  operates on the same set of elements as ) [16℄. Now suppose we want to
+show that a node with representant Q and properties P is indeed an isotopism
+lass. We rst ompute all fg -isotopes of Q that are not isomorphi to eah
+other together with their generating systems. We then show that all algebrai
+strutures with ardinality n satisfying a property P have at least one of the
+generating systems of the fg -isotopes. This partiular problem an amount
+to rather large disjuntive formulas. If we an show this, then we an redue
+the proof that all strutures in our isotopism lass are isotopi to Q to the
+statement that all strutures in the lass are isomorphi to one of the fg isotopes. In the formulation of this problem we an now exploit the fat that
+we have the generating systems for all fg -isotopes and therefore only have to
+show all possible mappings to the dierent generating systems involved.
+In addition to exploiting the above tehniques for the veriation proofs
+we an apply them when looking for non-isomorphi or non-isotopi models,
+respetively, during the bootstrapping algorithm.
+
+4 Results
+We have experimented with the bootstrapping algorithm to lassify several
+types of algebrai strutures with respet to isomorphism and isotopism. The
+results are given in Table 1. The left olumn of the table gives the domain
+of the lassiation, i.e., quasigroups or loops together with the order of the
+strutures and possibly additional axioms.
+For example, Quasigr.6 + Idem. denotes the domain of quasigroups of
+order 6 together with idempoteny as an additional axiom. Observe that for
+some domains, the lassiation is not yet ompleted, mostly beause the proess is very time and omputation intensive. The remaining three olumns
+ontain information about the form of the deision trees onstruted with the
+bootstrapping algorithm, suh as the total number of nodes in the tree, the
+number of equivalene lasses, i.e., leaf nodes of the tree, and the maximum
+depth of the tree. The largest deision tree so far is the full isomorphism
+lassiation of quasigroups of size 5 that ontains 2875 nodes and 1411 isomorphism lasses but is nevertheless fairly shallow with a maximum depth
+of 23. Its ompletion alone has taken more than four month. In addition
+to lassiations of quasigroups and loops we have also tested the algorithm
+10
+
+Sorge, Meier, MCasland, Colton
+
+Algebrai Struture
+
+Nodes Equiv.Classes Depth
+
+Isomorphism Classiation
+Quasigroup 3
+Quasigroup 4
+Quasigroup 5
+Quasigroup 6 + Idem.
+Quasigroup 6 + QG3
+Quasigroup 7 + QG9
+Loops4
+Loops5
+Loops6
+Loops7
+
+9
+71
+2875
+35
+131
+397
+3
+11
+233
+109
+
+5
+35
+1411
+18
+64
+108
+2
+6
+109
+53
+
+4
+9
+23
+6
+11
+12
+2
+5
+17
+13
+
+3
+43
+
+2
+22
+
+1
+8
+
+Isotopism Classiation
+Loops5
+Loops6
+
+
+
+not yet ompleted.
+
+Table 1
+Generated lassiation theorems.
+
+with lassiations of monoids, groups and star algebras with respet to isomorphism [5℄.
+As an illustrative example, onsider the isotopy lassiation of loops of
+size 6. The top of the tree produed by the bootstrapping algorithm is given
+in Figure 2. Single irled nodes represent inner nodes of the tree and doubly
+irled nodes represent leaf nodes, whih orrespond to isotopy lasses. For
+larity we have written the disriminating properties as labels on the edges,
+thus the property for a given node an be obtained by olleting the properties
+along the path from the node to the root of the tree. The disriminating
+properties P1 ; : : : ; P4 are given below the tree.
+When we start the algorithm, the rst loop generated is L4 given in the
+previous setion (it is labelled L4 beause the loop will eventually beome the
+representant of the isotopy lass given by node 4 in the tree). In the next
+step, the algorithm tries to nd another loop that is not an isotope of L4 .
+It sueeds and produes the struture L8 , whih will eventually beome the
+representant of node 8 and is likewise given above. The algorithm then nds
+the universal identity P1 to disriminate L4 and L8 , where P1 holds for L4 but
+not for L8 . This leads to the addition of two new nodes 2 and 3.
+In the next bootstrapping round, node 2 is further explored. Again, a loop
+is found that is non-isotopi to L4 but that nevertheless satises P1 , whih
+11
+
+Sorge, Meier, MCasland, Colton
+
+P1
+P2
+4
+
+2
+
+1
+
+P4
+
+P2
+
+5
+
+3
+
+:
+
+:
+
+P3
+
+P1
+
+:
+
+8
+
+P3
+
+P4
+9
+
+:
+
+6
+
+..
+.
+
+7
+
+..
+.
+
+P1 :8x; y1 ; y2 (x1 =y1 )  (((x1 =y1 )  (y2 nx1 ))  (y2 nx1 ))=
+((x1 =y1 )  (y2 nx1 ))  ((x1 =y1 )  (y2 nx1 ))
+
+P2 :8x; y1 ; y2 (x1 =y1 )  (((x1 =y1 )  (y2 ny1 ))  (y2 ny1 ))=
+((x1 =y1 )  ((x1 =y1 )  (y2 ny1 )))  (y2 ny1 )
+
+P3 :8x; y1 ; y2 (x1 =y1 ) = ((x1 =y1 )  (y2 ny1 ))  (y2 ny1 )
+P4 :9r1 ; r2 ; r3 91 ; 2 ; 3 9!v1 ; v2 ; v3
+= r2 ^ r1 6= r3 ^ r2 6= r3 ^ 1 6= 2 ^ 1 6= 3 ^ 2 6= 3 ^
+
+r1 6
+
+= v2 ^ v1 6= v3 ^ v2 6= v3 ^
+
+v1 6
+
+V3 V3 W3 (
+=1 j =1 k=1
+
+ri   j
+
+=v )
+k
+
+i
+
+Fig. 2. Deision tree for isotopy lassiation of size 6 loops.
+
+subsequently leads to another branhing of the tree with P2 as disriminant.
+The next node to be expanded is then 4. This time, the model generation fails
+and no struture an be found that is both not an isotope of L4 and satises
+P1 as well as P2 . This suggests that node 4 represents an equivalene lass
+with respet to isotopism, with representant L4 and P1 ^ P2 as the lassifying
+property. This is subsequently shown by a SAT solver. The bootstrapping
+algorithm then arries on with the expansion of node 5, et., until the entire
+tree is explored.
+We have omitted showing the entire lassiation tree, whih ontains another 34 nodes below node 9. While the top of the lassiation tree ontains
+universal identities as disriminants, the nodes below node 9 are disriminated
+by substruture properties only. Moreover, the automatially generated subtree is degenerated, that is, in every branhing node has exatly one leaf node
+and one branhing node as hildren. Manual rotation gives a more balaned
+tree below node 9, see [21℄ for details. So far we use roughly 6800 isotopy
+invariants for our lassiation but we only explore a limited number of randomly seleted invariants before we aept a possible substruture invariant
+as disriminant.
+12
+
+Sorge, Meier, MCasland, Colton
+
+5 Conlusions and Further Work
+
+We have presented an approah to onstruting lassiation theorems in nite algebra in a bootstrapping framework that failitates the ollaboration of
+a signiant number of AI systems. In our experiments we have foused on the
+important equivalene relations of isomorphism and isotopism in the algebrai
+domain of quasigroups and loops. Most of the theorems that our approah has
+produed so far are ertainly novel to mathematis and are most likely diÆult to derive by hand. The large number of instanes already for relatively
+small ardinalities makes it neessary and fruitful to develop sophistiated automated tehniques for lassiation. While our approah is general for the
+isomorphism equivalene relation, i.e. it does not depend on the partiular domain of quasigroups and loops, the tehniques developed for isotopism depend
+very muh on domain knowledge. In partiular, the generation of invariants
+as well as the simpliation neessary to verify isotopism lasses exploit the
+mathematis of the domain of loops. Nevertheless, we onsider the non-trivial
+generalisation of the original tehniques to isotopism a signiant ahievement.
+And onsidering the appliations of quasigroups, suh as in sheduling, ode
+theory, or ryptography, the tehniques developed for isotopism proofs might
+have impat beyond their use in pure lassiation.
+Currently it seems that with strutures of order 8 we reah the solvability
+horizon of most provers and SAT solvers, with our urrent enoding tehniques. In partiular, the enoding of the substruture invariants is often
+too large and umbersome to get the proofs through. More advaned enoding tehniques are therefore subjet of future work. Similarly a smarter
+pre-seletion of universal identity invariants would be desirable to ut down
+on searh time and on the need to use substruture invariants. In this ontext
+we also intend to have another look at the isotopy lassiation of loops of size
+6, in order to gain a shallower tree. To make further use of the onstruted
+lassiation theorems we envisage a detailed, possibly automated, analysis
+of the deision trees and the ourring properties as well as a omparison
+of lassiation theorems of dierent sizes for partiular strutures. Another
+approah to get more uniform trees ould be to rst lassify loops with respet to isotopy, then grow this tree further to lassify all loops with respet
+to isomorphism, and afterwards grow the tree even further by lassifying all
+quasigroups of that size.
+It is lear that it is impossible to reprodue the lassiation theorems
+generated by this approah using a single reasoning system. This highlights
+the fat that ombining reasoning systems an often produe an implementation whih is more than the sum of its parts. We believe that only via suh
+integration projets will automated mathematis begin to make an impat on
+mainstream mathematial researh.
+13
+
+Sorge, Meier, MCasland, Colton
+
+Referenes
+[1℄ Alur, R. and D. Peled, editors, \Computer Aided Veriation, 16th International
+Conferene, CAV 2004," LNCS 3114, Springer Verlag, Boston, MA, USA, 2004.
+[2℄ Barrett, C. and S. Berezin, CVC Lite: A new implementation of the ooperating validity
+heker, in: Alur and Peled [1℄, pp. 515{518.
+[3℄ Burris, S. and H. P. Sankappanavar, \A Course in Universal Algebra," Graduate Texts
+in Mathematis 78, Springer-Verlag, New York, 1981, xvi+276 pp.
+[4℄ Colton, S., \Automated Theory Formation in Pure Mathematis," Springer, 2002.
+[5℄ Colton, S., A. Meier, V. Sorge and R. MCasland, Automati generation of lassiation
+theorems for nite algebras, in: Pro. of IJCAR 2004, LNAI 3097 (2004), pp. 400{414.
+[6℄ Faloner, E., Isotopy invariants in quasigroups, Transations of the Amerian
+Mathematial Soiety 151 (1970), pp. 511{526.
+[7℄ Ganzinger, H., G. Hagen, R. Nieuwenhuis, A. Oliveras and C. Tinelli, Dpll(t): Fast
+deision proedures, in: Alur and Peled [1℄, pp. 175{188.
+[8℄ The GAP Group, \GAP { Groups, Algorithms, and Programming, Version 4.3," (2002),
+http://www.gap-system.org.
+[9℄ Humphreys, J., \A Course in Group Theory," Oxford University Press, 1996.
+[10℄ Kunen, K., Single Axioms for Groups, Journal of Automated Reasoning 9 (1992),
+pp. 291{308.
+[11℄ MCune, W., Single axioms for groups and Abelian groups with various operations,
+Journal of Automated Reasoning 10(1) (1993), pp. 1{13.
+[12℄ MCune, W., \Mae4 Referene Manual and Guide," Argonne National Laboratory
+(2003), aNL/MCS-TM-264.
+[13℄ MKay, B., A. Meinert and W. Myrvold, Counting small latin squares (2003), available
+at http://www.sr.uvi.a/~wendym/ls.ps.
+[14℄ Moskewiz, M., C. Madigan, Y. Zhao, L. Zhang and S. Malik, ha: Engineering an
+eÆient SAT solver, in: Pro. of the 39th Design Automation Conferene, 2001, pp. 530{
+535. URL http://www.sigda.org/Arhives/ProeedingArhives/Da/Da2001/
+[15℄ Nagy, G. P. and P. Vojtehovsky, \Computing with quasigroups and loops in GAP,"
+http://www.math.du.edu/loops/.
+[16℄ Pugfelder, H. O., \Quasigroups and Loops: Introdution," Sigma Series in Pure
+Mathematis 7, Heldermann Verlag, Berlin, Germany, 1990.
+[17℄ Riazanov, A. and A. Voronkov, Vampire 1.1, in: Pro. of IJCAR 2001, LNAI 2083
+(2001), pp. 376{380.
+[18℄ Shulz, S., E: A brainia theorem prover, Journal of AI Communiation 15 (2002),
+pp. 111{126.
+[19℄ Slaney, J., \FINDER, Notes and Guide," Center for Information Siene Researh,
+Australian National University (1995).
+[20℄ Slaney, J., M. Fujita and M. Stikel, Automated reasoning and exhaustive searh:
+Quasigroup existene problems, Computers and Mathematis with Appliations 29
+(1995), pp. 115{132.
+[21℄ Sorge, V., A. Meier, R. MCasland and S. Colton, Automati onstrution and
+veriation of isotopy invariants, in: Pro. of IJCAR 2006, LNAI 4130 (2006), pp.
+36{51, forthoming.
+[22℄ Weidenbah, C., U. Brahm, T. Hillenbrand, E. Keen, C. Theobald and D. Topi, SPASS
+version 2.0, in: A. Voronkov, editor, Pro. of the 18th International Conferene on
+Automated Dedution (CADE{18), LNAI 2392 (2002), pp. 275{279.
+[23℄ Zhang, J. and H. Zhang, \SEM User's Guide," Department of Computer Siene,
+University of Iowa (2001).
+
+14
+
+

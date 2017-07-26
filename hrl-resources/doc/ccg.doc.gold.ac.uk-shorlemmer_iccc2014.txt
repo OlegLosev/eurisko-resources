@@ -1,0 +1,650 @@
+COINVENT: Towards a Computational Concept Invention Theory
+3
+¨
+Marco Schorlemmer,1 Alan Smaill,2 Kai-Uwe Kuhnberger,
+Oliver Kutz,4 and
+Simon Colton,5 Emilios Cambouropoulos6 and Alison Pease7
+1
+
+Artificial Intelligence Research Institute, IIIA-CSIC, Spain 2 School of Informatics, The University of Edinburgh, UK
+3
+Institute of Cognitive Science, University of Osnabr¨uck, Germany
+4
+Institute of Knowledge and Language Engineering, Otto-von-Guericke University Magdeburg, Germany
+5
+Department of Computing, Goldsmiths, University of London, UK
+6
+School of Music Studies, Aristotle University of Thessaloniki, Greece 7 School of Computing, University of Dundee, UK
+
+Abstract
+We aim to develop a computationally feasible, cognitivelyinspired, formal model of concept invention, drawing on
+Fauconnier and Turner’s theory of conceptual blending, and
+grounding it on a sound mathematical theory of concepts.
+Conceptual blending, although successfully applied to describing combinational creativity in a varied number of fields,
+has barely been used at all for implementing creative computational systems, mainly due to the lack of sufficiently precise
+mathematical characterisations thereof. The model we will
+define will be based on Goguen’s proposal of a Unified Concept Theory, and will draw from interdisciplinary research
+results from cognitive science, artificial intelligence, formal
+methods and computational creativity. To validate our model,
+we will implement a proof of concept of an autonomous
+computational creative system that will be evaluated in two
+testbed scenarios: mathematical reasoning and melodic harmonisation. We envisage that the results of this project will
+be significant for gaining a deeper scientific understanding
+of creativity, for fostering the synergy between understanding and enhancing human creativity, and for developing new
+technologies for autonomous creative systems.
+
+Introduction
+Of the three forms of creativity put forward in (Boden
+1990)—combinational, exploratory, and transformational—
+the most difficult to capture computationally turned out to
+be the combinational type (Boden 2009), i.e., when novel
+ideas (concepts, theories, solutions, works of art) are produced through unfamiliar combinations of familiar ideas.
+Although generating novel ideas, or concepts, by combining
+old ones is not complicated in principle, the difficulty lies in
+doing this in a computationally tractable way, and in being
+able to recognise the value of newly invented concepts for
+better understanding a certain domain; even without it being
+specifically sought—i.e., by ‘serendipity’ (Boden 1990, p.
+234), (Pease et al. 2013).
+To address this problem, we will concentrate on an important development that has significantly influenced the
+current understanding of the general cognitive principles
+operating during creative thinking, namely Fauconnier and
+Turner’s theory of conceptual blending, also known as conceptual integration (Fauconnier and Turner 1998). Fauconnier and Turner proposed conceptual blending as the fundamental cognitive operation underlying much of every-
+
+Figure 1: ‘Houseboat’ blend, adapted from (Goguen and
+Harrell 2010)
+day thought and language, and modelled it as a process by
+which people subconsciously combine particular elements
+and their relations, of originally separate mental spaces, into
+a unified space, in which new elements and relations emerge,
+and new inferences can be drawn. For instance, a ‘houseboat’ or a ‘boathouse’ are not simply the intersection of the
+concepts of ‘house’ and ‘boat’. Instead, the concepts ‘houseboat’ and ‘boathouse’ selectively integrate different aspects
+of the source concepts in order to produce two new concepts,
+each with its own distinct internal structure (see Figure 1 for
+the ‘houseboat’ blend).
+The cognitive, psychological and neural basis of conceptual blending has been extensively studied (Fauconnier and
+Turner 2003; Gibbs, Jr. 2000; Baron and Osherson 2011).
+Moreover, Fauconnier and Turner’s theory has been successfully applied for describing existing blends of ideas and concepts in a varied number of fields, such as linguistics, mu-
+
+sic theory, poetics, mathematics, theory of art, political science, discourse analysis, philosophy, anthropology, and the
+study of gesture and of material culture (Turner 2012). However, the theory has hardly been used for implementing creative computational systems. Indeed, since Fauconnier and
+Turner did not aim at computer models of cognition, they
+did not develop their theory in sufficient detail for conceptual blending to be captured algorithmically. Consequently,
+the theory is silent on issues that are relevant if conceptual
+blending is to be used as a mechanism for designing creative
+systems: it does not specify how input spaces are retrieved;
+or which elements and relations of these spaces are to be
+projected into the blended space; or how these elements and
+relations are to be further combined; or how new elements
+and relations emerge; or how this new structure is further
+used in creative thinking (i.e., how the blend is “run”). Conceptual blending theory does not specify how novel blends
+are constructed.
+Nevertheless, a number of researchers in the field of computational creativity have recognised the potential value of
+Fauconnier and Turner’s theory for guiding the implementation of creative systems, and some computational accounts
+of conceptual blending have already been proposed (Veale
+and O’Donoghue 2000; Pereira 2007; Goguen and Harrell
+2010; Thagard and Stewart 2011). They attempt to concretise some of Fauconnier and Turner’s insights, and the
+resulting systems have shown interesting and promising results in creative domains such as interface design, narrative
+style, poetry generation, and visual patterns. All of these
+accounts, however, are customised realisations of conceptual blending, which are strongly dependent on hand-crafted
+representations of domain-specific knowledge, and are limited to very specific forms of blending. The major obstacle
+for a general account of computational conceptual blending
+is currently the lack of a mathematically precise theory that
+is suitable for the rigorous development of creative systems
+based on conceptual blending.
+
+A Formal Model of Conceptual Blending
+To address the relative lack of study of the computational
+potential of conceptual blending, in the FP7-ICT project
+COINVENT1 , we are setting out to:
+1. develop a novel, computationally feasible, formal model
+of conceptual blending that is sufficiently precise to capture the fundamental insights of Fauconnier and Turner’s
+theory, while being general enough to address the syntactic and semantic heterogeneity of knowledge representations;
+2. gain a deeper understanding of conceptual blending and
+its potential role in computational creativity, by linking
+this novel formal model to relevant, cognitively-inspired
+computational models, such as analogical and case-based
+reasoning, induction, semantic alignment, and coherencebased reasoning;
+3. design a generic, creative computational system based on
+this novel formal model, capable of serendipitous inven1
+
+www.coinvent-project.eu
+
+tion and manipulation of novel abstract concepts, enhancing thus the creativity of humans when this system is
+instantiated to particular application domains for which
+conceptual blending is a core process of creative thinking;
+4. validate the model and its computational realisation in two
+representative working domains: mathematics and music.
+The only attempt so far to provide a general and mathematically precise account of conceptual blending has been
+put forward by Goguen, initially as part of algebraic semiotics (Goguen 1999), and later in the context of a wider theory of concepts: Unified Concept Theory (Goguen 2005a).
+He has also shown its aptness for formalising information
+integration (Goguen 2005b) and reasoning about space and
+time (Goguen 2006).
+Goguen’s intuition was that conceptual blending could
+be modelled based on the colimit construct of category
+theory—a field of abstract mathematics that has provided
+deep insights in mathematical logic and computer science,
+and has often been used as a guide for finding good definitions and research directions. In his Categorical Manifesto,
+he intuitively describes this construct as follows: “Given a
+category of widgets, the operation of putting a system of
+widgets together to form some super-widget corresponds to
+taking the colimit of the diagram of widgets that shows how
+to interconnect them.” (Goguen 1991)
+To model conceptual blending we would start with a
+collection of input spaces—Goguen defines them as semiotic spaces of signs and their relations—and of structurepreserving mappings between them, capturing how the
+structure of these spaces is related. The colimit would be
+the optimal way to put these spaces together into one single space taking into account how they were originally connected by structure-preserving mappings. Here ‘optimal’
+means that the colimit includes all structure of the input
+spaces, but not more; and that it would not make unnecessary fusion of structure. An important property of colimits
+is that they are unique up to isomorphism. But since conceptual blending does not operate in general under this notion of optimality, Goguen suggested to extend this idea by
+including a notion of ‘quality’ of structure-preserving mappings between mental spaces to cope with the idea of partial
+mappings that selectively map only certain structure into the
+blend, and to model conceptual blends as colimits in this
+extended setting.
+As it stands, Goguen’s account is still very abstract and
+lacks concrete algorithmic descriptions. There are several
+reasons, though, that make it an appropriate candidate theory
+on which to ground the formal model we are aiming at:
+• It is an important contribution towards the unification of
+several formal theories of concepts, including the geometrical conceptual spaces of (G¨ardenfors 2004), the symbolic conceptual spaces of (Fauconnier 1994), the information flow of (Barwise and Seligman 1997), the formal
+concept analysis of (Ganter and Wille 1999), and the lattice of theories of (Sowa 2000). This makes it possible
+to potentially draw from existing algorithms that have already been developed in the scope of each of these frame-
+
+works.
+• It covers any formal logic, even multiple logics, supporting thus the integration and processing of concepts under various forms of syntactic and semantic heterogeneity. This is important, since we cannot assume conceptual spaces represented in a homogeneous manner across
+diverse domains. Current tools for heterogeneous specifications such as Hets (Mossakowski, Maeder, and L¨uttich
+2007) allow parsing, static analysis and proof management incorporating various provers and different specification languages.
+By developing a formal model of conceptual blending
+building on Goguen’s initial account, we aim to provide general principles that will guide the design of computer systems capable of inventing new higher-level, more abstract
+concepts and representations out of existing, more concrete
+concepts and interactions with the environment, and to do so
+based on the sound reuse and exploitation of existing computational implementations of closely related models, such
+as those for analogical and metaphorical reasoning (Falkenhainer, Forbus, and Gentner 1989), semantic integration
+(Schorlemmer and Kalfoglou 2008), or cognitive coherence
+(Thagard 2000). With such a formal, but computationally
+feasible model, we will ultimately bridge the existing gap
+between the theoretical foundations of conceptual blending
+and their computational realisations. This, in turn, will contribute to the much-needed foundations for the design of creative systems that effectively enhance both artificial and human creativity when deployed in the kinds of genuinely creative tasks underlying the sort of abstract reasoning common
+to many branches of the sciences and the arts.
+
+Example 1 The historical example of the discovery of the
+quaternions by Hamilton is one that is well documented
+(e.g., (Hersh 2011)), so much is known about the intermediate steps involved in the discovery. This can be treated by
+our approach, by taking the starting point as the unproblematic blend between the algebraic structure of the complex
+numbers as a field (with addition, multiplication and division), and the geometric structure of the 2-dimensional real
+plane as a real vector space (with addition, and scalar multiplication). In our terms, Hamilton wanted to find a similar
+blend involving an algebraic structure corresponding to 3dimensional real vector space. He ended up, however, by
+finding a blend involving a 4-dimensional real vector space,
+and the algebra of the quaternions — which involves leaving
+out from the algebraic theory the commutativity of multiplication. We thus see the characteristic features of blending,
+in the diagram of Figure 2, where the arrows indicate morphisms in Unified Concept Theory. This shows the characteristic features of blending, where:
+• there are two given concepts: commutative fields, and (4dimensional) real vector spaces;
+• a common concept, structurally similar to some aspects of
+the given concepts is identified (Common);
+• the initial concepts are blended, respecting the common
+aspects,
+• an initially inconsistent blended concept of quaternions is
+obtained;
+• this is modified by dropping an initial feature (commutativity of multiplication), to obtain a consistent concept.
+
+Working Domains
+To explore the genericity of the proposed formal model
+of concept invention and of the computational realisation
+we are after, we will focus on two representative working
+domains of creativity: mathematics and music, “the most
+sharply contrasted fields of intellectual activity which one
+can discover, and yet bound together, supporting one another
+as if they would demonstrate the hidden bond which draws
+together all activities of our mind, and which also in the revelations of artistic genius leads us to surmise unconscious
+expressions of a mysteriously active intelligence,” as noted
+wisely in (von Helmholtz 1885).
+In mathematics, the creative act of providing novel definitions, conjectures, theorems, examples, counter-examples,
+or proofs can be seen as particular cases of concept invention
+(Montano-Rivas et al. 2012). In music, concept invention
+may apply to the generation of new melodies, harmonies,
+rhythms, or counterpoints (and their combination) (Mazzola,
+Park, and Thalmann 2011), and to the integration of musical and textual spaces to achieve novel musical metaphors
+(Zbikowski 2002).
+The following examples illustrate the sort of creative activity we want to address with our formal model and its computational realisation.
+
+Figure 2: Blend for quaternions.
+By deploying COINVENT-based technology in this
+working domain, our ultimate goal is to transcend the capabilities of current state-of-the-art automated reasoning support tools, which as of today are reluctantly accepted by their
+users and perceived more as an obstacle to than a facilitator
+of creative thinking. The choice of the domain of mathematics is further supported by the following reasons:
+• Evidence from cognitive science, education, and history
+of mathematics suggests that the hierarchy of mathematical concepts is grounded on some simple numerical abili-
+
+ties humans have, combined with know-how about physical scenarios of interaction with the environment (Lakatos
+1976; Lakoff and N´un˜ ez 2000). This means that by tackling the case of mathematics, we need to address problems
+concerning the situatedness of agents.
+• The span of usage of mathematical concepts goes from
+rather concrete situations (children learning to count how
+many toys you give them) to the very abstract (as when
+professional mathematicians do research) — see (Lakoff
+and N´un˜ ez 2000; Alexander 2011).
+• Mathematics allows us to explore the social dimension of
+concept invention and the forces external to cognition that
+shape the process of conceptual blending over time, crucial in educational and research environments (Lakatos
+1976; Goguen 1997).
+• Currently, there is no cognitive model of the way in which
+people invent mathematical concepts; there are to our
+knowledge no models of how humans create mathematics. Hence only a few computational creativity systems
+exist that support creative mathematical thinking, such as
+(Colton 2002).
+Example 2 Devising appropriate chordal harmonisations
+for melodies derived from non-Western cultures or, even,
+for new creations could potentially be tackled computationally based on our approach. A computational system
+could autonomously explore different chordal spaces generating novel harmonic combinations/blends appropriate for
+the melodies at hand. This could be applied for the design of an interactive compositional tool or computer game
+where the user inputs a melody (may ‘sing in’ a melody)
+and the automatic harmonisation system produces interactively novel harmonisations that creatively combine harmonic properties from different music idioms. It could also
+be applied, for instance, for video-game design and programming, by endowing game creations with the capacity
+of generating new harmonisations on-the-fly; the creative
+melodic harmonisation assistant could provide appropriate
+harmonisations following the mood changes or activity or
+gestural patterns emerging as the game unfolds. In Figure
+3, a traditional melody is harmonised in radically different
+ways corresponding to individual harmonic spaces (tonal,
+modal, atonal). The creative harmonisation assistant may
+generate such original harmonisations or enable the emergence of new unpredicted harmonisations stemming from
+blends between such spaces.
+By deploying COINVENT-based technology in this
+working domain our ultimate goal is to be capable of making software go beyond a mere application of compositional
+rules, so as to refute the common belief that creativity is
+separated from the computational processes used in music
+composition, and that these processes just do uncreative calculations. The choice of the domain of music is further supported by the following reasons:
+• The conceptual level of music, together with the role of
+cognitive models such as conceptual blending in musical
+
+Figure 3: Four different harmonisations of a traditional
+melody (first four-bar phrase) — harmonizations created by
+C. Tsougras (Aristotle University of Thessaloniki).
+analysis, has gained increased attention in the field of music theory (Zbikowski 2002).
+• A substantial body of contemporary research on musical creativity from the philosophy of computer modelling, through music semiotics, education, performance
+and neuroscience, to experimental psychology (Deli`ege
+and Wiggins 2006; Mazzola, Park, and Thalmann 2011)
+provides the necessary background for exploring computational creativity in a scientific manner in the domain of
+music.
+• Traditional music analysis has weak conceptual power for
+studying complex constructions. Formal theories of musical structure and processes, as employed in contemporary
+computational modelling of music (Anagnostopoulou and
+Cambouropoulos 2012; Conklin and Anagnostopoulou
+2006; Steedman 1996), are considered an adequate tool
+for computer-aided composition of advanced music.
+• The language of modern mathematics, whose conceptual
+character has been stressed by contemporary mathematicians (Lawvere and Shanuel 1997; Boulez and Connes
+2011), has been advocated as a way forward in the analysis of its effectiveness in musical creativity (Future and
+
+Emerging Technologies 2011).
+• Musical creativity, particularly musical performance,
+is ultimately contextualised, situated, and embodied
+(Goguen 2004). In particular, in musical gesture theory,
+conceptual blending has been suggested as a powerful
+model of musical interpretation (Echard 2006).
+We believe that the exploration of the domains of mathematics and music should reveal very general principles applicable to other creative domains.
+
+Relevant Prior Research
+COINVENT is a collective effort to advance the understanding of creativity through a precise formalisation of an important cognitive model and a concrete computational realisation thereof. We shall do so informed by the main contributions towards a science of creativity (Sternberg 1999) and
+drawing from several foundational theories that have hitherto largely been pursued independently.
+During the last decades, scholars and researchers in cognitive linguistics and cognitive psychology have made significant contributions to the understanding of the fundamental role that metaphor and analogy play in cognition (Lakoff
+and Johnson 1980; Gentner, J.Holvoak, and Kokinov 2001;
+Fauconnier and Turner 2003), at the same time that significant evidence has been gathered supporting a philosophy
+of mind grounded on the embodiment of mind and meaning
+(Maturana and Varela 1987; Varela, Thompson, and Rosch
+1992; Lakoff and Johnson 1999; Johnson 2007). This research has been heavily influenced by the dramatic progress
+in imaging techniques carried out in the field of neuroscience, such as functional MRI.
+In parallel, the development of the field of Category Theory has led to a remarkable unification and simplification of
+mathematics (Mac Lane 1971; Lawvere and Shanuel 1997),
+which has helped to reach a deep understanding across different fields such as computer science, mathematical logic,
+physics, and linguistics. More recently, these techniques
+have been applied to obtain some preliminary formalisations of conceptual metaphor and blending (Goguen 1999;
+Old and Priss 2001; Guhe, Smaill, and Pease 2009) by applying techniques such as institution theory (Goguen and
+Burstall 1992) or information flow theory (Barwise and
+Seligman 1997), which are based on category theory.
+Automated reasoning techniques from artificial intelligence that are either based on cognitive principles such as
+case-based reasoning (Aamodt and Plaza 1994) —grounded
+on the prototype theory of categorisation (Rosch 1973) and
+reasoning by analogy making (Gentner 1983)—or on formal methods for inductive reasoning such as anti-unification
+(Plotkin 1971) will be some of the seed technologies for the
+computational realisation of our model. Some preliminary
+steps have been made already, in joint research by some
+of the consortium members of COINVENT, by taking ideas
+from Lakatos (Lakatos 1976) and from (Lakoff and N´un˜ ez
+2000) as starting points and extending the HDTP system
+(Heuristic-Driven Theory Projection, developed at the University of Osnabr¨uck (Gust, K¨uhnberger, and Schmid 2006;
+Schwering et al. 2009) and based on anti-unification) to give
+
+a computational account of how these processes can give rise
+to basic concepts of arithmetic (Guhe et al. 2011). Another
+set of important seed technologies for COINVENT originates in research carried out originally at the University of
+Bremen, and now at the University of Magdeburg, and addresses the knowledge representation and reasoning layer of
+the project. This includes the distributed ontology language
+DOL, currently standardised within the Object Management
+Group OMG (www.ontoiop.org), a major international
+effort with over 40 experts involved worldwide, and which
+supports an extensible number of logical languages, major
+modularisation and logical structuring techniques, and in
+particular supports the specification of basic blending diagrams as formalised by Joseph Goguen. Moreover, the Hets
+system2 will serve as a central, and extensible, reasoning infrastructure, with which other tools developed within COINVENT will interface. Lastly, the technology developed in
+the OntoHub.org project will allow the building of a dedicated semantic repository for formalised concepts in the
+mathematics and music domains, supporting heterogeneous
+specifications in a semantically-backed logical context, and
+providing interfaces for sharing, browsing, and the integration of reasoning services. This repository will be hosted at
+conceptportal.org.
+In addition, the consortium members of COINVENT have
+shown an important experience in the development and application of the above foundational theories and seed technologies to a wide variety of fields, in computational creativity and other related areas: by studying the combination of case solutions and knowledge transfer in case-based
+reasoning (CBR) (Onta˜no´ n and Plaza 2010; Onta˜no´ n and
+Plaza 2012) and its application to computational creativity
+(Onta˜no´ n and Plaza 2012; Arcos 2012); by providing formal
+foundations for distributed reasoning with heterogeneous
+logics and their representations (Mossakowski, Maeder, and
+L¨uttich 2007), and by applying them to achieve semantic alignment and integration (Schorlemmer and Kalfoglou
+2008; Kutz, Mossakowski, and L¨ucke 2010; Kalfoglou
+and Schorlemmer 2010; Kutz et al. 2012); by proposing novel architectures for coherence-driven, cognitivelyinspired (BDI) agents (Joseph et al. 2010) and computational frameworks for multi-agent interaction-based agreement on concepts and their semantics (Onta˜no´ n and Plaza
+2010; Atencia and Schorlemmer 2012); by formalising
+Lakatos-style automated theorem proving (Colton and Pease
+2004) and mathematical theory formation (Colton 2002).
+
+Expected Contributions
+We expect that a mathematically precise theory, as the one
+we are proposing in the context of the COINVENT project,
+will lead to the following contributions:
+Theory and Technology. Computational implementations
+of cognitive and psychological models serve, in general, two
+main purposes:
+2
+
+See
+http://www.informatik.uni-bremen.de/
+agbkb/forschung/formal_methods/CoFI/hets/
+index_e.htm
+
+1. Computational implementations are tools for exploring
+implications of the ideas embedded in a particular model,
+beyond the limits of human thinking. Thus, they are vehicles of further scientific inquiry of the cognitive and psychological processes that the model seeks to describe.
+In this sense, the formal model coming out of the COINVENT project, together with its computational realisation, will be an important tool for exploring the implications of Fauconnier and Turner’s theory of conceptual
+blending for understanding creative thinking. One such
+implication is the role concept creation and invention
+plays in serendipitous reasoning, i.e., in recognising the
+value of newly invented concepts not only for better understanding a certain domain, but even for advancing the
+understanding of a previously unidentified problem that
+was initially not the concern of inquiry. If our model
+advances the understanding of implications such as how
+serendipity might work, cognitive science and psychology could take these results to explore serendipitous reasoning from a cognitive and psychological point of view.
+This alone would already be an important step forward in
+developing a science of creativity.
+By grounding our research on Goguen’s proposal for a
+Unified Concept Theory, we will build upon the deep understanding gained by relating different approaches to the
+notion of concept invention, and do so on a firm mathematical foundation that is consequently of great help in
+providing precise descriptions of what can and should be
+implemented in a computational system.
+2. Computational implementations make a general model
+that is usually stated in abstract terms more concrete, facilitating the study of its formal and computational properties, and guiding the design and implementation of computer systems that attempt to display the cognitive capabilities captured in the model. Hence, they provide direct
+engineering advances.
+We will demonstrate these advances through two prototype implementations of autonomous creative systems
+that display creative activity through the accomplishment
+of concept creation and invention in the domains of mathematics and music. Ideally, these systems will be developed with the following properties:
+• an ability to form abstractions over both semantic and
+syntactic aspects of a domain;
+• an ability to form new representations, by conceptual
+blending;
+• an ability to revise representations on the basis of new
+concrete information that fits badly with the current
+conceptualisation (using ideas from Lakatos); and
+• heuristically guided algorithms to solve problems,
+based on combinations of the above abilities.
+If our intuitions are right about the power of conceptual
+blending to boost the capabilities of autonomous creative
+systems and our project is successful, our contribution
+could go even beyond that direction, in developing novel
+ways to use methodologies from cognitive science in systems engineering, and vice versa.
+
+Working Domains. In the domain of mathematics, we
+plan to build a computational system that aids mathematicians in by supporting their reasoning at a conceptual level
+and in their creative work, for example
+• proposing potentially interesting novel definitions, theories, and conjectures that are motivated by conceptual (not
+only formal) reasons, and
+• evaluating the potential of such ideas when proposed by
+the mathematician.
+Not only mathematicians, but also others engaged in similar
+sorts of reasoning, when developing new concepts and theories, can benefit greatly from the processes of building new
+conceptualisations from combinations of existing conceptualisations and particular examples and counter-examples.
+The particular system we propose as our proof-of-concept
+would be the first of its kind in mathematics, as it goes well
+beyond what proof assistants do. More importantly, if, as we
+intend, the system turns out to be judged by mathematicians
+attractive and even potentially useful in their work of conceptually advancing mathematics, this would open the door
+to something not seen before. The system resulting from
+this project will, therefore, be a showcase of how systems
+like proof assistant systems can be improved so that they are
+useful for mathematicians.
+In the domain of music, we plan to build a pioneering
+computational system that aids musicians in composition,
+namely in melodic harmonisation, that allows exploration of
+novel uncharted conceptual territories, for example
+• proposing new harmonic concepts emerging from learned
+harmonic spaces, examples and counter-examples;
+• suggesting new harmonic conceptualisations emerging
+from combinations/blends of different harmonic spaces
+that give rise to potentially interesting new harmonies.
+Computer-aided compositional systems are often ‘accused’
+of merely replicating/mimicking given music styles and being confined to the initial musical space that has been explicitly modelled in the system. The creativity of such systems is
+considered rather limited as the system cannot supersede its
+built-in concepts and cannot generate new unforeseen concepts. The particular system we propose as our proof-ofconcept would be the first of its kind that goes well beyond
+what current melodic harmonisation systems are capable of
+doing. It would open the way more generally to music/art
+creativity assistance tools that enable people to explore the
+borders of their artistic creativity by giving them new original ideas for further exploration.
+Measures of Creativity. The computational creativity
+community needs concrete measures of evaluation to enable
+us to make objective, falsifiable claims about progress made
+from one version of a program to another, or for comparing
+and contrasting different software systems for the same creative task. There are currently three main models of evaluation (Ritchie 2007; Colton, Pease, and Charnley 2011;
+Jordanous 2011), but they are still rarely used, and there are
+problems with each. We will extend these measures: for instance, serendipity, which is an important aspect of human
+
+creativity, currently does not feature in any of the evaluation models. We will formulate ways of evaluating this and
+other under-represented notions. We will also contribute to
+the methodology of computational creativity by applying all
+three models, as well the new measures we develop, to our
+system and to other creative systems. One of the best ways
+to evaluate and improve measures of creativity is to apply
+them in a reflective manner. We will furthermore evaluate
+each model of evaluation according to principles in the philosophy of science, and survey other experts for ease of use
+and adherence to intuitions about creativity.
+
+Acknowledgements
+The project COINVENT acknowledges the financial support
+of the Future and Emerging Technologies (FET) programme
+within the Seventh Framework Programme for Research of
+the European Commission, under FET-Open Grant number:
+611553.
+
+References
+Aamodt, A., and Plaza, E. 1994. Case-based reasoning: Foundational issues, methodological variations, and
+system approaches. Artificial Intelligence Communications
+7(1):39–52.
+Alexander, J. 2011. Mathematical blending. Semiotica
+2011(187):1–48.
+Anagnostopoulou, C., and Cambouropoulos, E. 2012. Semiotic analysis and computational modeling: Two case studies
+on works by Debussy and Xenakis. In Sheinberg, E., ed.,
+Music Semiotics: A Network of Significations. Ashgate Publishing, Surrey, UK. 129–145.
+Arcos, J. L. 2012. Music and similarity based reasoning. In
+Soft Computing in Humanities and Social Sciences, volume
+273 of Studies in Fuzziness and Soft Computing. Springer.
+467–478.
+Atencia, M., and Schorlemmer, M. 2012. An interactionbased approach to semantic alignment. Journal of Web Semantics 12–13:131–147.
+Baron, S. G., and Osherson, D. 2011. Evidence for conceptual combination in the left anterior temporal lobe. Neuroimage 55(4):1847–1852.
+Barwise, J., and Seligman, J. 1997. Information Flow:
+The Logic of Distributed Systems, volume 44 of Cambridge
+Tracts in Theoretical Computer Science. Cambridge University Press.
+Boden, M. A. 1990. The Creative Mind: Myths and Mechanisms. George Weidenfeld and Nicolson Ltd.
+Boden, M. A. 2009. Computer models of creativity. AI
+Magazine.
+Boulez, P., and Connes, A. 2011. La cr´eativit´e en musique
+et en math´ematique. A dialogue during the 3rd International Conference on Mathematics and Computation in Music (MCM 2011).
+Colton, S., and Pease, A. 2004. Lakatos-style automated
+theorem modification. In Proceedings of the 16th Eureopean Conference on Artificial Intelligence, ECAI’2004, in-
+
+cluding Prestigious Applicants of Intelligent Systems, PAIS
+2004, Valencia, Spain, August 22-27, 2004.
+Colton, S.; Pease, A.; and Charnley, J. 2011. Computational
+creativity theory: The FACE and IDEA descriptive models.
+In 2nd International Conference on Computational Creativity.
+Colton, S. 2002. Automated Theory Formation in Pure
+Mathematics. Distinguished Dissertations Series. Springer.
+Conklin, D., and Anagnostopoulou, C. 2006. Segmental pattern discovery in music. INFORMS Journal on Computing
+18(3):285–293.
+Deli`ege, I., and Wiggins, G., eds. 2006. Musical Creativity:
+Multidisciplinary Research in Theory and Practice. Psychology Press.
+Echard, W. 2006. ‘Plays guitar without any hands’: Musical
+movement and problems of immanence. In Gritten, A., and
+King, E., eds., Music and Gesture. Ashgate.
+Falkenhainer, B.; Forbus, K. D.; and Gentner, D. 1989. The
+structure-mapping engine: Algorithm and examples. Artificial Intelligence 41(1):1–63.
+Fauconnier, G., and Turner, M. 1998. Conceptual integration networks. Cognitive Science 22(2):133–187.
+Fauconnier, G., and Turner, M. 2003. The Way We Think:
+Conceptual Blending and the Mind’s Hidden Complexities.
+New York: Basic Books.
+Fauconnier, G. 1994. Mental Spaces. Cambridge University
+Press.
+Future and Emerging Technologies. 2011. Creativity and
+ICT. FET consultation workshop. Report, European Commission, Directorate-General Information Society and Media.
+Ganter, B., and Wille, R. 1999. Formal Concept Analysis.
+Springer.
+G¨ardenfors, P. 2004. Conceptual Spaces. A Bradford Book.
+Gentner, D.; J.Holvoak, K.; and Kokinov, B. N., eds. 2001.
+The Analogical Mind. MIT Press.
+Gentner, D. 1983. Structure-mapping: A theoretical framework for analogy. Cognitive Science 7:155–170.
+Gibbs, Jr., R. W. 2000. Making good psychology out of
+blending theory. Cognitive Linguistics 11(3–4):347–358.
+Goguen, J., and Burstall, R. 1992. Institutions: Abstract
+model theory for specification and programming. Journal of
+the ACM 39(1):95–146.
+Goguen, J. A., and Harrell, D. F. 2010. Style: A computational and conceptual blending-based approach. In Argamon, S.; Burns, K.; and Dubnov, S., eds., The Structure of
+Style. Springer. chapter 12, 291–316.
+Goguen, J. 1991. A categorical manifesto. Mathematical
+Structures in Computer Science 1(49–67).
+Goguen, J. 1997. Towards a social, ethical theory of information. In Bowker, G.; Gasser, L.; Star, L.; and Turner, W.,
+eds., Social Science Research, Technical Systems and Cooperative Work: Beyond the Great Devide. Erlbaum. 27–56.
+
+Goguen, J. 1999. An introduction to algebraic semiotics,
+with applications to user interface design. In Nehaniv, C. L.,
+ed., Computation for Metaphors, Analogy, and Agents, volume 1562 of Lecture Notes in Computer Science. Springer.
+242–291.
+Goguen, J. 2004. Musical qualia, context, time, and emotion. Journal of Consciousness Studies 11(3/4):117–147.
+Goguen, J. 2005a. What is a concept? In Dau, F.; Mugnier,
+M.-L.; and Stumme, G., eds., Conceptual Structures: Common Semantics for Sharing Knowledge. 13th International
+Conference on Conceptual Structures, ICCS 2005, Kassel,
+Germany, July 17-22, 2005. Proceedings, volume 3596 of
+Lecture Notes in Artificial Intelligence, 52–77. Springer.
+Goguen, J. 2005b. Information integration in institutions. To
+appear in a memorial volume for Jon Barwise edited by L.
+Moss. Draft available at http://www.cs.ucsd.edu/
+users/goguen/pps/ifi04.pdf.
+Goguen, J. 2006. Mathematical models of cognitive space
+and time. In Andler, D.; Ogawa, Y.; Okada, M.; and Watanabe, S., eds., Reasoning and Cognition, volume 2 of Interdisciplinary Conference Series on Reasoning Studies. Keio
+University Press.
+Guhe, M.; Pease, A.; Smaill, A.; Mart´ınez, M.; Schmidt,
+M.; Gust, H.; K¨uhnberger, K.-U.; and Krumnack, U. 2011.
+A computational account of conceptual blending in basic
+mathematics. Cognitive Systems Research 12(3–4):249–
+265.
+Guhe, M.; Smaill, A.; and Pease, A. 2009. Using information flow for modelling mathematical metaphors. In Howes,
+A.; Peebles, D.; and Cooper, R. P., eds., Proceedings of the
+9th International Conference on Cognitive Modeling (ICCM
+2009).
+Gust, H.; K¨uhnberger, K.-U.; and Schmid, U. 2006.
+Metaphors and heuristic-driven theory projection (hdtp).
+Theoretical Computer Science 354(1):98–117.
+Hersh, R. 2011. From counting to quaternions – the agonies
+and ecstasies of the student repeat those of d’Alembert and
+Hamilton. Journal of Humanistic Mathematics 1(1):65–93.
+Johnson, M. 2007. The Meaning of the Body. The University
+of Chicago Press.
+Jordanous, A. 2011. Evaluating evaluation: Assessing
+progress in computational creativity research. In Proceedings of the Second International Conference on Computational Creativity (ICCCX) Mexico City, Mexico.
+Joseph, S.; Sierra, C.; Schorlemmer, M.; and Dellunde, P.
+2010. Deductive coherence and norm adoption. Logic Journal of the IGPL 18(1):118–156.
+Kalfoglou, Y., and Schorlemmer, M. 2010. The informationflow approach to ontology-based semantic integration. In
+Poli, R.; Healey, M.; and Kameas, A., eds., Theory and Applications of Ontology: Computer Applicactions. Springer.
+chapter 4, 101–114.
+Kutz, O.; Mossakowski, T.; Hois, J.; Bhatt, M.; and Bateman, J. 2012. Ontology blending in DOL. In Besold,
+T. R.; K¨uhnberger, K.-U.; Schorlemmer, M.; and Smaill, A.,
+
+eds., Computational Creativity, Concept Invention and General Intelligence. 1st International Workshop. Montpellier,
+France, August 27, 2012.
+Kutz, O.; Mossakowski, T.; and L¨ucke, D. 2010. Carnap, Goguen, and the Hyperontologies: Logical Pluralism
+and Heterogeneous Structuring in Ontology Design. Logica
+Universalis 4(2):255–333.
+Lakatos, I. 1976. Proofs and Refutations. Cambridge University Press.
+Lakoff, G., and Johnson, M. 1980. Metaphors We Live By.
+University of Chicago Press.
+Lakoff, G., and Johnson, M. 1999. Philosophy in the Flesh.
+Basic Books.
+Lakoff, G., and N´un˜ ez, R. E. 2000. Where Mathematics
+Comes From. Basic Books.
+Lawvere, F. W., and Shanuel, S. H. 1997. Conceptual Mathematics. Cambridge University Press.
+Mac Lane, S. 1971. Categories for the Working Mathematician. Springer.
+Maturana, H. R., and Varela, F. J. 1987. The Tree of
+Knowledge: The Biological Roots of Human Understanding. Shambhala.
+Mazzola, G.; Park, J.; and Thalmann, F. 2011. Musical
+Creativity: Strategies and Tools in Composition and Improvisation. Computational Music Science. Springer.
+Montano-Rivas, O.; McCasland, R.; Dixon, L.; and Bundy,
+A. 2012. Scheme-based theorem discovery and concept
+invention. Expert Systems with Applications 39:1637–1646.
+Mossakowski, T.; Maeder, C.; and L¨uttich, K. 2007. The
+Heterogeneous Tool Set. In Grumberg, O., and Huth, M.,
+eds., Tools and Algorithms for the Construction and Analysis of Systems. 13th International Conference, TACAS 2007,
+Held as Part of the Joint European Conferences on Theory and Practice of Software, ETAPS 2007 Braga, Portugal, March 24 - April 1, 2007. Proceedings, volume 4424 of
+Lecture Notes in Computer Science, 519–522. Springer.
+Old, L. J., and Priss, U. 2001. Metaphor and information
+flow. In Proceedings of the 12th Midwest Artificial Intelligence and Cognitive Science Conference, 99–104.
+Onta˜no´ n, S., and Plaza, E. 2010. Amalgams: A formal approach for combining multiple case solutions. In ICCBR’10:
+18th International Conference on Case-Based Reasoning,
+volume 6176 of Lecture Notes in Artificial Intelligence, 257–
+271. Springer.
+Onta˜no´ n, S., and Plaza, E. 2012. Toward a knowledge transfer model of case-based inference. In Twenty-Fifth International Florida Artificial Intelligence Research Society Conference, 341–346. AAAI Press.
+Pease, A.; Colton, S.; Ramezani, R.; Charnley, J.; and Reed,
+K. 2013. A discussion on serendipity in creative systems.
+In Proceedings of the Fourth International Conference on
+Computational Creativity.
+Pereira, F. C. 2007. Creativity and Artificial Intelligence,
+volume 4 of Applications of Cognitive Linguistics. Mouton
+de Bruyter.
+
+Plotkin, G. D. 1971. A further note on inductive generalization. Machine Intelligence 6:101–124.
+Ritchie, G. 2007. Some empirical criteria for attributing creativity to a computer program. Minds and Machines 17:67–
+99.
+Rosch, E. H. 1973. Natural categories. Cognitive Psychology 4(3):328–350.
+Schorlemmer, M., and Kalfoglou, Y. 2008. Institutionalising ontology-based semantic integration. Applied Ontology
+3(3):131–150.
+Schwering, A.; Krumnack, U.; K¨uhnberger, K.-U.; and
+Gust, H. 2009. Syntactic principles of heuristic-driven theory projection. Cognitive Systems Research 10(3):251–269.
+Sowa, J. F.
+2000.
+Knowledge Representation:
+Logical, Philosophical, and Computational Foundations.
+Brooks/Cole.
+Steedman, M. 1996. The blues and the abstract truth: Music
+and mental models. In Garnham, A., and Oakhill, J., eds.,
+Mental Models in Cognitive Science. Erlbaum, Mahwah, NJ.
+
+Sternberg, R. J., ed. 1999. Handbook of Creativity. Oxford
+University Press.
+Thagard, P., and Stewart, T. C. 2011. The AHA! experience: Creativity through emergent binding in neural networks. Cognitive Science 35:1–33.
+Thagard, P. 2000. Coherence in Thought and Action. Life
+and Mind: Philosophical Issues in Biology and Psychology.
+MIT Press.
+Turner, M. 2012. Blending and conceptual integration.
+http://markturner.org/blending.html.
+Varela, F. J.; Thompson, E. T.; and Rosch, E. 1992. The
+Embodied Mind. MIT Press.
+Veale, T., and O’Donoghue, D. 2000. Computation and
+blending. Cognitive Linguistics 11(3/4):253–281.
+von Helmholtz, H. 1885. On the Sensations of Tone. Longmans & Co.
+Zbikowski, L. M. 2002. Conceptualizing Music. Oxford
+University Press.
+
+

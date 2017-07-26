@@ -1,0 +1,535 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+<script type="text/javascript" src="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics7_files/analytics.js"></script>
+<script type="text/javascript">archive_analytics.values.server_name="wwwb-app12.us.archive.org";archive_analytics.values.server_ms=145;</script>
+<link type="text/css" rel="stylesheet" href="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics7_files/banner-styles.css">
+
+
+</head><body alink="blue" text="blue" vlink="blue" background="HR%20-%20Automatic%20Theory%20Formation%20In%20Pure%20Mathematics7_files/chalk.jpg"><a name="top"></a>
+<title> HR - Automatic Theory Formation In Pure Mathematics </title>
+
+
+
+<a name="settle_conjectures"></a>
+<h2>7. HOW HR SETTLES CONJECTURES</h2>
+
+<font color="red">Subsections:</font>&nbsp;&nbsp;
+<a href="#otter_proof">Otter Proofs</a>&nbsp;&nbsp;
+<a href="#hr_proof">HR Proofs</a>&nbsp;&nbsp;
+<a href="#mace_counterexamples">MACE Counterexamples</a>&nbsp;&nbsp;
+<a href="#hr_counterexamples">HR Counterexamples</a>
+
+<p align="justify">
+Where possible, HR attempts to prove or disprove the conjectures it
+makes. It relies on the Otter theorem prover to prover theorems, and
+the MACE model finder to disprove conjectures by finding a
+counterexample. Otter is a state of the art first order resolution
+theorem prover written by William McCune, and MACE is its sister
+program which can find small models for first order statements. See<a href="#links">Section 18</a> for web pages for Otter and MACE. Otter
+and MACE do not deal well with inductively defined concepts, so
+certain conjectures involving numerical concepts cannot be settled by
+Otter or MACE. However, there are still many conjectures that can be
+settled. To begin with, HR asks Otter to prove all the conjectures it
+makes. Later on, when Otter has proved some core results (prime
+implicants), HR can take over, and use these to prove more complicated
+conjectures. Sometimes, if both Otter and HR fail to prove a
+conjecture, it may turn out to be false, in which case, it is passed
+to MACE, which will look for a counterexample. Alternatively, HR could
+attempt to generate a counterexample itself, and test it against the
+conditions of the conjecture.
+
+
+<a name="otter_proof"></a>
+</p><h2>Proofs Supplied by Otter</h2>
+
+When the concepts are non-numerical, HR is usually able to generate
+Otter-style definitions for the concepts discussed in a conjecture and
+pass the negation of the conjecture to Otter along with the
+axioms. Note that the negation of the conjecture is given because
+Otter is a resolution theorem prover, which derives a contradiction. A
+typical equivalence conjecture in groups theory as input to Otter,
+supplied by HR, looks like this:
+<pre>set(auto).
+assign(max_seconds,36000).
+assign(max_mem, 1000000).
+formula_list(usable).
+all ax1 (ax1=ax1).
+all ax1 ax2 ax3 (ax1 * (ax2 * ax3) = (ax1 * ax2) * ax3).
+all ax1 (ax1*id=ax1 &amp; id*ax1=ax1).
+all ax1 (inv(ax1)*ax1=id &amp; ax1*inv(ax1)=id).
+-(all a b c ( ( a*b=c &amp; a*c=b &amp; b*a=c ) &lt;-&gt; ( a*b=c &amp; a*c=b &amp; c*a=b ) ) ).
+end_of_list.
+</pre>
+<p align="justify">
+However, to give Otter the best chance of proving this, HR splits the
+conjecture into non-trivial implies conjectures. There are just two
+things to be proved for this conjecture:
+</p><p>
+<tt>-(all a b c ( ( a*b=c &amp; a*c=b &amp; b*a=c -&gt; ( c*a=b ) ) ).</tt>
+</p><p>
+and
+</p><p>
+<tt>-(all a b c ( ( a*b=c &amp; a*c=b &amp; c*a=b -&gt; ( b*a=c ) ) ).</tt>
+</p><p align="justify">
+More than this, HR attempts first to extract any prime implicants
+which are more general than the implied conjectures. It tries these
+more general conjectures:
+</p><pre>a*b=c -&gt; c*a=b
+a*c=b -&gt; c*a=b
+b*a=c -&gt; c*a=b
+a*b=c &amp; a*c=b -&gt; c*a=b
+a*b=c &amp; b*a=c -&gt; c*a=b
+a*c=b &amp; b*a=c -&gt; c*a=b
+------
+a*b=c -&gt; b*a=c
+a*c=b -&gt; b*a=c
+c*a=b -&gt; b*a=c
+a*b=c &amp; a*c=b -&gt; b*a=c
+a*b=c &amp; c*a=b -&gt; b*a=c
+a*c=b &amp; c*a=b -&gt; b*a=c
+</pre>
+<p align="justify">
+None of which turn out to be true. Had any been true, HR would have
+stored them as "prime implicants", ie. those conjecture where no
+subset of the premises implies the goal. Of course, if any prime
+implicant is true, then the whole implies conjecture is
+true. Extracting and proving prime implicants is time wasting to begin
+with, but HR never attempts to prove a conjecture it has tried before,
+and the payoff comes later when HR itself can use the prime implicants
+to prove conjectures. If Otter does prove any implies conjectures or
+prime implicants, then HR reads Otter's output and stores the
+results. 
+
+<a name="hr_proof"></a>
+</p><h2>Proofs Supplied by HR</h2>
+
+If we take this conjecture as an example:
+<pre>all a b c (( a*b=c &amp; a*c=b &amp; b*a=c ) &lt;-&gt; ( a*b=c &amp; a*c=b &amp; c*a=b )).
+</pre>
+<p align="justify">
+and suppose that, in the course of proving some other conjecture, HR
+has extracted and Otter has proved these prime implicants:
+</p><pre>(i) a*b=c &amp; a*c=b -&gt; a=inv(a)
+(ii) b*a=c &amp; a=inv(a) -&gt; c*a=b
+(iii) c*a=b &amp; a=inv(a) -&gt; b*a=c
+</pre>
+<p align="justify">
+In this case, HR doesn't need to call Otter, because it has enough
+information to prove the conjecture itself. When trying to prove the
+first implies conjecture:
+</p><p>
+<tt>all a b c (( a*b=c &amp; a*c=b &amp; b*a=c -&gt; ( c*a=b )).</tt>
+</p><p align="justify">
+HR knows that two of the premises, namely <tt>a*b=c</tt> and
+<tt>a*c=b</tt> imply that <tt>a=inv(a)</tt> [using prime implicant (i)
+above]. This new fact can be added to the premises, so HR now needs to
+prove this conjecture:
+</p><p>
+<tt>all a b c (( a*b=c &amp; a*c=b &amp; b*a=c &amp; a=inv(a) -&gt; ( c*a=b )).</tt>
+</p><p align="justify">
+Now, using prime implicant (ii) above, HR spots that two of the
+premises, namely <tt>b*a=c</tt> and <tt>a=inv(a)</tt> imply the goal,
+<tt>c*a=b</tt>. Hence the implies conjecture is proved. Using prime
+implicants (i) and (iii) above, HR can also prove the second implies
+conjecture, and the whole equivalence conjecture is settled. HR's
+output for this conjecture looks like this:
+<font color="green">
+</font></p><pre><font color="green">all a b c ((a*b=c &amp; a*c=b &amp; b*a=c) &lt;-&gt; (a*b=c &amp; a*c=b &amp; c*a=b)).
+
+all a b c ( a*b=c &amp; a*c=b &amp; b*a=c -&gt; c*a=b ).
+---------------------------------------------
+all a b c ( a*b=c &amp; a*c=b -&gt; a=inv(a) ).
+all a b c ( b*a=c &amp; a=inv(a) -&gt; c*a=b ).
+
+all a b c ( a*b=c &amp; a*c=b &amp; c*a=b -&gt; b*a=c ).
+---------------------------------------------
+all a b c ( a*b=c &amp; a*c=b -&gt; a=inv(a) ).
+all a b c ( c*a=b &amp; a=inv(a) -&gt; b*a=c ).
+</font></pre><font color="green">
+</font>
+
+<p align="justify">
+It is clearly an advantage to have two ways for HR to prove
+conjectures. The particular advantages in allowing HR to prove
+conjectures itself are two-fold:
+</p><ul>
+<li>The proofs output are human readable.</li>
+<li>There is a chance later, when more prime implicants have been
+found, to return to the conjecture and prove it.</li>
+</ul>
+
+<p align="justify">
+HR can often produce very complicated proofs, for example, while
+working in ring theory recently, HR proved this conjecture:
+</p><p>
+</p><center>
+all a b c ((a+b=c &amp; c=idp &amp; a*c=b) &lt;-&gt; (a+b=c &amp; a+c=b &amp; b+b=a &amp; b+a=b
+&amp; c+b=b)).
+</center>
+
+<p align="justify">
+This took a long proof, with 14 subgoals proved along the way.
+
+</p><pre><font color="red">
+all a b c ( a+c=b &amp; b+b=a &amp; b+a=b &amp; c+b=b -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+</font><font color="green">
+all a b c ( a+a=b &amp; a+b=a &amp; c+a=a -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+a=a -&gt; a+c=a ).
+all a b c ( a+c=a -&gt; c=idp ).
+</font><font color="red">
+
+all a b c ( a+b=a &amp; c+a=a -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+a=a -&gt; a+c=a ).
+all a b c ( a+c=a -&gt; c=idp ).
+</font><font color="green">
+
+all a b c ( a+c=b &amp; b+a=b &amp; c+b=b -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+</font><font color="red">
+
+all a b c ( a+b=c &amp; b+b=a &amp; b+a=b &amp; c+b=b -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+</font><font color="green">
+
+all a b c ( a+b=c &amp; b+a=b &amp; c+b=b -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+</font><font color="red">
+
+all a b c ( a+b=c &amp; a+c=b &amp; b+a=b &amp; c+b=b -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+</font><font color="green">
+
+all a b c ( a+b=c &amp; a+c=b &amp; b+b=a &amp; b+a=b &amp; c+b=b -&gt; c=idp ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+</font><font color="red">
+
+all a b c ( a+c=b &amp; b+b=a &amp; b+a=b &amp; c+b=b -&gt; a*c=b ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+all a b c ( c=idp -&gt; a+c=a ).
+all a b c ( a+c=b &amp; b+b=a &amp; a+c=a -&gt; a*c=b ).
+</font><font color="green">
+
+all a b c ( a+c=b &amp; b+a=b &amp; c+b=b -&gt; a*c=b ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+all a b c ( c=idp -&gt; a+c=a ).
+all a b c ( a+c=a -&gt; c+a=a ).
+all a b c ( b+a=b -&gt; a=idp ).
+all a b c ( a=idp -&gt; c+a=c ).
+all a b c ( c+a=c &amp; c+a=a -&gt; a*b=c ).
+all a b c ( a+c=b &amp; a=idp -&gt; a+b=c ).
+all a b c ( a+b=c &amp; c=idp -&gt; b=invp(a) ).
+all a b c ( a+b=c &amp; a+c=b &amp; b=invp(a) -&gt; a+a=c ).
+all a b c ( a+c=b -&gt; c+a=b ).
+all a b c ( c+a=b &amp; c=idp -&gt; c+b=a ).
+all a b c ( c+b=a &amp; a+a=c &amp; c+a=c -&gt; b=idp ).
+all a b c ( b=idp &amp; a*b=c -&gt; a+b=a ).
+all a b c ( c+b=a &amp; a=idp -&gt; b=invp(c) ).
+all a b c ( c+b=a &amp; c+a=b &amp; b=invp(c) -&gt; c+c=a ).
+all a b c ( a+b=c &amp; a+c=b &amp; c+c=a -&gt; b+b=a ).
+all a b c ( a+c=b &amp; b+b=a &amp; a+b=a -&gt; a*c=b ).
+</font><font color="red">
+
+all a b c ( a+b=c &amp; b+b=a &amp; b+a=b &amp; c+b=b -&gt; a*c=b ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+all a b c ( c=idp -&gt; a+c=a ).
+all a b c ( b+a=b -&gt; a=idp ).
+all a b c ( a+b=c &amp; a=idp -&gt; a+c=b ).
+all a b c ( a+c=b &amp; b+b=a &amp; a+c=a -&gt; a*c=b ).
+</font><font color="green">
+
+all a b c ( a+b=c &amp; b+a=b &amp; c+b=b -&gt; a*c=b ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+all a b c ( c=idp -&gt; a+c=a ).
+all a b c ( a+c=a -&gt; c+a=a ).
+all a b c ( b+a=b -&gt; a=idp ).
+all a b c ( a=idp -&gt; c+a=c ).
+all a b c ( c+a=c &amp; c+a=a -&gt; a*b=c ).
+all a b c ( a+b=c &amp; c=idp -&gt; b=invp(a) ).
+all a b c ( a+b=c &amp; a=idp -&gt; a+c=b ).
+all a b c ( a+b=c &amp; a+c=b &amp; b=invp(a) -&gt; a+a=c ).
+all a b c ( a+c=b -&gt; c+a=b ).
+all a b c ( c+a=b &amp; c=idp -&gt; c+b=a ).
+all a b c ( c+b=a &amp; a+a=c &amp; c+a=c -&gt; b=idp ).
+all a b c ( b=idp &amp; a*b=c -&gt; a+b=a ).
+all a b c ( c+b=a &amp; a=idp -&gt; b=invp(c) ).
+all a b c ( c+b=a &amp; c+a=b &amp; b=invp(c) -&gt; c+c=a ).
+all a b c ( a+b=c &amp; a+c=b &amp; c+c=a -&gt; b+b=a ).
+all a b c ( a+c=b &amp; b+b=a &amp; a+b=a -&gt; a*c=b ).
+</font><font color="red">
+
+all a b c ( a+b=c &amp; a+c=b &amp; b+a=b &amp; c+b=b -&gt; a*c=b ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+all a b c ( c=idp -&gt; a+c=a ).
+all a b c ( a+c=a -&gt; c+a=a ).
+all a b c ( b+a=b -&gt; a=idp ).
+all a b c ( a=idp -&gt; c+a=c ).
+all a b c ( c+a=c &amp; c+a=a -&gt; a*b=c ).
+all a b c ( a+b=c &amp; c=idp -&gt; b=invp(a) ).
+all a b c ( a+b=c &amp; a+c=b &amp; b=invp(a) -&gt; a+a=c ).
+all a b c ( a+c=b -&gt; c+a=b ).
+all a b c ( c+a=b &amp; c=idp -&gt; c+b=a ).
+all a b c ( c+b=a &amp; a+a=c &amp; c+a=c -&gt; b=idp ).
+all a b c ( b=idp &amp; a*b=c -&gt; a+b=a ).
+all a b c ( c+b=a &amp; a=idp -&gt; b=invp(c) ).
+all a b c ( c+b=a &amp; c+a=b &amp; b=invp(c) -&gt; c+c=a ).
+all a b c ( a+b=c &amp; a+c=b &amp; c+c=a -&gt; b+b=a ).
+all a b c ( a+c=b &amp; b+b=a &amp; a+b=a -&gt; a*c=b ).
+</font><font color="green">
+
+all a b c ( a+b=c &amp; a+c=b &amp; b+b=a &amp; b+a=b &amp; c+b=b -&gt; a*c=b ).
+---------------------------------------------
+all a b c ( c+b=b -&gt; b+c=b ).
+all a b c ( b+c=b -&gt; c=idp ).
+all a b c ( c=idp -&gt; a+c=a ).
+all a b c ( a+c=b &amp; b+b=a &amp; a+c=a -&gt; a*c=b ).
+</font>
+</pre>
+
+<a name="mace_counterexamples"></a>
+<h2>Counterexamples Supplied by MACE</h2>
+
+<p align="justify">
+HR can form theories using just the axioms of a finite algebra. From
+the axioms, HR asks MACE to produce just one model of the algebra. HR
+first asks for a model of order 1, but if one is not found HR asks for
+a model of order 2, etc. Usually, the first model found is the trivial
+one, for example the trivial group, with only one element. Using only
+the trivial group to supply empirical evidence for conjectures, the
+conjectures are often wrong. When Otter fails to prove a conjecture,
+it is passed to MACE, which attempts to find a counterexample. Again,
+a counterexample of size 1 is sought first, then one of size 2 and so
+on.
+
+</p><p>
+If a counterexample is found, then:
+</p><ol>
+<li> The conjecture is discarded, as it is not a theorem.</li>
+<li> HR checks whether the new model is a counterexample to any
+other previously unsettled conjectures.</li>
+<li> For every equivalence conjecture that is disproved, a new concept
+is entered into the theory (as it turns out that it was not equivalent
+to a previous concept).</li>
+<li> The new model is entered into the database, and all previous
+data-tables are recalculated to include the extra data.</li>
+</ol>
+<p align="justify">
+I've extracted below some false group theory conjectures that HR made
+in a recent session, and given the counterexamples that MACE finds for
+them. The extracts are presented in the order in which HR found them:
+
+<font color="green">
+</font></p><pre><font color="green">2. all a b c ((a*b=c) &lt;-&gt; (a*b=c &amp; a*c=b)).       %%% ORIGINAL CONJECTURE %%%
+all a b c ( a*b=c -&gt; a*c=b ). sos     %%% FALSE SUBGOAL %%%
+
+Mace generating counterexample of order: 1 2 3 e02   %%% CALLING MACE %%%
+Checking whether conjectures are disproved: 2:yes(New Concept = 21), 
+(21) [G,a,b,c] s.t. a*b=c &amp; a*c=b  %%% NEW CONCEPT ADDED %%%
+
+* | 0 | 1 | 2 | 
+--+---+---+---+
+0 | 0 | 1 | 2 |      %%% MODEL FOUND BY MACE %%%
+--+---+---+---+
+1 | 1 | 2 | 0 | 
+--+---+---+---+
+2 | 2 | 0 | 1 | 
+--+---+---+---+
+.
+.
+.
+
+4. all a ((a=id) &lt;-&gt; ((exists b c (a*b=c &amp; a*c=b)))).
+all a ( a=id -&gt; (exists b c (a*b=c &amp; a*c=b)) ). max_proofs 3
+all a ( (exists b c (a*b=c &amp; a*c=b)) -&gt; a=id ). sos
+
+Mace generating counterexample of order: 1 2 e03 
+Checking whether conjectures are disproved: 4:yes(New Concept = 22),
+(22) [G,a] s.t. (exists b c (a*b=c &amp; a*c=b)) " ahlfors element 1 "
+
+* | 0 | 1 | 
+--+---+---+
+0 | 0 | 1 | 
+--+---+---+
+1 | 1 | 0 | 
+--+---+---+
+.
+.
+.
+
+15. all a b c ((a*b=c) &lt;-&gt; (a*b=c &amp; b*a=c)).
+all a b c ( a*b=c -&gt; b*a=c ). sos
+
+Mace generating counterexample of order: 1 2 3 4 5 6 e04 
+Checking whether conjectures are disproved: 13:no,14:no,15:yes(New Concept = 34),
+(34) [G,a,b,c] s.t. a*b=c &amp; b*a=c
+
+* | 0 | 1 | 2 | 3 | 4 | 5 | 
+--+---+---+---+---+---+---+
+0 | 0 | 1 | 2 | 3 | 4 | 5 | 
+--+---+---+---+---+---+---+
+1 | 1 | 0 | 3 | 2 | 5 | 4 | 
+--+---+---+---+---+---+---+
+2 | 2 | 4 | 0 | 5 | 1 | 3 | 
+--+---+---+---+---+---+---+
+3 | 3 | 5 | 1 | 4 | 0 | 2 | 
+--+---+---+---+---+---+---+
+4 | 4 | 2 | 5 | 0 | 3 | 1 | 
+--+---+---+---+---+---+---+
+5 | 5 | 3 | 4 | 1 | 2 | 0 | 
+--+---+---+---+---+---+---+
+.
+.
+.
+
+27. all a b c ((a*b=c &amp; c=inv(b) &amp; -(a=id)) &lt;-&gt; (a*b=c &amp; c=inv(b) &amp; -(a*c=b))).
+all a b c ( a*b=c &amp; -(a*c=b) -&gt; -(a=id) ). max_proofs 4
+all a b c ( a*b=c &amp; c=inv(b) &amp; -(a*c=b) -&gt; -(a=id) ).
+---------------------------------------------
+all a b c ( a*b=c &amp; -(a*c=b) -&gt; -(a=id) ).
+all a b c ( a*b=c &amp; c=inv(b) &amp; -(a=id) -&gt; -(a*c=b) ). sos
+
+Mace generating counterexample of order: 1 2 3 4 e05 
+Checking whether conjectures are disproved: 13:no,14:no,27:yes(New Concept = 57),
+(57) [G,a,b,c] s.t. a*b=c &amp; c=inv(b) &amp; -(a*c=b)
+
+* | 0 | 1 | 2 | 3 | 
+--+---+---+---+---+
+0 | 0 | 1 | 2 | 3 | 
+--+---+---+---+---+
+1 | 1 | 0 | 3 | 2 | 
+--+---+---+---+---+
+2 | 2 | 3 | 1 | 0 | 
+--+---+---+---+---+
+3 | 3 | 2 | 0 | 1 | 
+--+---+---+---+---+
+</font></pre><font color="green">
+</font>
+
+<a name="hr_counterexamples"></a>
+<h2>Counterexamples Supplied by HR</h2>
+
+<p align="justify">
+As well as being able to write definitions for concepts in Otter-style
+first order logic, and in LaTeX scripts, HR can also generate a Prolog
+definition for concepts. For example, in another recent run, HR
+re-invented prime numbers as concept 21. I then asked for the prolog
+program which tests for primality, and tried it out a few times.
+
+<font color="green">
+</font></p><pre><font color="green">| ?- concept(21)::prolog_program.
+
+predicate(1,[I,A,B]) :-
+      I is A * B, !.
+
+predicate(3,[I,A]) :-
+      length(L,I), nth(A,L,_), 0 is I mod A.
+
+predicate(18,[I,N]) :-
+      findall([A,B],(predicate(3,[I,A]),
+                     predicate(3,[I,B]),
+		     predicate(1,[I,A,B])),
+	      TuplesA),
+      remove_duplicates(TuplesA,Tuples),
+      length(Tuples,N), N &gt; 0, !.
+
+predicate(21,[I]) :-
+      predicate(18,[I,2]), !.
+
+yes
+| ?- predicate(21,[17]).
+
+yes
+| ?- predicate(21,[10]).
+
+no
+| ?- predicate(21,[1193]).
+
+yes
+</font></pre><font color="green">
+</font>
+<p align="justify">
+Note here that predicate 1 checks whether two integers (A and B)
+multiply to give the entity (I). Predicate 3 can actually generate all
+the divisors of an input integer, I. Predicate 18 is the tau function,
+which calculates the number of divisors of an integer, and predicate
+21 only says yes if the tau function returns 2. Predicates 1 and 3
+were provided by the user, and are essential if HR is going to be able
+to build further prolog definitions. 
+
+</p><p align="justify">
+The original motivation for allowing HR to generate and read its own
+prolog code is so that we can compare HR to machine learning programs
+such as Progol, which uses inductive logic programming to learn given
+concepts. We can claim that, as HR has written its own prolog code for
+a primality test, it has learned the concept of prime numbers. Another
+application of this functionality is that HR can generate models
+itself, and, using the prolog predicates it has generated, check
+whether the models are counterexamples to a conjecture. The user has
+to supply prolog code which generates entities. For certain domains,
+such as number theory and quasigroup theory, this is a simple matter,
+and there are plenty of examples which are easy to generate. However,
+for more complicated domains, such as group theory, it is more
+difficult to generate examples, and there are fewer of them.
+
+</p><p align="justify">
+The advantage to allowing HR to generate its own counterexamples is
+that it can do so when MACE cannot. Otter and MACE have very limited
+abilities in number theory, so HR can be used to generate
+counterexamples to numerical conjectures. For example, when given only
+the integers up to 10, HR makes the conjecture that there are no
+integers, <i>n</i> for which <i>tau(n)=4</i> and <i>4</i> divides
+<i>n</i>. The first counterexample that HR found was the number
+12. Another example comes when HR is given the integers up to 30. HR
+makes the conjecture that all integers, <i>n</i> for which
+<i>tau(n)</i> has 3 divisors, are such that <i>n</i> has 4
+divisors. This is true for the integers up to 30, as none of them have
+9 divisors. However, HR found the first counterexample, namely the
+number 36. Whenever HR finds a counterexample itself, it goes through
+the same routine as when MACE finds them, ie. it checks previous
+conjectures, adds any new concepts, discards any non-theorems and add
+the new model to the data-base, updating each concept as it does so.
+</p><hr>
+©&nbsp;Simon Colton 1999.
+
+
+
+
+
+
+
+
+</body></html>
+<!--
+     FILE ARCHIVED ON 20:39:56 Jul 22, 2001 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 10:44:20 May 16, 2016.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->

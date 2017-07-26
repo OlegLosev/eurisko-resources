@@ -1,0 +1,864 @@
+From: AAAI-80 Proceedings. Copyright © 1980, AAAI (www.aaai.org). All rights reserved.
+
+A Representation Language Language
+
+Russell Greiner
+
+and Douglas B. Lenat
+
+Computer Science Deptartment
+Stanford University
+
+2. INTRODUCTION
+
+ABSTRACT
+
+RLL explicitly represents (i.e. contains units-? for) the components
+of reprcscntation languages in general and of itself in particular.
+The programming language LISP derives its flexibility in a similar
+manner: it, too, encodes many of its constructs within its own
+formalisms.
+Representation languages aim at easy, natural
+interfacing to users; therefore their primitive building blocks are
+larger, more abstract, and more complex than the primitives of
+programming languages.
+
+The field of AI is strewn with knowledge representation languages. The language
+designer typically has one particular application domain in mind: as subsequent
+types of applications are tried, what had originally been US&II j2urure.y become
+undesirable limitations, and the language is overhauled or scrapped. One remedy
+to this bleak cycle might be to construct a representational scheme whose domain
+is the field of representational languages itself. Toward this end, we designed and
+implemented RLL, a frame-based Representation Languange Language. The
+components of representation languages in general (such ti slots and inheritance
+mechanisms) and of RLL itself are encoded declaratively as frames. Modifvinn
+altering the
+these frames can change the semantics of RLL, by
+of the RLL environment.
+
+Building blocks of a representation language include such things as
+control regimes (ExhaustiveBackwardChaining, Agendas), methods
+3f associating procedures with relevant knowledge (Footnotes,
+Demons), tindamental access functions (Put/Get, Assert/Match),
+automatic inference mechanisms (InheritFromEvery2ndGeneration,
+InheritBut-PermitExceptions),
+and even specifications of the
+intended
+semantics and epistemology of the components
+(ConsistencyConstraint, EmpiricalHeuristic).
+
+1. MOTIVATION
+
+“One ring to rule them all... and in the darkness bind them. ”
+Often a large Artificial Intelligence project begins by designing and
+implementing a high-level language in which to easily and precisely
+specify the nuances of the task. The language designer typically
+builds his Representation Language around the one particular
+highlighted application (such as molecular biology for Units
+[Sfe$k], or natural language understanding for KRL [Bobrow &
+Winogrudj and OWL [Szolovifs, et al.]). For this reason, his
+language is often inadequate for any subsequent applications
+(except those which can be cast in a form similar in structure to the
+initial task): what had originally been useful features become
+undesirable limitations (such as Units’ explicit copying of inherited
+facts, or KRL’s sophisticated but slow matcher).
+
+RLL is designed to help manage these complexities, by providing
+language
+(1) an organized library of such representation
+components, and (2) tools for manipulating, modifying, and
+combining them.
+Rather than produce a new representation
+language as the “output” of a session with RLL, it is rather the
+RLL language itself, the environment the user sees, which changes
+gradually in accord with his commands.
+3. HOWJS A REPRESENTATION
+ORGAN?
+
+Building a new language seems cleaner than modifying the flawed
+one, so the designer scraps his “extensible, general” language after
+its one use. The size of the February 1980 SIGART shows how
+many similar yet incompatible representation schemes have
+followed this evolutionary path.
+
+When the user starts RLL, he finds himself in an environment very
+much like the Units package [Slefik], with one major difference. If
+he desires a new type of inheritance mechanism, he need only
+create a new Inheritance-type of unit, initialize it with that desired
+property; and that new mode of inheritance will automatically be
+enabled. This he can do using the same editor and accessing
+functions hc uses for cntcring and codifying his domain knowledge
+(say, poultry inspection); only hcrc the information pertains to the
+actual Knowledge Base system itself, not turkeys.
+
+One remedy to this bleak cycle might be to construct a
+representation scheme whose domain is the field of representational
+languages itself. a program which could thc’n bc tailored to suit
+many specific applications. Toward this end, WCarc designing and
+implementing RLL, an object-centered’ Representation Languange
+I,anguage.2 This paper reports on the current state of our ideas
+and our implementation.
+
+The Units package has Get and Put as its tindamcntal storage and
+retrieval functions; therefore RLL also begins in that state. But
+there is nothing sacred about cvcn these two “primitives”. Get and
+Put arc encoded as modifiable units: if they are altered, the nature
+of accessing iI slot’s value will change correspondingly. In short, by
+issuing a small number of commands hc can radically alter the
+character of the RLI. cnvironmcnt. molding it to his personal
+
+1
+This “object-centering”
+does not represent
+a loss in geneiality.
+We will
+soon see that each part of the full system, including procedural
+information,
+is reified
+as a unit.
+
+* As
+there
+
+RLL is itself
+is no need
+
+a completely
+self-descriptive
+for an RLLL.
+
+representation
+
+LANGUAGE LIKE AN
+
+-----______________
+3 RLL is a frame-based
+Units [Stefik],
+[Bobrow
+
+language,
+
+with
+
+165
+
+their
+
+respective
+
+system [Minsky], whose building
+& Winograd].
+Each unit consists
+values.
+
+blocks
+are called
+of a set of Slots
+
+preferences and to the specific needs of his application. RLL is
+responsible for performing the necessary “truth maintainence”
+operations, (e.g. retroactive updates) to preserve the overall
+correctness of the system as a whole. For example, Get and Put
+can be transformed into units which, when run as functions,
+resemble
+Assert (store proposition)
+and Match (retrieve
+propositions), and the user need never again mention “slots” at all.
+
+4. EXAMPLES
+
+The following examples convey the flavor of what can currently be
+done with the default settings of the RLL “organ stops”.
+4.1. EXAMPLE:
+
+Each stop
+RLL is more like a stop organ than a piano.
+corresponds to a “pre-fabricated” representational part (e.g. a slot,
+inheritance, format, control regime, etc.), which resides in the
+overall RLL system. The initial RLL is simply one configuration
+of this organ, with certain stops “pulled out” to mimic the Units
+package. These particular stops reflect our intuitions of what
+constitutes a general, powerful system. Some of the units initially
+“pulled out” (activated) define more or less standard inheritance
+regimes, such as Inherit-Along-IS-A-Links, which enables Fido to
+gather default information from AnyDog.
+
+Creating a New Slot
+
+In the following example, the user wishes to define a Fafher slot,in
+a sexist genealogical knowledge base which containes only the
+primitive slots Morher and Spouse.
+As RLL devotes a unit to
+store the necessary knowledge associated with each kind of slot,
+(see Figure 1,) defining a new kind of slot means creating and
+initializing one new unit. In our experience, the new desired slot is
+frequently quite similar to some other slot(s), with but a few
+distinguishing differences.
+We exploited this iegularity in
+developing a high level “slot-defining” language, by which a new
+slot can be defined precisely and succinctly in a single declarative
+statement.
+
+We chose to include a large assortment, of common slots. One
+hundred and six types of slots, including IS-A, SuperClass.
+BroaderHeuristics, and TypicalExamples, are used to hierarchically
+organize the units. That number grows daily, as we refine the
+organizing relationships which were originally “smeared” together
+into just. one or two kinds of slots (e.g. A-Kind-Ofl. An additional
+ToPut Value,
+fifteen types of slots, including ToGerValue,
+define
+the
+To Add Value,
+collectively
+ToKillUnit.
+and
+accessing/updating functions.
+
+1 Name:
+1 Description:
+I Format:
+1 Datatype:
+I Inverse:
+1 IS-A:
+1 UsedSylnhefifance:
+1 MyTimeOfCfeation:
+1 MyCreator:
+
+This bootstrapping system (the initial configuration of “organ
+stops”,) dots not span the scope of RLL’s capabilities: many of its
+stops are initially in the dormant position. Just as a competent
+musician can produce a radically different sound by manipulating
+an organ’s stops, so a sophisticated RLL user can define his own
+representation by turning off some features and activating others.
+For instance, an FRL devotee may notice -- and choose to use
+exclusively -- the kind of slot called A-Kind-Ox which is the
+SuperSet,
+Abstraction,
+Is- A,
+together
+of
+smearing
+He may then deactivate those
+TypicalExampleOJ PartOf etc.
+more specialized units from his system permanently. A user who
+does not want to see his system as a hierarchy at all can simply
+deactivate the A-Kind-Of unit and its progeny. The user need not
+worry about the various immediate, and indirect, consequences of
+this alteration (e.g., deleting the Inherit-Along-IS-A-Links unit);
+RLL will take care of them. By selectively pushing and pulling, he
+should be able to construct a system resembling almost any
+currently used representational language, such as KRL, OWL and
+KLONE;4 after all, an organ can be made to sound like a piano.
+Unlike musical organs, RIL also provides its user with mechanisms
+for building his own stops (or even type of stops, or even
+mechanisms for building stops).
+With experience, one can use
+RLL to build his own new components.
+Rather than building
+them from scratch, (e.g., from CAR, CDR, and CONS,) he can modi&
+some existing units of RLL (employing other units which are
+themselves tools designed for just such manipulations.)
+
+IS-A
+Lists the classes I AM-A member of.
+List-of-Entries
+Each entry represents a class of objects.
+Examples
+(AnySlot)
+Inherit-Along-/S-A-Links
+1 April 1979, 12:Ol AM
+D.B.Lenat
+
+Figure # 1 - Unit devoted to the “IS-A” slot. There are many other slots which are
+appropriate for this unit; whose value will be deduced automatically
+(e.g.
+inherited from AnySlot) if requested.
+
+Creating a new slot for Father is easy: we create a new unit called
+Father, and fill its HighLevelDefn slot with the value (Composition
+Spouse Mofher). Composition is the name of a unit in our initial
+system, a so-called “slot-combiner” which knows how to compose
+two slots (regarding each slot as a function from one unit to
+another). We also fill the new unit’s Isa slot, deriving the unit
+shown in Figure 2.
+Name:
+1 IS-A:
+I HighLevelDefn:
+
+Father
+(AnySlot)
+(Composition
+
+Spouse
+
+Mother)
+
+Figure # 2 - Slots filled in by hand when creating the unit devoted to the”Father”
+slot. Several other slots (e.g., the syntactic slots MyCreator,
+MyTimeOfCreation)
+are filled in automatically
+at this time.
+
+The user now asks for KarlPhilippEmanuel’s father, by typing
+(GetVal ue 'KPE 'Father).
+GetValue first tries a simple associative lookup (GET), but finds
+there is no Fafher property stored on KPE, the unit representing
+KarlPhilippEmanuel.
+GctValue then tries a more sophisticated
+approach: ask the Father unit how to compute the Father of any
+person.
+Thus the call becomes
+[Apply*
+
+(GetValue
+
+'Father
+
+'ToCompute)
+
+'KPE].
+
+Notice this calls on GctValue recursivelv. and once again there is
+no value stored on the ToCompure slot-of the unit tilled Father.
+The call now has expanded into
+[Apply*
+
+(Apply*
+
+Luckily, there is a
+ToCompute: it says
+combiner it employs,
+now cxpandcd out
+
+(GetValue
+'Father)
+
+'ToCompute
+'KPE].
+
+'ToCompute)
+
+value on the ToCompute slot of the unit
+to find the HighLevelDefn, find the slotfind its ToComput$, and ask it. Our call is
+into the following:
+
+[Apply*
+(Apply*
+(GetValue
+'Composition
+'ToCompute)
+'Spouse
+'Mother)
+'KPE].
+
+4 This particular task, of actually simulating various existing Representation
+languages, has not yet been done. It is high on our agenda of things to do.
+We anticipate it will require the addition of many new components (and types of
+components) to RLL, many representing orthogonal decompositions of the space
+of knowledge representation.
+
+’ Each unit which represents a function has a ToCompure slot, which holds the
+actual LISP function it encodes. Associating such a ToCompute slot with each slot.
+reflects our view that each slot is a function, whose argument happens to be a
+unit, and whose computed value may be cached away.
+
+166
+
+4.3. EXAMPLE: Epistemological Status
+
+The unit called Composition does indeed have a ToCompute Slot;
+after applying it, we have:
+‘(h (x) (GetValue
+(GetValue
+x ‘Mother)
+CApply*
+‘Spouse))
+‘KPE].
+This asks for the Mother slot of KPE, which is always physically
+stored in our knowledge base, and then asks for the value stored in
+The final result, JohannSebastian, is then
+her Spouse slot.
+returned. It is also cached (stored redundantly for future use) on
+the Fafher slot of the unit KPE. See [Lenat et al., 19791 for details.
+Several other slots (besides ToCompufe) are deduced automatically
+by RLL from the HighLevelDefn of Father (see Figure 3) as they
+are called for. The Format of each Fafher slot must be a single
+entry, which is the name of a unit which represents a person. The
+only units which may have a Fafher slot are those which may
+legally have a Mofher slot, viz., any person. Also, since Fafher is
+defined in terms of both Mother and Spouse, using the slot
+combiner Composition, a value stored on KPE:Fafher must be
+erased if ever we change the value for KPE’s M&her or
+AnnaMagdelena’s Spouse, or the definition (that is, 7’oCompufe) of
+Composition.
+Name:
+1 IS-A:
+1 HighLevelDefn:
+1 Description:
+1 Format:
+1 Datatype:
+1 MahesSenseFor:
+1 DefinedlnTermsOf:
+1 DefinedUsing:
+
+Father
+(AnySlot)
+(Composition
+Spouse Mother)
+Value of unit’s Mother’s
+Spouse.
+SingleEntry
+Each entry is unit representing
+a person.
+AnyPerson
+(Spouse Mother)
+Composition
+
+1 ToCompute:
+
+(A
+
+Figure
+
+(x) (GetValue
+
+(GetValue
+
+x ‘Mother)
+
+# 3 - Later form of the Father unit, showing
+automatically.
+
+‘Spouse)
+
+Epistemological Status: To represent the fact that John believes
+that Mary is 37 years old, RLL adds the ordered pair (SeeUnit
+AgeOfMaryOOOl) to the the Age slot of the Mary unit. RLL
+creates a unit called AgeOfMaryOOOl, fills its *value* slot with 37
+and its EpiSfa/us slot with “John believes”. See Figure 4. Note
+this mechanism suffices to rcprcscnt belief about belief (just a
+second chained SeeUnit pointer), quoted belief (“John thinks he
+knows Mary’s age”, by omitting the *value* 37 slot in
+AgeOfMaryOOOl), situational fluents, etc. This mechanism can also
+be used to represent arbitrary n-ary relations, escaping the
+associative triple (i.e. Unit/SZof/value) limitation.
+
+Name:
+] IS-A:
+I Description:
+i Age:
+
+I
+
+1
+1
+I
+1
+
+1
+I
+
+I ~Zs
+I Teleology:
+
+I
+
+AgeOfMaryOOOl
+(UnitForASlotFiller)
+
+Mary
+Age37
+John believes
+Epistemic
+
+il
+I
+I
+I
+1
+I
+1
+
+NameI
+I
+1
+1
+I
+I
+
+..
+
+lsa
+
+LiveslnUnit
+LiveslnSlot
+*value*
+Epistatus
+Teleology:
+
+1
+I
+
+AgeOfMaryOO02
+(UnitForASlotFiller)
+Mary
+Agegring
+Wedding805
+Historic
+
+I
+I
+I
+1
+I
+I
+
+i
+Figure 4 -
+
+slots filled in
+
+Representing
+“John believes that Mary is 37, but she’s really 39.
+When she was married. she was 21”.
+
+4.4. EXAMPLE: Enforcing Semantics
+
+Notice the the ease with which a use; can currently :‘extend his
+representation”, enlarging his vocabulary of new slots. A similar,
+though more extravagant example would be to define FavorifeAunf
+(Composition
+Sister
+Parenfs)
+(SingieMost
+(Unioning
+*as
+(Composition Spouse Brofher Parenfs)) $$). Note that “Unioning”
+and “SingleMost” are two of the slot combiners which come with
+RLL, whose definition and range can be inferred from this
+example.
+
+Suppose that Lee, a user of RLL, is constructing HearSayXXIV, a
+representation language which contains cooperating knowledge
+sources (KSs).
+He specifies that each unit representing a
+knowledge source should have some very precise applicability
+criteria (he defines a FuZZRelevancy slot) and also a much quicker,
+rougher check of its potential relevance (he defines a
+PrePreCondifions slot). If HearSayXXIV users employ these two
+slots in just the way he intended, they will be rewarded with a very
+efficiently-running program.
+
+It is usually no harder to create a new type of slot format
+(OrderedNonemptySet),
+slot combiner (TwoMost, Starring), or
+datatype (MustBePersonOverl6), than it was to create a new slot
+Explicitly encoding such
+type or inheritance mechanism.
+information helps the user (and us) understand the precise function
+of each of the various components. We do not yet feel that we
+have a complete set of any of these components, but are
+encouraged by empirical results like the following: The first two
+hundred slots we defined required us to define thirteen slot
+combiners, yet the lasf two hundred slots required only five new
+slot combiners.
+4.2. EXAMPLE:
+
+Name
+Isa
+LiveslnUnit
+LiveslnSlot
+
+Mary
+(Person Female ContraryActor)
+The grower of silver bells etc.
+
+But how can Lee be sure that users of HearSayXXIV will use these
+two new slots the way he intended? He also defines a new kind of
+slot called Semantics. The unit for each type of slot can have a
+Semanfics slot, in which case it should contain criteria that the
+values stored in such slots are expected to satisfy.
+Lee fills the Semanfics slot of the unit called PrePreConditions with
+a piece of code that checks that the PrePreConditions slot of every
+KS unit is filled by a Lisp predicate, which is very quick to
+execute, which (empirically) correlates highly to the FullRelevancy
+predicate, and which rarely returns NIL when the latter would
+return T. This bundle of constraints captures what he “really
+means” by PrePreCondifions
+
+Creating a New Inheritance Mode
+
+Suppose a geneticist wishes to have a type of inheritance which
+skips every second ancestor. He browses through the hierarchy of
+units descending from the general one called Inheritance, finds the
+closest existing unit, InheritSelectively, which he copies into a new
+unit, InheritFromEvery2ndGeneration.
+Editing this copy, he finds
+a high level description of the path taken during the inheritance,
+wherein he replaces the single occurrence of “Parenf” by
+“GrandParent” (or by two occurrences of Parenf, or by the phrase
+(Composition Parenf Parent)). After exiting from the edit, the new
+type of inheritance will be active; RLL will have translated the
+slight change in the unit’s high-level description into a multitude of
+If the geneticist now specifies that
+low-level changes.
+Organism # 34 is an “InheritFromEvery2ndGeneration
+offspring” of
+Organism#20, this will mean the right thing. Note that the tools
+used (browser, editor, translator, etc.) are themselves encoded as
+units in RLL.
+
+A user of HearSayXXIV, say Bob, now builds and runs a speech
+understanding program containing a large collection of cooperating
+knowledge sources.
+As he does so, statistics are gathered
+empirically.
+suppose
+Bob frequently
+circumvents
+the
+PrePreCondifions slot cntircly, by placing a’pointer there to the
+same long, slow, complete criteria he has written for the
+FuNReZevancy slot of that KS. This is empirically caught as a
+violation of one of the constraints which Lee recorded in the
+Semanfics slot of the unit PrePreConditions.
+As a result, the
+Semanfics slot of the Semantics unit will be consulted to find an
+appropriate reaction; the code therein might direct it to print a
+warning message to Bob: “The PrePreCondifions slot of a KS is
+meant to run very quickly, compared with the F&Relevancy slot,
+but 70% of yours don’t; please change your PrePreCondifions slots,
+
+167
+
+or your FullRelevancy slots, or (if you insist) the Semantics slot of
+the PrePreConditions unit”.6
+5. SPECIFICATIONS FOR ANY REPRESENTATION
+LANGUAGE LANGUAGE
+
+The following are some of the core constraints around which RLL
+was designed. One can issue commands to RLL which effectively
+“turn off’ some of these features, but in that case the user is left
+with an inflexible system we would no longer call a representation
+language language. Further details may be found in [Lena& Haye*
+Rorh, & Klahr] and in [Geneserelh & Lenaf].
+Self-description: No part of the RLL system is opaque; even the
+primitive Get and Put and Evaluate finctions are represented by
+individual units describing their operation.2 Current status:
+complete (to a base language level).
+Self-modification: Changes in the high-level description of an RLL
+process automatically result in changes in the Lisp code for -- and
+hence behavior of -- RLL. Current status: this works for changes
+in definition, format, etc. of units representing slots and control
+processes.
+Much additional effort is required.
+Codification of Representation
+Knowledge: Taxonomies of
+inheritance, function invocation, etc. Tools for manipulating and
+creating same. These correspond to the stops of the organ,
+illustrated above. Current status: this is some of the most exciting
+research we foresee; only a smattering of representation knowledge
+has yet been captured.
+6. INITIAL
+
+Each fact, heuristic.
+Economy via Appropriate Placement:
+comment, etc. is placed on the unit (or set of units) which are as
+general and abstract as possible. Frequently, new units are created
+just to facilitiate such appropriate placement. In the long run, this
+reduces the need for duplication of information. One example of
+this is the use of of appropriate conceptual units:
+Clarity of Conceptual Units: RLL can distinguish (i.e. devote a
+concepts:
+following
+unit
+to
+the
+each
+of)
+separate
+TheSetOfAllElephants, (whose associated properties describe this as
+a set -- such as #OjMembers or SubCaregories), TypicalElephant,
+(on which we might store Expected-TuskLenglh or DefauKolor
+slots), ElephantSpecies, (which EvoZvedAsASpecies some 60 million
+years ago and is CloselyRelaredTo the HippopatamusSpecies,)
+ElephantConcept,
+(which QuaZifiesAsA BeastOfBurden and a
+TuskedPackyderm,) ArchetypicalElephant
+(which represents an
+elephant, in the real world which best exemplifies the notion of
+“Elephant-ness”).
+It is important for RLL to be able to represent
+them distinctly, yet still record the relations among them. On the
+other hand, to facilitate interactions with a human user, RLL can
+accept a vague term (Elephant) from the user or from another unit,
+and automatically refine it into a precise term. This is vital, since a
+term which is regarded as precise today may be regarded as a
+vague catchall tomorrow. Current status: distinct representations
+pose no problem; but only an exhaustive solution to the problem
+of automatic disambiguation has been implemented.
+7. CONCLUSION
+
+“‘...inMordor, where the Shadow lies. ”
+The’system is currently usable, and only through use will direction.*
+for future effort be revealed. Requests for documentation and
+There are still many areas for
+access to RLL are encouraged.
+Some require merely a large
+tirther development of RLL.
+researchers’
+other
+amount
+of work (e.g., incorporating
+representational schemes and conventions); others require new
+ideas (es., handling intensional objects). To provide evidence for
+our arguments, we should exhibit a large collection of distinct
+representation languages which were built out of RLL; this we
+cannot yet do. Several specific applications systems live in (or are
+proposed to live in) RLL; these include ELI-RISK0 (discoiery of
+heuristic rules), E&E (combat gamina). FUNNEL (taxonomv of
+Lisp objects, with an aim toward-autor&tic programming), ROGET
+(Jim Bennett: guiding a medical expert to directly construct a
+knowledge based system), VLSI (Mark Stefik and Harold Brown: a
+foray of AI into the VLSI layout area), and WHEEZE (Jan Clayton
+and Dave Smith: diagnosis of pulminary function disorders,
+reported in [Smifh & Clayton]).
+
+“ORGAN STOPS”
+
+The following characteristics pertain especially to the initirll state of
+the current RLL system, wherein all “organ stops” are set at their
+default positions. Each RLL user will doubtless settle upon some
+different settings, more suited to the representation environment he
+wishes to be in while constructing his application program. For
+details, see [Greiner].
+Cognitive economy: Decision-making about
+values to cache away, when to recompute
+f-iltcring. Current status: simple reasoning is
+each of these decisions; the hooks for more
+exist, but they have not been used yet.
+
+what intermediate
+values, expectationdone to determine
+complex procedures
+
+Syntactic vs Semantic slots: Clyde should inherit values for many
+slots from TypicalElephant, such as Color, Diet, Size; but not from
+slots which refer to TypicalElephant qua data structure, slots such
+as NumerOjFilledInSlots and DaleCreated. Current status: RLL
+correctly treats these two classes of slots differently, e.g. when
+initializing a new unit.
+
+Experience in AI research has repeatedly shown the need for a
+flexible and extensible language -- one in which the very
+vocabulary can be easily and usefully augmented.
+Our
+representation language language addresses this challenge.
+We
+leave the pieces of a representation in an explicit and modifiable
+state. By performing simple modifications to these representational
+parts
+(using
+specially-designed
+manipulation
+tools),
+new
+representation languages can be quickly created, debugged,
+modified, and combined. This should ultimately obviate the need
+for dozens of similar yet incompatible representation languages,
+each usable for but a narrow spectrum of task.
+
+Onion field of languages:
+RLL contains a collection of features
+(e.g., automatically adding inverse links) which can be individually
+enabled or disabled, rather than a strict linear sequence of higher
+and higher level languages. Thus it is more like an onion field
+than the standard “skins of an onion” layering. Current status:
+Done. Three of the most commonly used settings are bundled
+together as CORLL, ERLL, and BRLL.
+’ This work has led us to realize the impossibility of unambiguously
+stating
+Consider the case of the semantics of the Lisp function “OR”.
+semantics.
+Suppose one person believes it evaluates its arguments left to right until a nonnull value is found: a second person believes it evaluates right to left: a third
+person believes it evaluates all simultaneously. They go to the Semanfics slot of
+Therein they find this expression:
+the unit called OR, to settle the question.
+(OR (Evaluate the args Iefi to right) [Evaluate the args right to leJ)J. Person #3
+is convinced now that he was wrong, but persons 1 and 2 point to each other
+The point of all this is that even
+and exclaim in unison “See, I toId you!”
+storing a Lisp predicate in the Semanfics slots only specifies the meaning of a slot
+up to a set of fixed points. One approaches the description of the semantics with
+some preconceived ideas, and there may be more than one set of sucpi hypotheses
+which are consistent with everything stored therein. See [Genesereth & Lenar].
+
+68
+
+ACKNOWLEDGEMENTS
+The work reported here represents a snapshot of the current state of an on-going
+Researchers from SAIL and
+research effort conducted at Stanford University.
+HPP are examining a variety of issues concerning representational schemes in
+general, and their construction in particular (viz., [Nii & Aiello]). Mark Stefik and
+Michael Geneseretb provided frequent insights into many of the underlying issues.
+He, Danny
+We thank Terry Winograd for critiquing a draft of this paper.
+Bobrow, and Rich Fikes conveyed enough of the good and bad aspects of KRL
+to guide us along the path to RLL. Greg Ilarris implemented an early system
+which perfomred the task described in Section 4.1. Others who have directly or
+indirectly influenced this work include Bob Balzer, John Brown, Cordell Green,
+Johan deKleer, and Rick Hayes-Roth. To sidestep InterLisp’s space limitation,
+Dave Smith implemented a demand unit swapping package (see [Smith]). The
+research is supported by NSF Grant #MCS-79-01954 and ONR Contract
+#NOOO14-80-C-0609.
+
+BIBLIOGRAPHY
+Aikins, Jan, “Prototypes and Production Rules: An Approach to Knowledge
+Representation from Hypothesis Formation”, HPP Working Paper HPP-7910, Computer Science Dept., Stanford University, July 1979.
+Bobrow, D.G. and Winograd, T., “An Overview of KRL; a Knowledge
+Representation Language”, SIJCAI, August 1977. a
+Brachman, Ron, “What’s in a Concept, Structural Foundations for Semantic
+Networks”. BBN report 3433, October 1976.
+Findler, Nicholas V. (ed.). Associafive Networks. NY. hcadcmic Press, 1979.
+and -Modijicnrion in
+Gencsereth, Michael, and Lenat, Douglas B.. SeIfDescripfion
+HPP Working Paper HPP-80-10,
+a Knowledge
+Representation
+Language,
+June, 1980.
+Greiner. Russell. “A Representation Language Language”, HPP Working Paper
+HPP-80-9, Computer Science Dept., Stanford University, June 1980.
+Lenat, Douglas B.. “AM: Automated Discovery in Mathematics”, SIJCAI, August
+1977
+Lenat, D. B., Hayes-Roth, F. and Klahr. P., “Cognitive Economy”, Stanford HPP
+Report HPP-79-15. Computer Science Dept., Stanford University, June 1979.
+Minsky, Marvin, “A Framework for Representing Knowledge”, in 77re I’s#rofogv
+OJ Computer
+Vision. P. Winston (ed.), McGraw-Ilill,
+New York, 1975.
+Nii, II. Penny, and Aiello, N., “AGE (Attempt to Generalize): A KnowledgeBased Program for Building Knowledge-Based Program”, 6IJCAI. August
+1979.
+
+SIGART Newsletter, February 1980 (Special Representation Issue; Brachman &
+Smith, eds.).
+Smith. David and Clavton. Jan. “A Frame-based Production System Architecture”,
+AAAI Conference, .1980.
+Smith, David, “CORLL: A Demand Paging System for Units”, HPP Working
+Paper HPP-80-8, June 1980.
+Stefik, Mark J.. “An Examination of a Frame-Structured Representation System”,
+SIJCAI, August 1977.
+Szolovits, Peter, Hawkinson, Lowell B., and Martin, William A., “An Overview of
+OWL, A Language for Knowledge Representation”, MITLLCS/TM-86,
+Massachusetts Institute of Technology, June 1977.
+Woods, W. A., “What’s in a Link, Foundations for Semantic Networks”, in D. G.
+Bobrow & A. M. Collins (eds.), Representation and Understanding, Academic
+Press, 1975.
+
+,
+
+169
+
+

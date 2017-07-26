@@ -1,0 +1,650 @@
+Towards the Automatic Generation of Fictional Ideas for Games
+Maria Teresa Llano
+
+Michael Cook
+
+Christian Guckelsberger
+
+Goldsmiths, University of London
+United Kingdom
+
+Goldsmiths, University of London
+United Kingdom
+
+Technische Universit¨at Darmstadt
+Germany
+
+Simon Colton
+
+Rose Hepworth
+
+Goldsmiths, University of London
+United Kingdom
+
+Goldsmiths, University of London
+United Kingdom
+
+Abstract
+The invention of fictional ideas is often a central process in the creative production of artefacts such as poems, music, paintings and games. Currently, fictional
+ideation is being studied by the Computational Creativity community within the WHIM European project. The
+aim of WHIM is to develop the What-If Machine, a software system capable of inventing, evaluating and presenting fictional ideas with cultural value. In this paper we explore the potential applications of the What-If
+Machine in the context of games. Specifically, we propose ways in which the What-If Machine can be used
+as an assistant for the design of games, by providing
+ideas about characters, the environment, etc., as well as
+a creative system during gameplay, through interesting
+interactions with the player.
+
+Introduction
+In Marc Saltzman’s book Game Design: Secrets Of The
+Sages (Saltzman 1999) the author reminds the reader “if reality was that fun, people wouldn’t play video games”. The
+quote is intended as a tongue-in-cheek reminder to game designers that providing the player with an interesting experience is more important than staying true to how the real
+world works. However, it also serves as a snappy reminder
+that the interplay between fact and fiction is a major part of
+why people play games. Fictionality is vital to video games,
+whether in creating fantastical situations and imaginative
+game mechanics, or conspicuous in its absence in games
+which pride themselves on accurately simulating certain aspects of the real world.
+Artificial intelligence is being integrated into almost every
+aspect of game development and play. Examples include design assistants like Tanagra (Smith, Whitehead, and Mateas
+2010) and the Game-o-Matic (Treanor et al. 2012), as well
+as software which interacts directly with the player, such as
+the Viewpoints AI system (Jacob et al. 2013). A major aspect of both designing games and their play is the creation
+of fictional ideas or concepts, and engagement with existing
+fictions. To build systems which can perform these tasks, or
+help people perform them, we need an understanding of fictionality and how it relates to video games.
+c 2014, Association for the Advancement of Artificial
+Copyright 
+Intelligence (www.aaai.org). All rights reserved.
+
+Understanding fictional ideation, the process of producing ideas which are in part or entirely imaginary, and building systems to automate this process, is one of the main objectives of Computational Creativity (CC), an area of Artificial Intelligence which involves designing software that
+exhibits behaviours perceived as creative by unbiased observers (Colton and Wiggins 2012). WHIM1 , a CC project,
+aims at developing the What-If Machine, which will be able
+to invent, evaluate and express fictional ideas that serve as
+the basis for cultural creations in different contexts. The
+work presented here describes possible applications of the
+What-If Machine in the context of games.
+The rest of the paper is structured as follows: first we give
+a brief overview of existing fictional ideation approaches.
+Then we provide a brief description of the meaning of fiction within the context of this paper. We next assess how
+fictionality is applied in five video games, chosen from different genres and gameplay forms, in order to identify the
+possible areas in which fictional ideation could be applied in
+this context. We follow by proposing how the What-If Machine can be used as a design assistant for game developers
+and as an in-game system during gameplay. We finish with
+some conclusions and some future research directions.
+
+Background
+A central aspect of creativity is idea generation, and many
+CC researchers have focussed on the study of fictional
+ideation in the last decade. Pereira (2007) implemented a
+system based on the psychological theory of Conceptual
+Blending put forward by Fauconnier and Turner (2008).
+By linking two theories about different subject material,
+novel concepts emerge from the approach. More specifically,
+through conceptual blending partial matches are identified
+between the domains of two input concepts and then carefully selected in order to form a novel ’blended’ concept.
+Using blending to reason about such fictional ideas was harnessed for various creative purposes, including natural language generation (Pereira and Gerv´as 2003), sound design
+(Martins et al. 2004), and for the invention of character models for video games (Pereira and Cardoso 2003).
+In addition, fictional ideation has been applied in the creative generation of characters for stories. Examples of this
+1
+
+www.whim-project.eu
+
+are the Party Quirks (Magerko, Dohogne, and DeLeon 2011)
+and the Flux Capacitor (Veale 2014) systems. The former is
+a digital improvisational theatre game that allows the generation of imaginary characters by manipulating their stereotypical attributes, e.g. a clumsy ninja. The Flux Capacitor,
+on the other hand, defines conceptual start and end points
+to transform the description of characters within a narrative,
+e.g., from good to evil, from rich to poor, etc. These characters are computationally modelled as dynamic blends; i.e.
+they can be used as the input for story generators and developed throughout a narrative. The generation of fictional
+objects that can play functional roles in stories has also been
+studied by Li and Riedl (2011). This is achieved by using
+partial order planning and analogy to find relations between
+typical properties and events of different objects, giving rise
+to new concepts such as a phone that can transmit the flu.
+In the context of WHIM, Llano et al (2014) developed
+three methods to automatically generate fictional ideas. Two
+of these approaches are based on conceptually altering facts
+from the ConceptNet2 and Reverb3 knowledge bases. These
+approaches work by altering the relations that link realworld concepts in order to produce fictional relations between them. The third approach is through bisociative discovery, which identifies linking terms between two different domains in order to produce new associations between
+them. The ideas proposed in this paper are based on the ConceptNet method. A detailed description and example outputs
+from this approach are given later where we present how we
+envisage the method can be tailored to the context of games.
+
+Fiction and Ideation
+Many definitions of fiction rely upon either an assumed distinction from the factual, or the ability of fictions and facts to
+destabilise the other when subjected to critical investigation.
+Fiction is difficult to define, and although there is no room
+to discuss these theoretical issues here, Jean-Marie Schaeffer presents a useful overview of these problems as part of
+the Living Handbook of Narratology (Schaeffer 2012). He
+also offers an account of fiction which we use for the work
+presented here:
+a representation portraying an imaginary/invented universe or world (Schaeffer 2012, Paragraph 9).
+In particular, Schaeffer makes a distinction between fiction and fact: that ‘factual narrative is referential whereas
+fictional narrative has no reference (at least not in “our”
+world)’ (Schaeffer 2012, Paragraph 2). The type of fictional
+ideation we present in relation with video games follows this
+principle; in other words, it has value based on its capacity
+for promoting or reinforcing an imagined world, or its capacity for suggesting a mechanism by which the player can
+interact with that world.
+In the games given as examples in this paper, story-world
+and fictionality interact in different ways, from the relatively
+self-contained imaginary world of Mario Bros. through to
+the imaginative space of Tetris, which although served by
+2
+3
+
+conceptnet5.media.mit.edu
+reverb.cs.washington.edu
+
+fictionalised objectives, could be said to reduce narrative to
+the experience of playing the game itself. Fiction and narrative are both important elements in the construction of
+an immersive experience of games and therefore fictional
+ideation, as envisioned in WHIM, has the potential to become a useful tool in their conception and development.
+
+Fictionality in Games
+The fictionality of games is crucial to their breadth as a creative and entertainment medium. On an aesthetic and artistic
+level, the fictionality of a setting in a game, the narrative and
+other elements convey messages and evoke emotion in the
+player through the use of artificial scenarios. It shares this
+property with any other creative medium, like film, painting or narrative fiction. As an entertainment medium, too,
+fictionality allows a user to be immersed in literally fantastical scenarios, which often rely on their fictional nature
+to present exciting, improbable or compelling worlds and
+events. Most importantly for video games, however, is fictionality of a systemic nature. While the popularity of simulation games, which strive to be realistic, is undeniable, most
+game designers acknowledge that fictionality in the mechanical systems of games is key for their enjoyment. This ranges
+from small adjustments that make a game more enjoyable to
+play, such as the ability of a player to withstand being shot
+without dying, right through to creating mentally challenging and engaging game settings which cannot be constructed
+in the real world, such as being able to cast magic or connect two points in space with portals. Games are wrapped
+in fiction, from their surface-level aesthetics to their deepest
+embedded systems, whether it is through very strong to very
+weak connections to reality.
+In this section we identify some fictional elements, used
+in video games, which could potentially be supported by the
+What-If Machine. The aim of this analysis is to comprehend
+how developers get real world concepts into games as well as
+how these are distorted. In particular, we explore how reality and fiction are portrayed in five well known video games
+in order to create imaginative and interesting scenarios. The
+selected games vary greatly in their environment, goals and
+gameplay mechanics; moreover, there is a different degree
+of realism and fiction portray in every game. As a result,
+this selection allow us to identify some of the many ways in
+which a game feature can be manipulated through fictionality. We selected the following games from different genres:
+Frogger (Konami 1981): An arcade game where players
+have to help frogs get to the other side of a busy road
+and pass through a river avoiding numerous hazards. The
+player must guide the frog and prevent it from getting hit
+by a car, or falling into the river. There is a time limit to
+guide each frog to its destination.
+Granny’s Garden (4Mation 1983): An educational game in
+which the player is tasked with finding and returning the
+children of a King and Queen, who have been captured by
+an evil witch. The player must avoid the witch and various
+obstacles by answering a series of puzzles correctly.
+Tetris (Pajitnov 1984): A puzzle game in pieces of blocks
+shaped as geometric figures are manipulated by the player
+
+while they move from the top to the bottom of the screen.
+The player must create horizontal lines without gaps
+which disappear as soon as they are formed. The speed of
+the descending blocks increases with every level, and the
+player must not allow them to reach the top of the screen.
+Super Mario Bros. (Nintendo EAD 1985): A platform game
+in which the main character, Mario, has to overpass several obstacles in order to rescue a princess from an evil
+turtle-like creature. The player must prevent Mario from
+being killed by various hazards in the way like falling into
+precipices or running out of time.
+Call of Duty 4 – Modern Warfare (Infinity Ward 2007): A
+first-person shooter game seen from the perspectives of a
+US Marine and a British SAS Commando. The purpose
+of the game is to complete missions which are involved in
+several global conflicts. During each mission, the player
+must avoid being killed by the enemies.
+We explore four aspects of the games mentioned above
+which we believe the What-If Machine can support, namely
+characters, environment, game mechanics and narrative.
+We observe the level of reality/fictionality being portrayed
+by identifying realities, half-truths or fictions. Specifically,
+we determine realities to be depicted by elements whose
+intrinsic properties are very close representations of their
+real-world counterparts, half-truths are elements for which
+an intrinsic property deviates completely from reality but
+all other aspects remain truthful, and fictions are elements
+of the games for which the intrinsic properties deviate completely from reality as we know it. In particular, we analyse
+how fiction is achieved by trying to answer two questions:
+“what do we believe was intended to be represented by the
+game designer?” and “how is it actually represented in the
+game?”. Note that the examples selected in this analysis
+have been manually selected through observation by the
+authors by following the criteria mentioned above.
+Realities: real world elements are used in games in order
+to create interesting, yet believable scenarios. In Frogger
+and Call of Duty, the games’ settings are very close to
+reality. Frogger has roads which cars go on and rivers which
+logs float along. The scenarios in Call of Duty replicate
+similar elements to those seen in war zones: the countryside,
+guns, people, uniforms, and so on. Call of Duty mechanical
+controls are mostly realistic as well, the character can
+move, run, crouch, weapons must be reloaded and bullets
+inflict wounds; while in games like Tetris, where the play
+environment is more simple, reality is captured through the
+daily and trivial action of fitting objects by maximising the
+space. However, in games like Granny’s Garden, where the
+environment is static, reality is retained in aspects such as
+the main character, i.e., by using the player as the main
+character of the game. This is largely because there is no
+character to play or control as such. Other characters and the
+narrative voice address the player in the 2nd person, further
+erasing distinction between the two. Reality can also be
+depicted through the visual representation of characters. In
+Super Mario Bros, Mario is a plumber with common human
+abilities such as running and jumping, and Frogger uses
+
+green frogs that can hop like their real-world counterparts.
+Half-Truths: using elements which retain most real
+features but only deviate in small aspects is a common
+approach used in games. In Frogger, a river is used as part
+of the setting; however it is not a faithful depiction of a real
+river since it flows both ways. Furthermore, although the
+look and feel of the frogs resemble reality, their size is the
+same as a lot of the other elements of the game, such as cars.
+In Granny’s Garden, the environment is mostly realistic in
+that objects do what you expect them to do. However, there
+are magical elements of the garden that are imaginative
+constructs. Similarly, animals are able to talk to the player
+and yet in all other respects these animals retain real-world
+characteristics, for example, the bee can sting the dog but
+the butterfly cannot. In Tetris, moving blocks are used as
+the element to be controlled; however, the movement of
+the blocks is constrained to the sides and to rotations of
+90 degrees only. Game mechanics can also be manipulated
+using half-truths, e.g., in Super Mario Bros, Mario collects
+coins as a way of increasing the score; however, the coins
+simply disappear from the screen when they are touched
+by Mario. Finally, in Call of Duty, the environments are
+modelled on real locations but they don’t reflect the specific
+geography or landmarks. Non-player characters are mostly
+realistic, being civilians, combatants or allies, but their
+behaviour is structured to facilitate the story; for example,
+allied soldiers will not advance on a location until the player
+does, to give the player a feeling of control.
+Fictions: in a world with its own resources and rules, fictional elements are largely used to create exciting games.
+Ending conditions, i.e., when the game has reached a state
+where the player has lost, are an example of this. In Frogger,
+fiction is used to model the ending conditions of the game
+in two ways: by making frogs die if they go into the water and by using time limits for frogs to complete the action
+of crossing. The character goal in Granny’s Garden is the
+most fictive element of the game. The children of a King
+and Queen being captured by a witch and the player having
+the task of rescuing them, is an entirely fictional narrative.
+In a simple environment like that of Tetris, fiction is used to
+model a way of liberating space. This is achieved by simply
+making disappear horizontal lines from the screen (when the
+condition of length is met). In Super Mario Bros, the character requires special abilities in order to overcome the various
+obstacles and increase the score. This is achieved by using
+elements from the environment, like mushrooms, to make
+Mario grow double his size in order to protect him from being killed by the enemies and to provide him with more than
+one life in the game. In fact, he can collect more lives by
+actions such as collecting 100 coins. The environment, supposed to depict a Mushroom Kingdom, has various fictional
+elements; for instance, invisible bricks, which if found, provide Mario with coins or powers and a time limit per level
+that takes away a life from Mario when it runs out. Finally, in
+Call of Duty, the character is the feature with most fictional
+elements. Being in war-like zones, the character would be in
+the middle of shootings and life threatening situations; how-
+
+Flowchart to generate fictional ideas for the context of Disney characters. The top ConceptNet process finds instances
+of animals that are filtered through the WordListCategoriser
+process. ConceptNet is used again to find properties of these
+animals, and the information is then rendered through the
+TemplateCombiner processes to produce the fictional ideas.
+The result is saved through the TextSaver processes.
+
+Figure 1: ConceptNet-based fictional ideation process.
+ever, a lot of damage can be inflicted before dying, wounds
+heal if the player remains in cover (out of the way of gunfire) for a few seconds and a bullet to the head has the same
+impact as a bullet to the leg.
+We observed that features of games can be depicted as
+close or as far away from reality, from simple game environments like Tetris to more complex games like Mario or Call
+of Duty, where the rich environment allows for more opportunities to exploit fictionality. Next, we will explore in more
+detail the potential role of the What-If Machine in the context of games based on the insights gained from this section.
+
+Automated Fictional Ideation for Games
+In (Llano et al. 2014) we developed a method for the automatic generation of fictional ideas based on ConceptNet, a semantic network of common sense knowledge produced by web mining techniques at the MIT media lab (Liu
+and Singh 2004). Mined knowledge is represented as facts,
+which comprise relations between concepts in a networklike structure, and a score, from 0.5 upwards, which estimates the likelihood of the relation being true, based on the
+amount of evidence mined. Example facts found in ConceptNet are: [camel, IsA, animal, 7.0] and [animal, CapableOf,
+hear sound, 2.0]. The method consists of altering the world
+modelled by ConceptNet. The technique uses different inversion methods, like negating a relation between two concepts, assigning properties to concepts that are opposed to
+what is found in the knowledge base or are simply not found
+in it, changing the scope of a relationship, etc.
+To carry out the ideation experiments over ConceptNet we
+used FloWr (Charnley, Colton, and Llano 2014), a framework for implementing creative systems as scripts over processes that can be manipulated visually as flowcharts. The
+flowchart in Figure 1 illustrates the use of FloWr to create
+fictional ideas for the context of Disney characters. First, the
+ConceptNet process at the top finds instances of animals by
+searching for facts [X, IsA, animal]. Then, a WordListCat-
+
+egoriser process is used to remove outliers such as [apple,
+IsA, animal]. ConceptNet processes are used again to find
+facts about animals that are specified through the relations:
+CapableOf, Desires, LocatedNear, UsedFor, NotCapableOf
+and HasA. The identified facts are then rendered through
+the TemplateCombiner processes. For instance, the fact [Cat,
+Desires, Milk] is rendered as “What if there was a little cat
+who was afraid of milk?”. Finally the results are stored in
+disk through the TextSaver processes.
+We have tested this methodology by generating fictional
+ideas in different contexts, namely for Disney characters,
+e.g., “What if there was a little cat who learned how to
+ride a bike?”, surrealist art, e.g., “What if you painted a
+dolphin that was made out of gold?”, superhero characters,
+e.g., “What if there was a police officer who had feather
+wings like a bird?” and Kafkaesque inspired characters, e.g.,
+“What if there was a woman who woke up in the sky as a
+bird, but could still speak?”.
+In this section, we will outline how we envisage the application of the What-If Machine to the context of games in
+two roles: as a design assistant and as an in-game system –
+the examples used in this section are manually invented by
+the authors unless stated otherwise.
+
+The What-If Machine as a Design Assistant
+One of the main objectives of CC research is to explore the
+potential of computers to be fully autonomous systems, able
+to create and evaluate material with minimal input, as well
+as systems which are designed to help people to be more
+creative, whether at the level of an inspirational system, a
+tool or a collaborator. CC researches believe that creative
+industry practitioners, as well as the general public, would
+come to appreciate software that is being creative rather than
+merely generative by being exposed to artificially generated
+artefacts and the reasoning behind their creative behaviour.
+The WHIM project is part of this endeavour by highlighting the potential of idea-centric approaches as creative software collaborators. Here we explore this possibility in the
+context of games, where a fictional ideation system such as
+the What-If Machine can be used as a creative collaborator
+by both amateur and professional game developers. Specifically, we are interested in the capabilities of the What-If Machine as an assistant during the design of games by offering
+the developer a series of ideas based on input constraints.
+The examples above illustrate the potential of the system
+to propose interesting game characters. For instance, ‘a little
+cat who learned how to ride a bike’ can be used as a character for children’s games, or ‘the police officer who had
+feather wings like a bird’ could be a superpower acquired
+by a policeman character if the player achieves certain conditions. However, the What-If Machine is currently unable
+to generate ideas like that of a frog that is the same size as
+a car, or enemies that only advance when the player does.
+This is because the knowledge base does not include facts
+that compare two concepts by their attributes, e.g., size, or
+quantitative knowledge to allow the user to make such comparisons. Enriching the knowledge base with this kind of information is a way of tackling this problem; however, this
+solution is not scalable. An alternative is to use systems like
+
+Visuo (Gagn´e and Davies 2013), which estimates quantitative information for input descriptions of scenes by transferring quantitative knowledge to concepts from distributions
+of familiar concepts in memory.
+Game mechanics would be an interesting aspect to explore from the perspective of WHIM, in particular, game
+ending conditions seem to have a great potential. Frogs that
+die when falling into water, or lives taken away when time
+runs out, are examples of the kind of ideas that could be generated. Imagine the What-If Machine is input with the information that pipes are an element of the environment in Super Mario, and that Mario is a plumber. Gathering information about plumbers and pipes, the What-If Machine identifies the following facts from ConceptNet: [plumbers, CapableOf, fixing leaky pipes], [pipes, UsedFor, carry water],
+[water, UsedFor, drown] and [human, CapableOf, drown].
+Then, the idea of Mario drowning due to leaking pipes is
+suggested as an ending condition, with the alternative of
+Mario fixing them, using his ability as a plumber, before the
+water reaches a high level. To achieve this kind of reasoning,
+the What-If Machine must be extended with sentiment analysis, in order to identify for instance, that drowning is a bad
+consequence, as well as inference techniques to find chains
+of facts that lead to ideas like the one above.
+We will also generate different renderings to increase the
+value of fictional ideas. These renderings could be potentially used to target progress conditions in games. For instance, Granny’s Garden uses puzzles as the way of progressing in the quest of finding the missing children. Currently, we are working on generating What am I? riddles to
+render fictional ideas. The clues provided in the riddles include facts describing the object(s) involved in the fictional
+idea and a hint to the transformation that took place and that
+must be guessed. These riddles could be provide conditions
+to progress if the player manages to answer them correctly.
+Game environments like that in Super Mario Bros offer a lot of opportunities to exploit fictionality, contrary to
+games like Tetris, where the environment is more abstract: a
+screen which does not provide a frame of comparison with
+reality for the What-If Machine to build on. Ideas such as
+those produced in the surrealist art context mentioned earlier are examples of how the What-If Machine could be used
+to transform the environment. Imagine for instance, enemies made out of gold which can only be destroyed with
+fire. Or more complex cases like extending the scope of the
+objects in the environment; for instance, having guns that
+shoot bullets with curve trajectories, or stairs that go as high
+as heaven, etc. Again, to achieve these kind of transformations, we would require knowledge about the limitations of
+these objects, such as maximum height, as well as comparative information that allows us to determine for instance,
+that heaven is higher than any stair can reach.
+Similarly, ideas for the story plot could be supported by
+the What-If Machine. The Flux Capacitor system (Veale
+2014) generates interesting character transformations which
+can be used as part of stories. For instance, ‘a King that becomes a slave’ could be used as the goal of a game in which
+the player must prevent the decline of a great sovereign.
+Moreover, in unpublished work, Veale and Valitutti are also
+
+working on generating ideas about utopias and dystopias,
+and the consequences that they bring. For instance, the idea,
+‘A world with fewer zombies is a world with more chaos’,
+could be used as part of the story of a game in which zombies are helpful because they kill enemies, and their absence
+would result in an unmanageable number of hostile troops.
+
+The What-If Machine as an In-game System
+There are many examples of games in which the primary
+mechanic involves creativity on the part of the player. Jason
+Rohrer’s Sleep Is Death4 tasks the player with responding to
+a story being told to them by another player (the game can
+only be played with two people). The emphasis is on creative
+decision-making, and improvising responses to whatever the
+story produces. In Max and the Magic Marker5 , the player
+can draw on the game world to create objects that become
+part of the game’s physics system. This allows the player to
+solve puzzles by drawing new level elements – weights to
+counterbalance catapults, for instance, or staircases to bypass dangerous areas.
+We have already described the potential of the What-If
+Machine as a tool for designers, but the aims of the project
+also make it a potential source of new types of gameplay,
+too. The system’s ability to create and modify fictional concepts could make it a component of games which involve
+dialogue or creative exchanges between the player and the
+game, along the lines of a single-player version of Sleep Is
+Death or similar. Consider a narrative-led game in which the
+player and the game take turns in telling part of the story.
+The player might try and swing the narrative in favour of the
+hero by inventing new characters or events – perhaps they
+suggest that the hero finds a sword in a cave. The What-If
+Machine can dynamically propose ideas that play off this
+and push back against the player. For instance, ConceptNet contains the facts: [sword, HasA, sharp edge] and [sharp
+edge, UsedFor, cut thing], which would allow the system to
+respond to the player by making the sword blunt, and therefore useless for cutting things.
+This example does not offer much in the way of gameplay,
+but it illustrates the kinds of experience that the What-If Machine might offer if integrated into a game. This improvisational back-and-forth is integral to many forms of gameplay,
+particularly pen-and-paper role-playing games such as Dungeons and Dragons. The ability to repair or adjust a scenario
+on-the-fly with invented ideas could add a huge amount of
+flexibility to many computer RPG systems, and perhaps even
+contribute to entirely new kinds of games by allowing the
+player to engage in invention.
+
+Conclusions and Future Work
+Fiction is a mechanism extensively used in a lot of aspects of
+games. In the WHIM project, we are interested in building
+a software system, the What-If Machine, that automatically
+generates, evaluates and presents fictional ideas, a system
+that can be used as a creative collaborative partner, or as an
+autonomous agent, in different contexts of cultural creation.
+4
+5
+
+www.sleepisdeath.net
+www.maxandthemagicmarker.com
+
+We have explored the role of fictionality by identifying
+how fiction is used in five well known video games, and proposed two potential roles of the What-If Machine in this context: as a game design assistant and as an in-game system.
+Specifically, we identified the potential of the What-If Machine to provide ideas in the creation of characters, imaginary environment, game mechanics and narrative. Moreover,
+being game design a holistic approach, we believe the WhatIf Machine can work as an assistant during the entire design
+process. We believe the system will be able to produce connected fictional ideas which refer to different aspects of a
+game but that represent compound settings for it. Causality
+and event associations are particular mechanisms the WHIM
+team are currently exploring in order achieve this kind of
+output from the system.
+We have identified ways in which the What-If Machine
+can be extended to produce more elaborate fictional ideas,
+which are applicable to the context of games as well as
+other types of cultural artefacts. In particular, a lot of fictions are formed by comparing attributes between concepts
+that belong to different domains; however, current knowledge bases, like ConceptNet, do not provide the type of information required to make these comparisons. Currently we
+are working on two ways of acquiring this knowledge: i) by
+extracting information from Metaphor Eyes6 (Veale 2013), a
+system used for metaphor processing that mines information
+from the web, and ii) by exploring the use of systems such as
+Visuo (Gagn´e and Davies 2013), to estimate quantitative information by transferring knowledge from familiar concepts
+in memory. Additionally, we will integrate inference chaining techniques and sentiment analysis into the generation of
+fictional ideas. We believe this will allow us to explore different scenarios that can arise from a fictional idea.
+Being able to measure the value of an idea is an important
+aspect of our research. Currently we evaluate the ideas generated by the What-If Machine through an inference chaining technique inspired by the hypothesis that ideas can be
+evaluated through narratives involving them. In (Llano et al.
+2014) we carried out a crowd sourcing study to asses this
+technique. We found a positive correlation of how people
+assess the quality of fictional ideas with our chaining technique. We also found that emotional response, narrative potential and level of expectation are key elements of people’s
+general impression of fictional ideas. As future work, we
+plan to implement rendering methods that will take narratives for an idea and produce interpretations of them which
+add value. We will experiment with the number and nature
+of scenarios arising from an idea and test the hypothesis that
+presenting a moderate amount of supporting information can
+motivate people to expand the idea, and thus begin to own
+and appreciate it more.
+We plan to carry out crowd sourcing studies to determine how people react and rank fictional ideas and different
+renderings of them in the context of games. A first prototype of the What-If Machine is available online7 . Users can
+parametrise the system for exploration, or simply click the
+6
+7
+
+ngrams.ucd.ie/metaphor-eye/
+www.whim-project.eu/whatifmachine/
+
+‘I’m feeling lucky’ button. This implementation will be used
+to gather feedback for audience modelling, and help promote
+fictional ideation as a major new area for CC research.
+As an educational activity, we asked two 15 year-old students to explore the online prototype and choose one fictional idea as the basis for a video game. They selected the
+idea “What if there was a little whale who couldn’t swim?”
+and came up with a novel game that involves humorous and
+social elements (see the appendix). The students also mentioned that although the system is an early version, they liked
+being able to work out which facts had been inverted and
+playing around with the options to get ideas about the object
+they chose. The success with this small activity is promising and shows that there could well be scope for the What-If
+Machine to assist in the design of interesting cultural artefacts. We plan to work more formally with creative writing
+and film students in order to analyse the possible interactions with the system, and we hope to show that automated
+fictional ideation has much potential to increase.
+
+Acknowledgments
+We would like to thank Brandon Wilson and Leo Cordery
+Smith for exploring the online prototype of the What-If Machine and for writing a game description from one of the
+generated ideas. We are also grateful to the members of the
+Computational Creativity Group at Goldsmiths for their useful feedback, and the anonymous reviewers for their constructive comments. This research was supported by EPSRC
+grant EP/100206X as well as through EC funding for the
+project WHIM 611560 by FP7, the ICT theme, and the Future Emerging Technologies FET programme.
+
+Appendix: Lenny the Whale
+
+Figure 2: Sketch of the game Lenny the Whale.
+A video game description created and written by Brandon Wilson and Leo Cordery Smith, two 15 year-old students, based on the fictional idea “What if there was a little
+whale who couldn’t swim?” taken from the online What-If
+Machine prototype.
+1. This video game would be about a whale who
+couldn’t swim and his family were migrating for winter. As he couldn’t swim, he was either going to have
+to learn how to swim or he would be left behind.
+
+2. The aim of the game would be to teach the whale how
+to swim by completing various levels in the game and
+talking to people you meet around the ocean who will
+teach you how.
+3. The back story of the game is the whale has 10 other
+brothers and sisters who can all swim but because
+he was born with a deformed fin which meant he
+couldn’t swim as well as the other whales.
+4. The main character would be called Lenny. He is a
+whale who is incapable of swimming.
+5. The character would encounter the following obstacles in his way:
+• Primarily, he would try to learn how to swim by
+being taught by people he meets.
+• Secondly, he would try and overcome his fear of
+drowning and being away from his mother.
+• Thirdly, he would have to grow accustomed to people laughing at and mocking his deformed fin.
+• Then, he would have to learn to utilise his small fin
+to make him move faster.
+• Finally, he would have to swim across the ocean
+with his family when they migrate in the winter.
+6. The player scores points by completing objectives
+quicker such as him completing tasks set by the people who teach him how to swim.
+7. This game might appeal to a younger audience as the
+main character tackles issues which most children
+face in school such as bullying or acclimatising to a
+new surrounding or new people.
+By Brandon Wilson and Leo Cordery Smith.
+
+References
+4Mation.
+1983.
+Granny’s Garden.
+4Mation.
+www.4mation.co.uk/cat/granny.html.
+Charnley, J.; Colton, S.; and Llano, M. T. 2014. The FloWr
+framework: Automated flowchart construction, optimisation
+and alteration for creative systems. In Proceedings of the 5th
+International Conference on Computational Creativity.
+Colton, S., and Wiggins, G. 2012. Computational Creativity: The final frontier? In Proceedings of the 20th European
+Conference on Aritificial Intelligence, volume 242 of Frontiers in Artificial Intelligence and Applications. IOS Press.
+Fauconnier, G., and Turner, M. 2008. The way we think:
+Conceptual blending and the mind’s hidden complexities.
+Basic Books.
+Gagn´e, J., and Davies, J. 2013. Visuo: A model of visuospatial instantiation of quantitative magnitudes. The Knowledge
+Engineering Review 28(3):347–366.
+Infinity Ward. 2007. Call of Duty: Modern warfare. Activision. www.callofduty.com.
+Jacob, M.; Coisne, G.; Gupta, A.; Sysoev, I.; Verma, G. G.;
+and Magerko, B. 2013. Viewpoints AI. In Proceedings of
+the 9th Conference on Artificial Intelligence and Interactive
+Digital Entertainment. The AAAI Press.
+Konami.
+1981.
+Frogger.
+Sega/Gremlin.
+www.happyhopper.org.
+
+Li, B., and Riedl, M. O. 2011. A phone that cures your flu:
+Generating imaginary gadgets in fictions with planning and
+analogies. In Intelligent Narrative Technologies IV, 2011
+AIIDE Workshop, volume WS-11-18 of AAAI Workshops.
+The AAAI Press.
+Liu, H., and Singh, P. 2004. Commonsense reasoning in
+and over natural language. In Proceedings of the 8th International Conference on Knowledge-Based Intelligent Information and Engineering Systems, volume 3215 of Lecture
+Notes in Computer Science, 293–306. Springer.
+Llano, M. T.; Hepworth, R.; Colton, S.; Gow, J.; Charnˇ
+ley, J.; Lavraˇc, N.; Znidarˇ
+siˇc, M.; Perovˇsek, M.; GranrothWilding, M.; and Clark, S. 2014. Baseline methods for
+automated fictional ideation. In Proceedings of the 5th International Conference on Computational Creativity.
+Magerko, B.; Dohogne, P.; and DeLeon, C. 2011. Employing fuzzy concept for digital improvisational theatre. In
+Proceedings of the 7th AAAI Conference on Artificial Intelligence and Interactive Digital Entertainment, AIIDE 2011.
+The AAAI Press.
+Martins, J.; Pereira, F.; Miranda, E.; and Cardoso, A. 2004.
+Enhancing sound design with conceptual blending of sound
+descriptors. In Proceedings of the 1st Joint Workshop on
+Computational Creativity.
+Nintendo EAD. 1985. Super Mario Bros. Nintendo.
+mario.nintendo.com.
+Pajitnov, A.
+1984.
+Tetris.
+Spectrum HoloByte.
+www.tetris.com.
+Pereira, F., and Cardoso, A. 2003. The horse-bird creature
+generation experiment. The Interdisciplinary Journal of Artifitial Intelligence and the Simulation of Behavior 1(3):257–
+280.
+Pereira, F., and Gerv´as, P. 2003. Natural language generation from concept blends. In Proceedings of the AISB
+Symposium on AI and Creativity in Arts and Science.
+Pereira, F. 2007. Creativity and AI: A Conceptual Blending
+Approach. Mouton de Gruyter.
+Saltzman, M. 1999. Game Design: Secrets of the Sages.
+Brady Games.
+Schaeffer, J.-M. 2012. Fictional vs. Factual narration, In:
+H¨uhn, Peter et al. (eds.): The living handbook of narratology.
+Hamburg: Hamburg University Press.
+Smith, G.; Whitehead, J.; and Mateas, M. 2010. Tanagra:
+A mixed-initiative level design tool. In Proceedings of the
+5th International Conference on the Foundations of Digital
+Games, 209–216. ACM.
+Treanor, M.; Blackford, B.; Mateas, M.; and Bogost, I.
+2012. Game-O-Matic: Generating videogames that represent ideas. In Proceedings of the 3rd Workshop on Procedural Content Generation in Games.
+Veale, T. 2013. A service-oriented architecture for computational creativity. Journal of Computing Science and Engineering 7(3):159–167.
+Veale, T. 2014. Coming good and breaking bad: Generating
+transformative character arcs for use in compelling stories.
+In Proceedings of the 5th International Conference on Computational Creativity.
+
+
